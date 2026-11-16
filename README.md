@@ -235,6 +235,8 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 
 Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải lại. Sau khi sửa mã backend hoặc biến môi trường, dừng và chạy lại máy chủ.
 
+Trên điện thoại, header sắp xếp logo và các biểu tượng thao tác ở hàng đầu, ô tìm kiếm ở hàng riêng, tiếp theo là menu một hàng gồm **Trang chủ**, **Sản phẩm** và **Đơn của tôi**. Biểu tượng xe giao hàng mở tra cứu đơn, hình người mở tài khoản, giỏ hàng mở trang giỏ và mặt trăng/mặt trời đổi giao diện sáng/tối.
+
 ## Kiểm tra nhanh và xử lý lỗi
 
 Mở hai API sau để kiểm tra bản demo trực tuyến trả dữ liệu.
