@@ -11,7 +11,7 @@ Bản demo chạy trên Cloudflare Workers và SQLite-backed Durable Object thu�
 
 Đơn hàng, tài khoản, tồn kho, quảng cáo, phiên đăng nhập và ảnh tải lên được lưu trên Cloudflare. Dữ liệu trực tuyến và [database trên máy](backend/shop.sqlite) được quản lý riêng. Lần triển khai đầu tiên nhập dữ liệu từ database của repo. Những lần cập nhật mã nguồn tiếp theo tiếp tục sử dụng dữ liệu trực tuyến đang có.
 
-Email đặt lại mật khẩu và thông báo đơn hàng cần cấu hình SMTP. Bản demo hiện để trống cấu hình email. Chuyển khoản ngân hàng hiện theo thông tin cấu hình của cửa hàng.
+Bản demo hiện dùng thanh toán khi nhận hàng (COD). Để bật chuyển khoản, cần khai báo ba biến thông tin ngân hàng trong cấu hình Worker. Hướng dẫn SMTP bên dưới áp dụng cho bản Node.js local. Bật email trên Workers cần cấu hình SMTP và bộ xử lý gửi email, gồm hàng đợi thông báo đơn hàng.
 
 ## Chuẩn bị
 
