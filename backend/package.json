@@ -5,6 +5,8 @@
   "main": "server.cjs",
   "scripts": {
     "start": "node server.cjs",
+    "dev:cloudflare": "wrangler dev",
+    "deploy": "wrangler deploy",
     "tao-admin": "node scripts/tao-admin.cjs",
     "xem-don": "node scripts/xem-don.cjs",
     "test": "echo \"Error: no test specified\" && exit 1"

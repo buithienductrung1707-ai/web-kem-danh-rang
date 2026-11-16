@@ -1,5 +1,6 @@
 const { randomUUID } = require("node:crypto");
 const db = require("../db/database.cjs");
+const { runTransaction } = require("../db/transaction.cjs");
 const { enqueueOrderEmail } = require("./email-outbox.cjs");
 const { normalizeRecipientEmail } = require("./mailer.cjs");
 
@@ -254,20 +255,15 @@ function createOrder(payload, { customerId = null, expectedCustomerId } = {}) {
   }
 
   const sortedItems = [...items].sort((a, b) => a.productId - b.productId);
-  db.exec("BEGIN IMMEDIATE");
-  try {
-    const result = saveOrder(payload, sortedItems, paymentMethod, { customerId, expectedCustomerId, requestEmail });
-    db.exec(result.status >= 400 ? "ROLLBACK" : "COMMIT");
-    return result;
-  } catch (error) {
-    db.exec("ROLLBACK");
-    throw error;
-  }
+  return runTransaction(
+    db,
+    () => saveOrder(payload, sortedItems, paymentMethod, { customerId, expectedCustomerId, requestEmail }),
+    { rollbackIf: result => result.status >= 400 }
+  );
 }
 
 function changeOrderStatus(id, expectedStatus, targetStatus, adminId) {
-  db.exec("BEGIN IMMEDIATE");
-  try {
+  return runTransaction(db, () => {
     const current = findOrderStatus.get(id, id);
     let result;
 
@@ -279,7 +275,6 @@ function changeOrderStatus(id, expectedStatus, targetStatus, adminId) {
       result = { status: 409, body: { error: "Đơn hàng đã đổi trạng thái. Hãy tải lại danh sách." } };
     } else {
       if (targetStatus === "CANCELLED" && !restoreReservedStock(current.id)) {
-        db.exec("ROLLBACK");
         return {
           status: 409,
           body: { error: "Chưa thể hoàn số lượng về kho. Hãy kiểm tra số lượng sản phẩm rồi thử hủy lại." }
@@ -296,12 +291,8 @@ function changeOrderStatus(id, expectedStatus, targetStatus, adminId) {
       result = { status: 200, body: updated };
     }
 
-    db.exec(result.status >= 400 ? "ROLLBACK" : "COMMIT");
     return result;
-  } catch (error) {
-    db.exec("ROLLBACK");
-    throw error;
-  }
+  }, { rollbackIf: result => result.status >= 400 });
 }
 
 function restoreReservedStock(orderId) {
@@ -316,8 +307,7 @@ function restoreReservedStock(orderId) {
 }
 
 function deleteOrder(id, expectedStatus) {
-  db.exec("BEGIN IMMEDIATE");
-  try {
+  return runTransaction(db, () => {
     const current = findOrderForDeletion.get(id, id);
     let result;
 
@@ -340,12 +330,8 @@ function deleteOrder(id, expectedStatus) {
       result = { status: 200, body: { id: current.id, deleted: true } };
     }
 
-    db.exec(result.status >= 400 ? "ROLLBACK" : "COMMIT");
     return result;
-  } catch (error) {
-    db.exec("ROLLBACK");
-    throw error;
-  }
+  }, { rollbackIf: result => result.status >= 400 });
 }
 
 module.exports = { createOrder, getOrderItems, getOrderHistory, changeOrderStatus, deleteOrder };

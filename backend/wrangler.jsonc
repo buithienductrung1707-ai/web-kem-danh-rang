@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "web-kem-danh-rang",
+  "account_id": "546457305ee72c7e896994d8ddc97c9c",
+  "main": "cloudflare/worker.js",
+  "compatibility_date": "2026-11-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "build": {
+    "command": "node cloudflare/build-seed.cjs"
+  },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "run_worker_first": ["/", "/api/*", "/uploads/products/*"]
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "SHOP_BACKEND", "class_name": "ShopBackend" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ShopBackend"] }],
+  "vars": {
+    "SHOP_PUBLIC_URL": "https://web-kem-danh-rang.buithienductrung1707.workers.dev"
+  }
+}

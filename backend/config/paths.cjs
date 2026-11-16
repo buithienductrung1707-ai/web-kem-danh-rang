@@ -1,6 +1,6 @@
 const path = require("node:path");
 
-const backendDirectory = path.resolve(__dirname, "..");
+const backendDirectory = typeof __dirname === "string" ? path.resolve(__dirname, "..") : "/bundle";
 
 module.exports = {
   databasePath: path.join(backendDirectory, "shop.sqlite"),

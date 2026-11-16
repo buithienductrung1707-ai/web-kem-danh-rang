@@ -4,8 +4,10 @@ const { rateLimit } = require("express-rate-limit");
 const { randomBytes, scrypt, timingSafeEqual, createHash } = require("node:crypto");
 const { promisify } = require("node:util");
 const db = require("../db/database.cjs");
+const { runTransaction } = require("../db/transaction.cjs");
 const { getOrderItems } = require("../services/orders.cjs");
 const mailer = require("../services/mailer.cjs");
+const { getSessionOptions } = require("../services/session-options.cjs");
 
 const router = express.Router();
 const deriveKey = promisify(scrypt);
@@ -40,16 +42,7 @@ function requireSameOrigin(req, res, next) {
 
 router.use(requireSameOrigin);
 router.use(express.json({ limit: "16kb" }));
-const customerSession = session({
-  name: cookieName,
-  secret: randomBytes(32).toString("hex"),
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    ...cookieOptions,
-    maxAge: 8 * 60 * 60 * 1000
-  }
-});
+const customerSession = session(getSessionOptions(cookieName, cookieOptions));
 router.use(customerSession);
 
 const loginLimiter = rateLimit({
@@ -327,19 +320,15 @@ router.post("/reset-password", resetPasswordLimiter, async (req, res) => {
   const salt = randomBytes(16).toString("hex");
   const hash = await deriveKey(password, salt, 64, passwordOptions);
 
-  db.exec("BEGIN IMMEDIATE");
-  try {
+  const passwordChanged = runTransaction(db, () => {
     const reset = findPasswordReset.get(tokenHash, Date.now());
     if (!reset || !resetCustomerPassword.get(salt, hash.toString("hex"), reset.customer_id, reset.password_salt)) {
-      db.exec("ROLLBACK");
-      return res.status(400).json(invalidToken);
+      return false;
     }
     db.prepare("DELETE FROM password_resets WHERE customer_id = ?").run(reset.customer_id);
-    db.exec("COMMIT");
-  } catch (error) {
-    db.exec("ROLLBACK");
-    throw error;
-  }
+    return true;
+  }, { rollbackIf: result => !result });
+  if (!passwordChanged) return res.status(400).json(invalidToken);
   res.json({ message: "Đã cập nhật mật khẩu. Hãy đăng nhập bằng mật khẩu mới." });
 });
 

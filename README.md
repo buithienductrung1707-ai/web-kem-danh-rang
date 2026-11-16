@@ -2,6 +2,17 @@
 
 Website bán hàng bằng tiếng Việt, gồm cửa hàng cho khách và trang quản trị. Frontend dùng HTML, CSS và JavaScript. Backend dùng Node.js, Express và SQLite, đồng thời phục vụ các trang web từ cùng một địa chỉ.
 
+## Bản demo trực tuyến
+
+- [Mở cửa hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev)
+- [Mở trang quản trị](https://web-kem-danh-rang.buithienductrung1707.workers.dev/admin.html)
+
+Bản demo chạy trên Cloudflare Workers và SQLite-backed Durable Object thuộc gói miễn phí, sử dụng tên miền phụ `workers.dev`. Website tiếp tục hoạt động khi tắt máy tính cá nhân. Đăng nhập admin bằng tài khoản có trong database tại lần triển khai đầu tiên.
+
+Đơn hàng, tài khoản, tồn kho, quảng cáo, phiên đăng nhập và ảnh tải lên được lưu trên Cloudflare. Dữ liệu trực tuyến và [database trên máy](backend/shop.sqlite) được quản lý riêng. Lần triển khai đầu tiên nhập dữ liệu từ database của repo. Những lần cập nhật mã nguồn tiếp theo tiếp tục sử dụng dữ liệu trực tuyến đang có.
+
+Email đặt lại mật khẩu và thông báo đơn hàng cần cấu hình SMTP. Bản demo hiện để trống cấu hình email. Chuyển khoản ngân hàng hiện theo thông tin cấu hình của cửa hàng.
+
 ## Chuẩn bị
 
 - Cài [Git](https://git-scm.com/downloads) và [Node.js](https://nodejs.org/en/download). Môi trường đã kiểm tra là **Node.js 26.13.1**.
@@ -193,7 +204,8 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Đường dẫn | Nội dung |
 | --- | --- |
 | [backend/public/](backend/public/) | Các trang HTML, CSS, JavaScript và ảnh giao diện |
-| [backend/src/server.cjs](backend/src/server.cjs) | Khởi tạo Express, API công khai và phục vụ frontend |
+| [backend/src/server.cjs](backend/src/server.cjs) | Chạy máy chủ Node.js trên máy cá nhân |
+| [backend/src/app.cjs](backend/src/app.cjs) | Ứng dụng Express, API công khai và phục vụ frontend |
 | [backend/src/routes/admin.cjs](backend/src/routes/admin.cjs) | Đăng nhập và API quản trị |
 | [backend/src/routes/account.cjs](backend/src/routes/account.cjs) | Tài khoản, hồ sơ, đơn của khách và khôi phục mật khẩu |
 | [backend/src/db/database.cjs](backend/src/db/database.cjs) | Schema, nâng cấp cấu trúc và dữ liệu mẫu |
@@ -201,6 +213,8 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | [backend/src/utils/](backend/src/utils/) | Lọc đơn và xuất CSV |
 | [backend/scripts/](backend/scripts/) | Tạo admin và xem đơn bằng Terminal |
 | [backend/config/](backend/config/) | Đường dẫn dữ liệu và mẫu cấu hình |
+| [backend/cloudflare/](backend/cloudflare/) | Entry point Workers, SQLite, phiên đăng nhập và ảnh trực tuyến |
+| [backend/wrangler.jsonc](backend/wrangler.jsonc) | Cấu hình triển khai Cloudflare |
 | [backend/server.cjs](backend/server.cjs) | Điểm chạy cho `npm.cmd start` |
 
 ### Chỉnh sửa giao diện
@@ -232,12 +246,30 @@ Mở hai API sau để kiểm tra máy chủ trả dữ liệu.
 | `EADDRINUSE` ở cổng 3000 | Tìm Terminal đang chạy website, bấm Ctrl + C để dừng lần chạy đó, rồi khởi động lại. |
 | Giao diện vẫn hiển thị bản cũ | Bấm Ctrl + F5 trong trình duyệt. |
 | Thông báo email chưa sẵn sàng | Điền cấu hình SMTP và chạy bằng `node --env-file=smtp.env server.cjs`. |
-| Trang yêu cầu đăng nhập lại sau khi khởi động máy chủ | Đăng nhập lại. Phiên tài khoản được lưu trong bộ nhớ tiến trình và có thời hạn tối đa 8 giờ. |
+| Trang local yêu cầu đăng nhập lại sau khi khởi động máy chủ | Đăng nhập lại. Phiên local được lưu trong bộ nhớ tiến trình và có thời hạn tối đa 8 giờ. Phiên trên Cloudflare được lưu cùng dữ liệu trực tuyến. |
 
 Trong [package.json](backend/package.json), lệnh `npm.cmd test` hiện được cấu hình trả thông báo `Error: no test specified`. Có thể dùng kiểm tra API và thao tác thử trên giao diện theo các mục trên để kiểm tra bản cài đặt.
 
-## Cách chạy hiện tại
+## Cập nhật bản demo Cloudflare
 
-Máy chủ đang được cấu hình lắng nghe tại **127.0.0.1, cổng 3000** trong [src/server.cjs](backend/src/server.cjs). Website hoạt động khi tiến trình Node.js đang chạy trên máy.
+Chạy các lệnh sau từ thư mục [backend/](backend/). Lệnh đăng nhập mở trình duyệt để bạn cấp quyền cho Wrangler sử dụng tài khoản Cloudflare của mình.
 
-Để vận hành liên tục trên Internet, cần triển khai backend lên máy chủ Node.js, cấu hình địa chỉ lắng nghe theo môi trường triển khai, HTTPS, phiên đăng nhập và nơi lưu bền database cùng ảnh tải lên.
+```powershell
+npm.cmd ci
+npx.cmd wrangler login
+npm.cmd run deploy
+```
+
+Đích triển khai được khai báo trong [wrangler.jsonc](backend/wrangler.jsonc). Build tự tạo snapshot từ [shop.sqlite](backend/shop.sqlite) trong thư mục tạm `.cloudflare`, sau đó tải mã backend và ảnh giao diện lên Cloudflare. Snapshot dùng để khởi tạo database trực tuyến ở lần đầu.
+
+Để thử môi trường Workers trên máy trước khi triển khai, dùng lệnh sau rồi mở địa chỉ Wrangler hiển thị.
+
+```powershell
+npm.cmd run dev:cloudflare
+```
+
+Phần sao lưu SQLite và ảnh ở trên áp dụng cho bản chạy local. Với dữ liệu trực tuyến, dùng mục Durable Objects trong Cloudflare để quản lý database và khả năng khôi phục được cung cấp cho gói hiện tại.
+
+Giữ nguyên tên Worker, binding `SHOP_BACKEND`, tên class `ShopBackend` và tên instance `storefront` khi cập nhật để tiếp tục truy cập đúng database. Gói miễn phí có hạn mức sử dụng, phù hợp cho bản demo ít người truy cập. Xem [hạn mức Workers](https://developers.cloudflare.com/workers/platform/limits/) và [hạn mức Durable Objects](https://developers.cloudflare.com/durable-objects/platform/pricing/).
+
+Khi dùng `npm.cmd start`, website vẫn chạy trên máy cá nhân tại **127.0.0.1, cổng 3000** qua [src/server.cjs](backend/src/server.cjs).

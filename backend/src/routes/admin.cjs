@@ -10,6 +10,7 @@ const { parseOrderFilters, orderFilterSql, orderFilterParameters } = require("..
 const { ordersToCsv } = require("../utils/order-export.cjs");
 const { getAdminBanners, updateBanner } = require("../services/banners.cjs");
 const { outboxSummary, retryFailedEmails } = require("../services/email-outbox.cjs");
+const { getSessionOptions } = require("../services/session-options.cjs");
 
 const router = express.Router();
 const deriveKey = promisify(scrypt);
@@ -38,16 +39,7 @@ router.use((req, res, next) => {
   next();
 });
 
-router.use(session({
-  name: cookieName,
-  secret: randomBytes(32).toString("hex"),
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    ...cookieOptions,
-    maxAge: 8 * 60 * 60 * 1000
-  }
-}));
+router.use(session(getSessionOptions(cookieName, cookieOptions)));
 
 const loginLimiter = rateLimit({
   windowMs: 60 * 1000,

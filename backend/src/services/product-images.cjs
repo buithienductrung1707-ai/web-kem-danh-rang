@@ -4,6 +4,7 @@ const fs = require("node:fs/promises");
 const { createHash, randomUUID } = require("node:crypto");
 const { crc32 } = require("node:zlib");
 const { publicDirectory } = require("../../config/paths.cjs");
+const { getRuntime } = require("../runtime.cjs");
 
 const maximumImageBytes = 5 * 1024 * 1024;
 const imageExtensions = {
@@ -143,6 +144,28 @@ function validWebp(data) {
   return offset === data.length && hasFrame;
 }
 
+async function saveImageToFilesystem(uploadDirectory, filename, data) {
+  const target = path.join(uploadDirectory, filename);
+  const temporary = path.join(uploadDirectory, `.${filename}-${randomUUID()}.tmp`);
+  await fs.mkdir(uploadDirectory, { recursive: true });
+  let created = false;
+  try {
+    await fs.writeFile(temporary, data, { flag: "wx" });
+    try {
+      // Publish a fully written file without replacing a concurrent upload.
+      await fs.link(temporary, target);
+      created = true;
+    } catch (error) {
+      if (error.code !== "EEXIST") throw error;
+    }
+  } finally {
+    await fs.unlink(temporary).catch(error => {
+      if (error.code !== "ENOENT") throw error;
+    });
+  }
+  return created;
+}
+
 function createProductImageUpload({
   uploadDirectory = path.join(publicDirectory, "uploads", "products")
 } = {}) {
@@ -184,24 +207,10 @@ function createProductImageUpload({
 
     const hash = createHash("sha256").update(data).digest("hex");
     const filename = `${hash}.${imageExtensions[contentType]}`;
-    const target = path.join(uploadDirectory, filename);
-    const temporary = path.join(uploadDirectory, `.${hash}-${randomUUID()}.tmp`);
-    await fs.mkdir(uploadDirectory, { recursive: true });
-    let created = false;
-    try {
-      await fs.writeFile(temporary, data, { flag: "wx" });
-      try {
-        // Publish a fully written file without replacing a concurrent upload.
-        await fs.link(temporary, target);
-        created = true;
-      } catch (error) {
-        if (error.code !== "EEXIST") throw error;
-      }
-    } finally {
-      await fs.unlink(temporary).catch(error => {
-        if (error.code !== "ENOENT") throw error;
-      });
-    }
+    const runtime = getRuntime();
+    const created = runtime?.saveImage
+      ? await runtime.saveImage(filename, data, contentType)
+      : await saveImageToFilesystem(uploadDirectory, filename, data);
 
     res.status(created ? 201 : 200).json({ imageUrl: `/uploads/products/${filename}` });
   }

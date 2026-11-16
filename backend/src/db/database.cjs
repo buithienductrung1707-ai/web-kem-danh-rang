@@ -1,12 +1,13 @@
 const { databasePath } = require("../../config/paths.cjs");
 const { Database } = require("node:sqlite");
+const { runTransaction } = require("./transaction.cjs");
+const { getRuntime } = require("../runtime.cjs");
 
-const db = new Database(databasePath);
+const db = getRuntime()?.database || new Database(databasePath);
 
 db.exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
-db.exec("BEGIN IMMEDIATE");
 
-try {
+function initializeSchema() {
   const bannersExist = db.prepare(`
     SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'home_banners'
   `).get();
@@ -269,10 +270,11 @@ try {
   if (!productColumns.has("image_url")) {
     db.exec("UPDATE products SET image_url = '/kem-danh-rang.jpg' WHERE id = 1");
   }
+}
 
-  db.exec("COMMIT");
+try {
+  runTransaction(db, initializeSchema);
 } catch (error) {
-  db.exec("ROLLBACK");
   db.close();
   throw error;
 }
