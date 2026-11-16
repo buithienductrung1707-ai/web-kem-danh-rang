@@ -4,8 +4,16 @@ Website bán hàng bằng tiếng Việt, gồm cửa hàng cho khách và trang
 
 ## Bản demo trực tuyến
 
-- [Mở cửa hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev)
-- [Mở trang quản trị](https://web-kem-danh-rang.buithienductrung1707.workers.dev/admin.html)
+| Trang | Đường dẫn |
+| --- | --- |
+| Trang chủ | [Mở trang chủ](https://web-kem-danh-rang.buithienductrung1707.workers.dev/) |
+| Kem đánh răng | [Xem sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/kem-danh-rang.html) |
+| Giỏ hàng và đặt hàng | [Mở giỏ hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/gio-hang.html) |
+| Đăng ký | [Tạo tài khoản](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-ky.html) |
+| Đăng nhập, thông tin tài khoản | [Mở tài khoản](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html) |
+| Đơn hàng của tôi | [Xem đơn đã đặt](https://web-kem-danh-rang.buithienductrung1707.workers.dev/don-hang.html) |
+| Tra cứu đơn hàng | [Tra cứu trạng thái đơn](https://web-kem-danh-rang.buithienductrung1707.workers.dev/tra-cuu.html) |
+| Quản trị cửa hàng | [Đăng nhập quản trị](https://web-kem-danh-rang.buithienductrung1707.workers.dev/admin.html) |
 
 Bản demo chạy trên Cloudflare Workers và SQLite-backed Durable Object thuộc gói miễn phí, sử dụng tên miền phụ `workers.dev`. Website tiếp tục hoạt động khi tắt máy tính cá nhân. Đăng nhập admin bằng tài khoản có trong database tại lần triển khai đầu tiên.
 
@@ -19,7 +27,7 @@ Bản demo hiện dùng thanh toán khi nhận hàng (COD). Để bật chuyển
 - Đăng nhập GitHub bằng tài khoản có quyền truy cập repo riêng tư này.
 - Mở PowerShell hoặc Terminal trong VS Code. Các lệnh dưới đây dành cho Windows PowerShell và dùng `npm.cmd` đi kèm Node.js.
 
-## Tải và chạy website
+## Tải và chạy website trên máy cá nhân
 
 Mở Terminal tại nơi bạn muốn lưu dự án, rồi chạy lần lượt từng dòng.
 
@@ -34,18 +42,7 @@ npm.cmd start
 
 `npm.cmd ci` cài các thư viện theo phiên bản trong [package-lock.json](backend/package-lock.json). Khi máy chủ sẵn sàng, Terminal hiển thị `Cửa hàng đang chạy tại http://127.0.0.1:3000`.
 
-Mở các địa chỉ sau trong trình duyệt.
-
-| Trang | Địa chỉ |
-| --- | --- |
-| Trang chủ | <http://127.0.0.1:3000/> |
-| Kem đánh răng | <http://127.0.0.1:3000/kem-danh-rang.html> |
-| Giỏ hàng và đặt hàng | <http://127.0.0.1:3000/gio-hang.html> |
-| Đăng ký | <http://127.0.0.1:3000/dang-ky.html> |
-| Đăng nhập, thông tin tài khoản | <http://127.0.0.1:3000/dang-nhap.html> |
-| Đơn hàng của tôi | <http://127.0.0.1:3000/don-hang.html> |
-| Tra cứu đơn hàng | <http://127.0.0.1:3000/tra-cuu.html> |
-| Quản trị cửa hàng | <http://127.0.0.1:3000/admin.html> |
+Mở [website trên máy cá nhân](http://127.0.0.1:3000/) trong trình duyệt sau khi chạy máy chủ.
 
 Giữ Terminal chạy trong lúc sử dụng website. Bấm **Ctrl + C** trong Terminal để dừng máy chủ. Ở lần mở tiếp theo, vào thư mục [backend/](backend/) rồi chạy `npm.cmd start`.
 
@@ -104,7 +101,7 @@ Các trạng thái đơn hàng được hiển thị theo luồng xử lý.
 
 ## Sử dụng trang quản trị
 
-Đăng nhập tại <http://127.0.0.1:3000/admin.html> bằng tài khoản quản trị.
+Mở [trang quản trị trực tuyến](https://web-kem-danh-rang.buithienductrung1707.workers.dev/admin.html) và đăng nhập bằng tài khoản quản trị của bản demo.
 
 ### Sản phẩm
 
@@ -154,7 +151,7 @@ SMTP_FROM=Cua hang kem danh rang <no-reply@example.com>
 SHOP_PUBLIC_URL=http://127.0.0.1:3000
 ```
 
-`SHOP_PUBLIC_URL` là địa chỉ gốc dùng để tạo liên kết trong email, ví dụ `http://127.0.0.1:3000` khi chạy trên máy hoặc địa chỉ HTTPS của website khi triển khai. Nhà cung cấp dùng cổng 465 thường yêu cầu `SMTP_SECURE=true`, còn cổng 587 thường dùng `SMTP_SECURE=false`.
+`SHOP_PUBLIC_URL` là địa chỉ gốc dùng để tạo liên kết trong email. Bản chạy trên máy dùng `http://127.0.0.1:3000`. Địa chỉ của bản demo là `https://web-kem-danh-rang.buithienductrung1707.workers.dev`. Nhà cung cấp dùng cổng 465 thường yêu cầu `SMTP_SECURE=true`, còn cổng 587 thường dùng `SMTP_SECURE=false`.
 
 Để cấu hình chuyển khoản, thêm ba dòng sau vào cùng tệp và thay bằng thông tin ngân hàng thực tế của cửa hàng.
 
@@ -233,10 +230,10 @@ Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải 
 
 ## Kiểm tra nhanh và xử lý lỗi
 
-Mở hai API sau để kiểm tra máy chủ trả dữ liệu.
+Mở hai API sau để kiểm tra bản demo trực tuyến trả dữ liệu.
 
-- [Danh sách sản phẩm](http://127.0.0.1:3000/api/products)
-- [Quảng cáo đầu trang](http://127.0.0.1:3000/api/banners)
+- [Danh sách sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/api/products)
+- [Quảng cáo đầu trang](https://web-kem-danh-rang.buithienductrung1707.workers.dev/api/banners)
 
 | Hiện tượng | Cách xử lý |
 | --- | --- |
