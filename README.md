@@ -113,7 +113,7 @@ Mở [trang quản trị trực tuyến](https://web-kem-danh-rang.buithienductr
 
 Mở mục **Quảng cáo** trong trang quản trị và chọn nhóm cần quản lý.
 
-- **Quảng cáo đầu trang** quản lý các ảnh quảng cáo ngang ở đầu trang chủ. Khi có nhiều quảng cáo đang hiển thị, chúng tự chuyển mỗi **2 giây**.
+- **Quảng cáo đầu trang** quản lý các ảnh quảng cáo ngang ở đầu trang chủ. Khi có nhiều quảng cáo đang hiển thị, chúng tự chuyển mỗi **4 giây**. Dùng nút **‹** và **›** ở hai bên để chuyển quảng cáo trước hoặc tiếp theo, hoặc chọn các nút chấm bên dưới.
 - **Quảng cáo hai bên** quản lý banner dọc ở mép trái và phải website, xuất hiện trên màn hình từ **1280px**. Chọn vị trí **Bên trái website** hoặc **Bên phải website** cho từng banner. Khi một bên có nhiều banner đang hiển thị, chúng luân phiên mỗi **5 giây**.
 
 Trong mỗi nhóm, bấm **Thêm quảng cáo** để tạo mới, hoặc chọn một quảng cáo có sẵn để sửa tiêu đề, mô tả, ảnh, nhãn và liên kết nút, thứ tự cùng trạng thái hiển thị. Số thứ tự nhỏ được hiển thị trước. Để ẩn quảng cáo, bỏ chọn **Hiển thị trên website** rồi lưu.

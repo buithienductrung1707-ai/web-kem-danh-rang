@@ -8,6 +8,8 @@
   const link = document.getElementById("hero-link");
   const controls = document.getElementById("hero-carousel-controls");
   const dots = document.getElementById("hero-dots");
+  const previous = document.getElementById("hero-previous");
+  const next = document.getElementById("hero-next");
   const copy = hero.querySelector(".hero-copy");
   const status = document.getElementById("hero-banner-status");
   const message = document.getElementById("hero-banner-message");
@@ -15,7 +17,7 @@
   const fallbackImage = image.getAttribute("src");
   const fallbackAlt = image.alt;
   const motionPreference = window.matchMedia?.("(prefers-reduced-motion: reduce)");
-  const rotationDelay = 2000;
+  const rotationDelay = 4000;
   let banners = [{
     id: null, title: title.textContent.trim(), description: description.textContent.trim(),
     imageUrl: fallbackImage, imageAlt: fallbackAlt,
@@ -112,15 +114,22 @@
 
   function renderSlide(announce = false) {
     stopTransition();
+    const focusWithinHero = hero.contains(document.activeElement);
+    const navigationFocused = controls.contains(document.activeElement) ||
+      document.activeElement === previous || document.activeElement === next;
     const banner = banners[index];
     hero.hidden = !banner;
     controls.hidden = banners.length < 2;
+    previous.hidden = controls.hidden;
+    next.hidden = controls.hidden;
+    previous.disabled = controls.hidden;
+    next.disabled = controls.hidden;
     if (!banner) {
       status.textContent = "";
-      if (hero.contains(document.activeElement)) document.getElementById("catalog-title")?.focus();
+      if (focusWithinHero) document.getElementById("catalog-title")?.focus();
       return;
     }
-    if (controls.hidden && controls.contains(document.activeElement)) hero.focus();
+    if (controls.hidden && navigationFocused) hero.focus();
     title.textContent = banner.title;
     description.textContent = banner.description;
     description.hidden = banner.description === "";
@@ -168,6 +177,9 @@
     dots.replaceChildren(fragment);
     if (restoreFocus) (dots.children[index] ?? hero).focus();
   }
+
+  previous.addEventListener("click", () => selectSlide(index - 1));
+  next.addEventListener("click", () => selectSlide(index + 1));
 
   hero.addEventListener("pointerenter", event => {
     if (event.pointerType === "touch") return;

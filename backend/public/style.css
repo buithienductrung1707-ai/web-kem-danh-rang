@@ -3011,6 +3011,7 @@ button.button-danger:disabled:hover {
   }
 
   .hero-carousel .hero-slide {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     min-height: 480px;
@@ -3044,6 +3045,42 @@ button.button-danger:disabled:hover {
     border: 0;
     border-radius: 999px;
     background: var(--soft);
+  }
+
+  .hero-carousel .hero-arrow {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: 1px solid var(--control-border);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--primary-dark);
+    box-shadow: var(--shadow);
+    transform: translateY(-50%);
+    transition: background-color 180ms ease, color 180ms ease;
+  }
+
+  .hero-carousel .hero-arrow--previous {
+    left: 8px;
+  }
+
+  .hero-carousel .hero-arrow--next {
+    right: 8px;
+  }
+
+  .hero-carousel .hero-arrow:hover {
+    border-color: var(--primary);
+    background: var(--soft);
+    color: var(--primary-dark);
+  }
+
+  .hero-arrow svg {
+    pointer-events: none;
   }
 
   .hero-dots {
@@ -3196,6 +3233,12 @@ button.button-danger:disabled:hover {
   }
 }
 
+@media screen and (min-width: 801px) {
+  .storefront-page .hero-carousel .hero-copy {
+    padding-left: 68px;
+  }
+}
+
 @media screen and (max-width: 800px) {
   .storefront-page .hero.hero-carousel,
   .hero-carousel .hero-slide {
@@ -3204,6 +3247,36 @@ button.button-danger:disabled:hover {
 
   .hero-carousel .hero-slide {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-carousel .hero-copy {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .hero-carousel .hero-media {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .hero-carousel .hero-arrow {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    grid-column: 1;
+    grid-row: 2;
+    align-self: center;
+    margin: 8px;
+    transform: none;
+  }
+
+  .hero-carousel .hero-arrow--previous {
+    justify-self: start;
+  }
+
+  .hero-carousel .hero-arrow--next {
+    justify-self: end;
   }
 
   .storefront-page .hero-carousel .hero-media img {
@@ -4453,6 +4526,10 @@ button.button-danger:disabled:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hero-carousel .hero-arrow {
+    transition: none;
+  }
+
   .side-banner {
     transition: none;
   }
