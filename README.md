@@ -109,11 +109,18 @@ Mở [trang quản trị trực tuyến](https://web-kem-danh-rang.buithienductr
 - Khi dùng ảnh từ máy tính, chọn ảnh rồi bấm **Tải ảnh lên**. Tiếp tục bấm **Lưu sản phẩm** để áp dụng.
 - Định dạng ảnh hỗ trợ gồm JPEG, PNG và WebP, dung lượng tối đa **5 MiB**.
 
-### Quảng cáo đầu trang
+### Quảng cáo
 
-Chọn một trong ba quảng cáo có sẵn, sửa tiêu đề, mô tả, ảnh, nút liên kết, thứ tự và trạng thái hiển thị, rồi bấm **Lưu quảng cáo**. Ảnh tải từ máy tính cũng cần được lưu vào quảng cáo sau khi tải lên.
+Mở mục **Quảng cáo** trong trang quản trị và chọn nhóm cần quản lý.
 
-Hai banner ở mép trái, phải màn hình lấy nội dung từ [header.js](backend/public/header.js) và ảnh trong [assets/](backend/public/assets/). Chúng hiển thị từ chiều rộng màn hình **1280px**.
+- **Quảng cáo đầu trang** quản lý các ảnh quảng cáo ngang ở đầu trang chủ. Khi có nhiều quảng cáo đang hiển thị, chúng tự chuyển mỗi **2 giây**.
+- **Quảng cáo hai bên** quản lý banner dọc ở mép trái và phải website, xuất hiện trên màn hình từ **1280px**. Chọn vị trí **Bên trái website** hoặc **Bên phải website** cho từng banner. Khi một bên có nhiều banner đang hiển thị, chúng luân phiên mỗi **5 giây**.
+
+Trong mỗi nhóm, bấm **Thêm quảng cáo** để tạo mới, hoặc chọn một quảng cáo có sẵn để sửa tiêu đề, mô tả, ảnh, nhãn và liên kết nút, thứ tự cùng trạng thái hiển thị. Số thứ tự nhỏ được hiển thị trước. Để ẩn quảng cáo, bỏ chọn **Hiển thị trên website** rồi lưu.
+
+Ảnh từ máy tính cần được **Tải ảnh lên** trước khi bấm **Thêm quảng cáo** hoặc **Lưu quảng cáo**. Bấm **Xóa quảng cáo** và xác nhận trong hộp thoại để xóa quảng cáo đang chọn. Khi nhóm trống, dùng **Thêm quảng cáo** để bắt đầu lại.
+
+Nội dung cả hai nhóm được lưu trong database và quản lý qua trang admin. Tải lại trang cửa hàng để xem thay đổi. Khi có thông báo phiên bản đã thay đổi hoặc kết quả lưu chưa xác nhận, bấm **Tải lại quảng cáo** để kiểm tra danh sách hiện tại.
 
 ### Đơn hàng
 
@@ -180,7 +187,7 @@ SMTP phục vụ email đặt lại mật khẩu và thông báo đơn hàng. Li
 | Ảnh giao diện có sẵn | [backend/public/assets/](backend/public/assets/) |
 | Cấu hình cục bộ do bạn tạo | `backend/smtp.env` |
 
-Database được mở và khởi tạo schema khi máy chủ chạy. Khi sử dụng một database mới, chương trình tạo sản phẩm mẫu và ba quảng cáo đầu trang. Bản database đang nằm trong repo lưu dữ liệu của cửa hàng tại thời điểm commit.
+Database được mở và khởi tạo schema khi máy chủ chạy. Khi sử dụng một database mới, chương trình tạo sản phẩm mẫu, ba quảng cáo đầu trang và hai banner hai bên. Bản database đang nằm trong repo lưu dữ liệu của cửa hàng tại thời điểm commit.
 
 Để sao lưu, dừng máy chủ bằng **Ctrl + C**, rồi chạy từ thư mục [backend/](backend/). Các lệnh tạo một thư mục có thời gian ở cùng cấp với thư mục dự án.
 
@@ -220,7 +227,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | --- | --- |
 | Màu sắc, header, menu và banner hai bên | [style.css](backend/public/style.css) |
 | Thẻ tiện ích, xem nhanh và giỏ hàng nổi | [storefront-widgets.css](backend/public/storefront-widgets.css) |
-| Tìm kiếm, menu và nội dung banner hai bên | [header.js](backend/public/header.js) |
+| Tìm kiếm, menu và hiển thị banner hai bên từ API | [header.js](backend/public/header.js) |
 | Ảnh logo dùng chung | [shop-logo.png](backend/public/assets/shop-logo.png) |
 | Danh mục sản phẩm, giỏ hàng và đặt hàng | [app.js](backend/public/app.js) |
 | Trình chiếu quảng cáo trang chủ | [carousel.js](backend/public/carousel.js) |

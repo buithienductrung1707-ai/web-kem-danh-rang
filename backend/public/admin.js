@@ -76,6 +76,15 @@ const bannerImageMessage = document.getElementById("banner-image-message");
 const bannerEditorMessage = document.getElementById("banner-editor-message");
 const saveBannerButton = document.getElementById("save-banner");
 const reloadBannerButton = document.getElementById("reload-banner");
+const newBannerButton = document.getElementById("new-banner");
+const deleteBannerButton = document.getElementById("delete-banner");
+const cancelBannerButton = document.getElementById("cancel-banner");
+const bannerGroupTabs = [...document.querySelectorAll(".banner-group-tabs [role='tab']")];
+const bannerGroupPanel = document.getElementById("banner-group-panel");
+const bannerGroupDescription = document.getElementById("banner-group-description");
+const bannerPlacementField = document.getElementById("banner-placement-field");
+const bannerPlacement = document.getElementById("edit-banner-placement");
+const bannerEmpty = document.getElementById("banner-empty");
 
 let productSnapshot = null;
 let managedProducts = [];
@@ -84,6 +93,8 @@ let productCreationKey = null;
 let bannerSnapshot = null;
 let managedBanners = [];
 let bannerMode = "loading";
+let bannerGroup = "hero";
+let bannerCreationKey = null;
 let bannerRequestController = null;
 let activeOrderPhone = "";
 let activeOrderFromDate = "";
@@ -131,13 +142,20 @@ function setBusy(value) {
   clearProductImageButton.disabled = value || !productReady ||
     productImageField.value.trim() === "";
 
-  const bannerEditable = bannerSnapshot !== null && bannerMode !== "loading";
+  const bannerEditable = ["edit", "new", "unknown"].includes(bannerMode);
   for (const field of Object.values(bannerFields)) field.disabled = value || !bannerEditable;
-  bannerPicker.disabled = value || bannerMode !== "edit";
-  saveBannerButton.disabled = value || bannerMode !== "edit";
+  const bannerReady = ["edit", "new", "empty"].includes(bannerMode);
+  bannerPlacement.disabled = value || !bannerEditable;
+  bannerPicker.disabled = value || !bannerReady || groupedBanners().length === 0;
+  saveBannerButton.disabled = value || !["edit", "new"].includes(bannerMode);
+  newBannerButton.disabled = value || !bannerReady;
+  deleteBannerButton.disabled = value || bannerMode !== "edit";
+  cancelBannerButton.hidden = bannerMode !== "new";
+  cancelBannerButton.disabled = value;
+  for (const tab of bannerGroupTabs) tab.disabled = value || !bannerReady;
   reloadBannerButton.disabled = value;
-  bannerImageFileField.disabled = value || bannerMode !== "edit";
-  uploadBannerImageButton.disabled = value || bannerMode !== "edit" || bannerImageFileField.files.length !== 1;
+  bannerImageFileField.disabled = value || !["edit", "new"].includes(bannerMode);
+  uploadBannerImageButton.disabled = value || !["edit", "new"].includes(bannerMode) || bannerImageFileField.files.length !== 1;
   bannerForm.setAttribute("aria-busy", String(value));
 
   for (const control of ordersList.querySelectorAll("button, select")) {
@@ -1465,6 +1483,14 @@ function clearBannerEditor() {
   bannerSnapshot = null;
   managedBanners = [];
   bannerMode = "loading";
+  bannerCreationKey = null;
+  bannerGroup = "hero";
+  bannerForm.hidden = true;
+  bannerEmpty.hidden = true;
+  cancelBannerButton.hidden = true;
+  newBannerButton.disabled = true;
+  deleteBannerButton.disabled = true;
+  updateBannerGroup();
   bannerPicker.replaceChildren();
   for (const field of Object.values(bannerFields)) {
     field.value = "";
@@ -1511,7 +1537,8 @@ function validBannerButtonUrl(value) {
 }
 
 function validateManagedBanner(banner) {
-  if (!banner || !Number.isSafeInteger(banner.id) || banner.id < 1 || banner.id > 3 ||
+  if (!banner || !Number.isSafeInteger(banner.id) || banner.id < 1 ||
+    !["hero", "left", "right"].includes(banner.placement) ||
     typeof banner.title !== "string" || banner.title.trim() === "" || banner.title.length > 120 ||
     typeof banner.description !== "string" || banner.description.length > 400 ||
     typeof banner.imageUrl !== "string" || banner.imageUrl.length > 2048 || !validBannerImageUrl(banner.imageUrl) ||
@@ -1538,26 +1565,89 @@ function showBannerImagePreview() {
   }
 }
 
+function groupedBanners() {
+  return managedBanners.filter(banner => bannerGroup === "hero"
+    ? banner.placement === "hero" : ["left", "right"].includes(banner.placement));
+}
+
+function updateBannerGroup() {
+  for (const tab of bannerGroupTabs) {
+    const selected = tab.id === "banner-group-" + bannerGroup;
+    tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+  }
+  bannerGroupPanel.setAttribute("aria-labelledby", "banner-group-" + bannerGroup);
+  bannerPlacementField.hidden = bannerGroup === "hero";
+  bannerGroupDescription.textContent = bannerGroup === "hero"
+    ? "Ảnh ngang ở đầu trang chủ, hiển thị theo thứ tự bạn chọn."
+    : "Banner dọc ở hai mép website trên màn hình từ 1280px. Chọn bên trái hoặc bên phải cho từng quảng cáo.";
+  for (const option of bannerPlacement.options) {
+    const available = bannerGroup === "hero" ? option.value === "hero" : option.value !== "hero";
+    option.hidden = !available;
+    option.disabled = !available;
+  }
+  bannerImagePreview.classList.toggle("banner-image-preview--side", bannerGroup === "side");
+}
+
+function renderBannerPicker(selectedId = "") {
+  const options = document.createDocumentFragment();
+  const items = groupedBanners();
+  if (bannerMode === "new" || items.length === 0) {
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = bannerMode === "new" ? "Đang thêm quảng cáo mới" : "Chưa có quảng cáo";
+    placeholder.disabled = true;
+    options.append(placeholder);
+  }
+  for (const item of items) {
+    const option = document.createElement("option");
+    option.value = String(item.id);
+    const position = item.placement === "left" ? "Bên trái · " : item.placement === "right" ? "Bên phải · " : "";
+    option.textContent = position + item.title + (item.enabled ? "" : " (đang ẩn)");
+    options.append(option);
+  }
+  bannerPicker.replaceChildren(options);
+  bannerPicker.value = String(selectedId);
+}
+
 function fillBannerEditor(banner) {
   validateManagedBanner(banner);
   clearBannerImagePreview();
   bannerSnapshot = banner;
+  bannerCreationKey = null;
   bannerMode = "edit";
+  bannerGroup = banner.placement === "hero" ? "hero" : "side";
+  updateBannerGroup();
+  bannerPlacement.value = banner.placement;
   for (const [key, field] of Object.entries(bannerFields)) {
     if (key === "enabled") field.checked = banner.enabled;
     else field.value = String(banner[key]);
     field.removeAttribute("aria-invalid");
   }
-  const options = document.createDocumentFragment();
-  for (const item of managedBanners) {
-    const option = document.createElement("option");
-    option.value = String(item.id);
-    option.textContent = "Quảng cáo " + item.id + " · " + item.title + (item.enabled ? "" : " (đang ẩn)");
-    options.append(option);
-  }
-  bannerPicker.replaceChildren(options);
-  bannerPicker.value = String(banner.id);
+  bannerForm.hidden = false;
+  bannerEmpty.hidden = true;
+  cancelBannerButton.hidden = true;
+  deleteBannerButton.hidden = false;
+  saveBannerButton.textContent = "Lưu quảng cáo";
+  renderBannerPicker(banner.id);
   showBannerImagePreview();
+}
+
+function selectBannerGroup(selectedId) {
+  updateBannerGroup();
+  const items = groupedBanners();
+  const banner = items.find(item => item.id === selectedId) || items[0];
+  if (banner) {
+    fillBannerEditor(banner);
+    return;
+  }
+  bannerSnapshot = null;
+  bannerCreationKey = null;
+  bannerMode = "empty";
+  bannerForm.hidden = true;
+  bannerEmpty.hidden = false;
+  clearBannerImagePreview();
+  renderBannerPicker();
 }
 
 function isCurrentBannerRequest(controller) {
@@ -1567,10 +1657,11 @@ function isCurrentBannerRequest(controller) {
 async function loadBannerEditor() {
   if (adminPanel.hidden || sessionCheckQueued || !pageActive) return;
   const selectedId = bannerSnapshot?.id;
+  const creationKey = bannerCreationKey;
   const controller = new AbortController();
   bannerRequestController = controller;
   bannerMode = "loading";
-  bannerEditorMessage.textContent = "Đang tải quảng cáo đầu trang...";
+  bannerEditorMessage.textContent = "Đang tải quảng cáo...";
   try {
     const { response, result } = await callAdmin("/banners", {
       signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)])
@@ -1581,15 +1672,15 @@ async function loadBannerEditor() {
       messageLabel.textContent = "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.";
       return;
     }
-    if (!response.ok || !Array.isArray(result) || result.length === 0 || result.length > 3) {
-      throw new Error("Tải quảng cáo gặp lỗi");
-    }
+    if (!response.ok || !Array.isArray(result)) throw new Error("Tải quảng cáo gặp lỗi");
     result.forEach(validateManagedBanner);
     if (new Set(result.map(banner => banner.id)).size !== result.length) {
       throw new Error("Danh sách quảng cáo bị trùng");
     }
     managedBanners = result.toSorted((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
-    fillBannerEditor(managedBanners.find(banner => banner.id === selectedId) || managedBanners[0]);
+    const created = creationKey && managedBanners.find(banner => banner.creationKey === creationKey);
+    if (created) fillBannerEditor(created);
+    else selectBannerGroup(selectedId);
     bannerEditorMessage.textContent = "Đã tải " + managedBanners.length + " quảng cáo.";
   } catch {
     if (!isCurrentBannerRequest(controller)) return;
@@ -1610,24 +1701,76 @@ reloadBannerButton.addEventListener("click", async () => {
   }
 });
 
+for (const tab of bannerGroupTabs) {
+  tab.addEventListener("click", () => {
+    if (busy || !["edit", "new", "empty"].includes(bannerMode) || adminPanel.hidden || !pageActive) return;
+    bannerGroup = tab.id === "banner-group-hero" ? "hero" : "side";
+    selectBannerGroup();
+    bannerEditorMessage.textContent = "";
+    setBusy(false);
+  });
+  tab.addEventListener("keydown", event => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key) || busy) return;
+    event.preventDefault();
+    const next = tab === bannerGroupTabs[0] ? bannerGroupTabs[1] : bannerGroupTabs[0];
+    const target = event.key === "Home" ? bannerGroupTabs[0] : event.key === "End" ? bannerGroupTabs[1] : next;
+    if (!target.disabled) {
+      target.click();
+      target.focus();
+    }
+  });
+}
+
+newBannerButton.addEventListener("click", () => {
+  if (busy || !["edit", "new", "empty"].includes(bannerMode) || adminPanel.hidden || !pageActive) return;
+  bannerSnapshot = null;
+  bannerCreationKey = crypto.randomUUID();
+  bannerMode = "new";
+  clearBannerImagePreview();
+  bannerForm.reset();
+  for (const field of Object.values(bannerFields)) field.removeAttribute("aria-invalid");
+  const lastSortOrder = groupedBanners().reduce((highest, banner) => Math.max(highest, banner.sortOrder), -1);
+  bannerFields.sortOrder.value = String(Math.min(999, lastSortOrder + 1));
+  bannerFields.enabled.checked = true;
+  bannerPlacement.value = bannerGroup === "hero" ? "hero" : "left";
+  bannerForm.hidden = false;
+  bannerEmpty.hidden = true;
+  deleteBannerButton.hidden = true;
+  saveBannerButton.textContent = "Thêm quảng cáo";
+  bannerEditorMessage.textContent = "";
+  renderBannerPicker();
+  setBusy(false);
+  bannerFields.title.focus();
+});
+
+cancelBannerButton.addEventListener("click", () => {
+  if (busy || bannerMode !== "new" || adminPanel.hidden || !pageActive) return;
+  selectBannerGroup();
+  bannerEditorMessage.textContent = "Đã hủy thêm quảng cáo.";
+  setBusy(false);
+  newBannerButton.focus();
+});
+
 bannerPicker.addEventListener("change", () => {
-  if (busy || bannerMode !== "edit" || adminPanel.hidden || !pageActive) return;
-  const banner = managedBanners.find(item => String(item.id) === bannerPicker.value);
+  if (busy || !["edit", "new"].includes(bannerMode) || adminPanel.hidden || !pageActive) return;
+  const banner = groupedBanners().find(item => String(item.id) === bannerPicker.value);
   if (!banner) return;
   fillBannerEditor(banner);
   bannerEditorMessage.textContent = "";
   setBusy(false);
 });
 
-bannerForm.addEventListener("submit", async (event) => {
+bannerForm.addEventListener("submit", async event => {
   event.preventDefault();
-  if (busy || bannerMode !== "edit" || !bannerSnapshot || adminPanel.hidden || !pageActive) return;
+  if (busy || !["edit", "new"].includes(bannerMode) || adminPanel.hidden || !pageActive) return;
   for (const [key, field] of Object.entries(bannerFields)) {
     if (key !== "enabled") field.value = field.value.trim();
     field.removeAttribute("aria-invalid");
   }
   if (!bannerForm.reportValidity()) return;
+  const creating = bannerMode === "new";
   const data = {
+    placement: bannerGroup === "hero" ? "hero" : bannerPlacement.value,
     title: bannerFields.title.value,
     description: bannerFields.description.value,
     imageUrl: bannerFields.imageUrl.value,
@@ -1637,25 +1780,26 @@ bannerForm.addEventListener("submit", async (event) => {
     sortOrder: Number(bannerFields.sortOrder.value),
     enabled: bannerFields.enabled.checked
   };
-  const bannerId = bannerSnapshot.id;
-  const revision = bannerSnapshot.revision;
+  const bannerId = bannerSnapshot?.id;
+  const revision = bannerSnapshot?.revision ?? 0;
   try {
-    validateManagedBanner({ id: bannerId, ...data, revision });
+    validateManagedBanner({ id: bannerId ?? 1, ...data, revision });
     if (bannerFields.sortOrder.value === "") throw new Error("Thiếu thứ tự hiển thị");
   } catch {
-    bannerEditorMessage.textContent = "Kiểm tra nội dung, ảnh, cặp nhãn/liên kết nút và thứ tự từ 0 đến 999 trước khi lưu.";
+    bannerEditorMessage.textContent = "Kiểm tra nội dung, vị trí, ảnh, cặp nhãn/liên kết nút và thứ tự từ 0 đến 999 trước khi lưu.";
     return;
   }
 
   const controller = new AbortController();
   bannerRequestController = controller;
   setBusy(true);
-  bannerEditorMessage.textContent = "Đang lưu quảng cáo...";
+  saveBannerButton.textContent = creating ? "Đang thêm..." : "Đang lưu...";
+  bannerEditorMessage.textContent = creating ? "Đang thêm quảng cáo..." : "Đang lưu quảng cáo...";
   try {
-    const { response, result } = await callAdmin("/banners/" + bannerId, {
-      method: "PATCH",
+    const { response, result } = await callAdmin(creating ? "/banners" : "/banners/" + bannerId, {
+      method: creating ? "POST" : "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...data, revision }),
+      body: JSON.stringify(creating ? { ...data, creationKey: bannerCreationKey } : { ...data, revision }),
       signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)])
     });
     if (!isCurrentBannerRequest(controller)) return;
@@ -1668,9 +1812,10 @@ bannerForm.addEventListener("submit", async (event) => {
       const errorMessage = typeof result?.error === "string" ? result.error : "Lưu quảng cáo gặp lỗi.";
       if ([400, 403].includes(response.status)) {
         bannerEditorMessage.textContent = errorMessage;
-        if (typeof result?.field === "string" && Object.hasOwn(bannerFields, result.field)) {
-          bannerFields[result.field].setAttribute("aria-invalid", "true");
-        }
+        let field = null;
+        if (result?.field === "placement") field = bannerPlacement;
+        else if (Object.hasOwn(bannerFields, result?.field)) field = bannerFields[result.field];
+        field?.setAttribute("aria-invalid", "true");
       } else {
         bannerMode = "unknown";
         bannerEditorMessage.textContent = errorMessage + " Bản đang sửa được giữ lại. Bấm Tải lại quảng cáo để xem phiên bản hiện tại.";
@@ -1678,25 +1823,67 @@ bannerForm.addEventListener("submit", async (event) => {
       return;
     }
     validateManagedBanner(result);
-    if (result.id !== bannerId || !Object.entries(data).every(([key, value]) => result[key] === value)) {
+    if ((!creating && result.id !== bannerId) || !Object.entries(data).every(([key, value]) => result[key] === value)) {
       throw new Error("Kết quả lưu quảng cáo chưa hợp lệ");
     }
-    managedBanners = managedBanners.map(banner => banner.id === result.id ? result : banner)
+    managedBanners = [...managedBanners.filter(banner => banner.id !== result.id), result]
       .toSorted((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
     fillBannerEditor(result);
-    bannerEditorMessage.textContent = "Đã lưu quảng cáo đầu trang.";
+    bannerEditorMessage.textContent = creating ? "Đã thêm quảng cáo." : "Đã lưu quảng cáo.";
   } catch {
     if (!isCurrentBannerRequest(controller)) return;
     bannerMode = "unknown";
     bannerEditorMessage.textContent = "Chưa xác nhận được kết quả lưu. Bản đang sửa được giữ lại. Bấm Tải lại quảng cáo để kiểm tra.";
   } finally {
     if (bannerRequestController === controller) bannerRequestController = null;
+    saveBannerButton.textContent = bannerMode === "new" ? "Thêm quảng cáo" : "Lưu quảng cáo";
     finishRequest(bannerMode === "unknown" ? reloadBannerButton : saveBannerButton);
   }
 });
 
+deleteBannerButton.addEventListener("click", async () => {
+  if (busy || bannerMode !== "edit" || !bannerSnapshot || adminPanel.hidden || !pageActive) return;
+  const banner = bannerSnapshot;
+  if (!window.confirm('Xóa quảng cáo "' + banner.title + '" khỏi website?')) return;
+  const controller = new AbortController();
+  bannerRequestController = controller;
+  setBusy(true);
+  deleteBannerButton.textContent = "Đang xóa...";
+  bannerEditorMessage.textContent = "Đang xóa quảng cáo...";
+  try {
+    const { response, result } = await callAdmin("/banners/" + banner.id, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ revision: banner.revision }),
+      signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)])
+    });
+    if (!isCurrentBannerRequest(controller)) return;
+    if (response.status === 401) {
+      showAuth(null);
+      messageLabel.textContent = "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.";
+      return;
+    }
+    if (!response.ok || result?.id !== banner.id || result.deleted !== true) {
+      bannerMode = "unknown";
+      bannerEditorMessage.textContent = (result?.error || "Chưa xác nhận được kết quả xóa.") + " Bấm Tải lại quảng cáo để kiểm tra.";
+      return;
+    }
+    managedBanners = managedBanners.filter(item => item.id !== banner.id);
+    selectBannerGroup();
+    bannerEditorMessage.textContent = "Đã xóa quảng cáo.";
+  } catch {
+    if (!isCurrentBannerRequest(controller)) return;
+    bannerMode = "unknown";
+    bannerEditorMessage.textContent = "Chưa xác nhận được kết quả xóa. Bấm Tải lại quảng cáo để kiểm tra.";
+  } finally {
+    if (bannerRequestController === controller) bannerRequestController = null;
+    deleteBannerButton.textContent = "Xóa quảng cáo";
+    finishRequest(bannerMode === "unknown" ? reloadBannerButton : newBannerButton);
+  }
+});
+
 bannerImageFileField.addEventListener("change", () => {
-  if (busy || bannerMode !== "edit" || adminPanel.hidden || !pageActive) return;
+  if (busy || !["edit", "new"].includes(bannerMode) || adminPanel.hidden || !pageActive) return;
   const file = bannerImageFileField.files[0];
   const error = file ? validateProductImageFile(file) : "";
   if (error) bannerImageFileField.value = "";
@@ -1720,7 +1907,7 @@ bannerImagePreview.addEventListener("error", () => {
 });
 
 uploadBannerImageButton.addEventListener("click", async () => {
-  if (busy || bannerMode !== "edit" || adminPanel.hidden || !pageActive) return;
+  if (busy || !["edit", "new"].includes(bannerMode) || adminPanel.hidden || !pageActive) return;
   const file = bannerImageFileField.files[0];
   const error = validateProductImageFile(file);
   if (error) {
@@ -1770,7 +1957,8 @@ uploadBannerImageButton.addEventListener("click", async () => {
 
 bannerForm.addEventListener("input", () => {
   for (const field of Object.values(bannerFields)) field.removeAttribute("aria-invalid");
-  if (bannerMode === "edit") bannerEditorMessage.textContent = "";
+  bannerPlacement.removeAttribute("aria-invalid");
+  if (["edit", "new"].includes(bannerMode)) bannerEditorMessage.textContent = "";
 });
 
 retryButton.addEventListener("click", checkSession);

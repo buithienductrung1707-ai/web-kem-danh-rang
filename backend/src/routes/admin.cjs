@@ -8,7 +8,7 @@ const { getOrderItems, getOrderHistory, changeOrderStatus, deleteOrder } = requi
 const { createProductImageUpload } = require("../services/product-images.cjs");
 const { parseOrderFilters, orderFilterSql, orderFilterParameters } = require("../utils/order-filters.cjs");
 const { ordersToCsv } = require("../utils/order-export.cjs");
-const { getAdminBanners, updateBanner } = require("../services/banners.cjs");
+const { getAdminBanners, createBanner, updateBanner, deleteBanner } = require("../services/banners.cjs");
 const { outboxSummary, retryFailedEmails } = require("../services/email-outbox.cjs");
 const { getSessionOptions } = require("../services/session-options.cjs");
 
@@ -156,8 +156,18 @@ router.get("/banners", requireAdmin, (req, res) => {
   res.json(getAdminBanners());
 });
 
+router.post("/banners", requireAdmin, (req, res) => {
+  const result = createBanner(req.body || {});
+  res.status(result.status).json(result.body);
+});
+
 router.patch("/banners/:id", requireAdmin, (req, res) => {
   const result = updateBanner(Number(req.params.id), req.body || {});
+  res.status(result.status).json(result.body);
+});
+
+router.delete("/banners/:id", requireAdmin, (req, res) => {
+  const result = deleteBanner(Number(req.params.id), req.body || {});
   res.status(result.status).json(result.body);
 });
 

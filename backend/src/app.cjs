@@ -45,7 +45,11 @@ app.get("/api/products", (req, res) => {
 
 app.get("/api/banners", (req, res) => {
   res.set("Cache-Control", "no-store");
-  res.json(getPublicBanners());
+  const placement = req.query.placement ?? "hero";
+  if (!["hero", "side", "all", "left", "right"].includes(placement)) {
+    return res.status(400).json({ error: "Vị trí quảng cáo chưa hợp lệ." });
+  }
+  res.json(getPublicBanners(placement));
 });
 
 app.get("/api/payment-options", (req, res) => {

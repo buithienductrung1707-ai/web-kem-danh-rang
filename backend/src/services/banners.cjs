@@ -1,20 +1,38 @@
 const db = require("../db/database.cjs");
+const { runTransaction } = require("../db/transaction.cjs");
 
-const bannerFields = `id, title, description, image_url AS imageUrl, image_alt AS imageAlt,
-  button_label AS buttonLabel, button_url AS buttonUrl, enabled, sort_order AS sortOrder, revision`;
+const bannerFields = `id, placement, title, description, image_url AS imageUrl, image_alt AS imageAlt,
+  button_label AS buttonLabel, button_url AS buttonUrl, enabled, sort_order AS sortOrder, revision,
+  creation_key AS creationKey`;
 const publicBannersQuery = db.prepare(`
-  SELECT ${bannerFields} FROM home_banners WHERE enabled = 1 ORDER BY sort_order, id
+  SELECT ${bannerFields} FROM home_banners WHERE enabled = 1
+    AND (? = 'all' OR placement = ? OR (? = 'side' AND placement IN ('left', 'right')))
+  ORDER BY sort_order, id
 `);
 const adminBannersQuery = db.prepare(`
   SELECT ${bannerFields} FROM home_banners ORDER BY sort_order, id
 `);
 const bannerByIdQuery = db.prepare(`SELECT ${bannerFields} FROM home_banners WHERE id = ?`);
+const bannerByCreationQuery = db.prepare(`SELECT ${bannerFields} FROM home_banners WHERE creation_key = ?`);
+const createBannerQuery = db.prepare(`
+  INSERT INTO home_banners (
+    placement, title, description, image_url, image_alt, button_label, button_url,
+    enabled, sort_order, creation_key
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ${bannerFields}
+`);
 const updateBannerQuery = db.prepare(`
-  UPDATE home_banners SET title = ?, description = ?, image_url = ?, image_alt = ?,
+  UPDATE home_banners SET placement = ?, title = ?, description = ?, image_url = ?, image_alt = ?,
     button_label = ?, button_url = ?, enabled = ?, sort_order = ?, revision = revision + 1
   WHERE id = ? AND revision = ? AND revision < 9007199254740991
   RETURNING ${bannerFields}
 `);
+const deleteBannerQuery = db.prepare("DELETE FROM home_banners WHERE id = ? AND revision = ? RETURNING id");
+const rememberDeletedCreationQuery = db.prepare(`
+  INSERT INTO deleted_banner_requests (creation_key)
+  SELECT creation_key FROM home_banners WHERE id = ? AND creation_key IS NOT NULL
+  ON CONFLICT DO NOTHING
+`);
+const deletedCreationQuery = db.prepare("SELECT creation_key FROM deleted_banner_requests WHERE creation_key = ?");
 
 function bannerResponse(banner) {
   return { ...banner, enabled: banner.enabled === 1 };
@@ -51,6 +69,9 @@ function validImageUrl(value) {
 }
 
 function validateBanner(body) {
+  if (!["hero", "left", "right"].includes(body.placement)) {
+    return { error: "Hãy chọn vị trí đầu trang, bên trái hoặc bên phải.", field: "placement" };
+  }
   if (typeof body.title !== "string" || body.title.trim().length < 1 || body.title.trim().length > 120) {
     return { error: "Tiêu đề cần có từ 1 đến 120 ký tự.", field: "title" };
   }
@@ -75,19 +96,19 @@ function validateBanner(body) {
     return { error: "Điền cả nhãn và liên kết nút trong cửa hàng, hoặc để trống cả hai để ẩn nút.", field: "buttonUrl" };
   }
   if (typeof body.enabled !== "boolean") {
-    return { error: "Hãy chọn trạng thái hiển thị của banner.", field: "enabled" };
+    return { error: "Hãy chọn trạng thái hiển thị của quảng cáo.", field: "enabled" };
   }
   if (!Number.isSafeInteger(body.sortOrder) || body.sortOrder < 0 || body.sortOrder > 999) {
     return { error: "Thứ tự hiển thị cần là số nguyên từ 0 đến 999.", field: "sortOrder" };
   }
-  if (!Number.isSafeInteger(body.revision) || body.revision < 0) {
-    return { error: "Hãy tải lại banner trước khi chỉnh sửa.", field: "revision" };
-  }
   return null;
 }
 
-function getPublicBanners() {
-  return publicBannersQuery.all().map(bannerResponse);
+function getPublicBanners(placement = "hero") {
+  return publicBannersQuery.all(placement, placement, placement).map(banner => {
+    const { creationKey, ...publicBanner } = bannerResponse(banner);
+    return publicBanner;
+  });
 }
 
 function getAdminBanners() {
@@ -95,24 +116,89 @@ function getAdminBanners() {
 }
 
 function updateBanner(id, body) {
-  if (!Number.isSafeInteger(id) || id < 1 || id > 3) {
-    return { status: 404, body: { error: "Không tìm thấy banner." } };
+  if (!Number.isSafeInteger(id) || id < 1) {
+    return { status: 404, body: { error: "Không tìm thấy quảng cáo." } };
+  }
+  if (body.placement === undefined) {
+    const current = bannerByIdQuery.get(id);
+    if (!current) return { status: 404, body: { error: "Không tìm thấy quảng cáo." } };
+    body = { ...body, placement: current.placement };
   }
   const validation = validateBanner(body);
   if (validation) return { status: 400, body: validation };
+  if (!Number.isSafeInteger(body.revision) || body.revision < 0) {
+    return { status: 400, body: { error: "Hãy tải lại quảng cáo trước khi chỉnh sửa.", field: "revision" } };
+  }
 
   const updated = updateBannerQuery.get(
-    body.title.trim(), body.description.trim(), body.imageUrl.trim(), body.imageAlt.trim(),
+    body.placement, body.title.trim(), body.description.trim(), body.imageUrl.trim(), body.imageAlt.trim(),
     body.buttonLabel.trim(), body.buttonUrl.trim(), Number(body.enabled), body.sortOrder, id, body.revision
   );
   if (updated) return { status: 200, body: bannerResponse(updated) };
 
   const current = bannerByIdQuery.get(id);
-  if (!current) return { status: 404, body: { error: "Không tìm thấy banner." } };
+  if (!current) return { status: 404, body: { error: "Không tìm thấy quảng cáo." } };
   return {
     status: 409,
-    body: { error: "Banner đã được chỉnh sửa. Hãy tải lại trước khi lưu tiếp.", current: bannerResponse(current) }
+    body: { error: "Quảng cáo đã được chỉnh sửa. Hãy tải lại trước khi lưu tiếp.", current: bannerResponse(current) }
   };
 }
 
-module.exports = { getPublicBanners, getAdminBanners, updateBanner };
+function createBanner(body) {
+  const validation = validateBanner(body);
+  if (validation) return { status: 400, body: validation };
+  if (typeof body.creationKey !== "string" || !/^[a-zA-Z0-9_-]{16,128}$/.test(body.creationKey)) {
+    return { status: 400, body: { error: "Mã tạo quảng cáo chưa hợp lệ. Hãy tải lại trang.", field: "creationKey" } };
+  }
+
+  return runTransaction(db, () => {
+    if (deletedCreationQuery.get(body.creationKey)) {
+      return { status: 409, body: { error: "Quảng cáo của lần tạo này đã được xoá. Hãy tạo một quảng cáo mới.", deleted: true } };
+    }
+    const current = bannerByCreationQuery.get(body.creationKey);
+    if (current) {
+      const currentBanner = bannerResponse(current);
+      const expected = {
+        placement: body.placement,
+        title: body.title.trim(),
+        description: body.description.trim(),
+        imageUrl: body.imageUrl.trim(),
+        imageAlt: body.imageAlt.trim(),
+        buttonLabel: body.buttonLabel.trim(),
+        buttonUrl: body.buttonUrl.trim(),
+        enabled: body.enabled,
+        sortOrder: body.sortOrder
+      };
+      const replay = Object.entries(expected).every(([field, value]) => currentBanner[field] === value);
+      return replay
+        ? { status: 200, body: currentBanner }
+        : { status: 409, body: { error: "Lần tạo quảng cáo này đã có nội dung khác. Hãy tải lại danh sách.", current: currentBanner } };
+    }
+    const created = createBannerQuery.get(
+      body.placement, body.title.trim(), body.description.trim(), body.imageUrl.trim(), body.imageAlt.trim(),
+      body.buttonLabel.trim(), body.buttonUrl.trim(), Number(body.enabled), body.sortOrder, body.creationKey
+    );
+    return { status: 201, body: bannerResponse(created) };
+  });
+}
+
+function deleteBanner(id, body) {
+  if (!Number.isSafeInteger(id) || id < 1) {
+    return { status: 404, body: { error: "Không tìm thấy quảng cáo." } };
+  }
+  if (!Number.isSafeInteger(body.revision) || body.revision < 0) {
+    return { status: 400, body: { error: "Hãy tải lại quảng cáo trước khi xoá.", field: "revision" } };
+  }
+  return runTransaction(db, () => {
+    const current = bannerByIdQuery.get(id);
+    if (!current) return { status: 200, body: { id, deleted: true } };
+    if (current.revision !== body.revision) {
+      return { status: 409, body: { error: "Quảng cáo đã được chỉnh sửa. Hãy tải lại trước khi xoá.", current: bannerResponse(current) } };
+    }
+    rememberDeletedCreationQuery.run(id);
+    deleteBannerQuery.get(id, body.revision);
+    return { status: 200, body: { id, deleted: true } };
+  });
+}
+
+module.exports = { getPublicBanners, getAdminBanners, createBanner, updateBanner, deleteBanner };

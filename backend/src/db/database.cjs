@@ -95,7 +95,9 @@ function initializeSchema() {
     ) STRICT;
 
     CREATE TABLE IF NOT EXISTS home_banners (
-      id INTEGER PRIMARY KEY CHECK (id BETWEEN 1 AND 3),
+      id INTEGER PRIMARY KEY AUTOINCREMENT CHECK (id BETWEEN 1 AND 9007199254740991),
+      placement TEXT NOT NULL DEFAULT 'hero' CHECK (placement IN ('hero', 'left', 'right')),
+      creation_key TEXT UNIQUE,
       title TEXT NOT NULL,
       description TEXT NOT NULL DEFAULT '',
       image_url TEXT NOT NULL,
@@ -106,7 +108,42 @@ function initializeSchema() {
       sort_order INTEGER NOT NULL DEFAULT 0 CHECK (sort_order BETWEEN 0 AND 999),
       revision INTEGER NOT NULL DEFAULT 0 CHECK (revision BETWEEN 0 AND 9007199254740991)
     ) STRICT;
+
+    CREATE TABLE IF NOT EXISTS deleted_banner_requests (
+      creation_key TEXT PRIMARY KEY
+    ) STRICT;
   `);
+
+  const bannerColumns = new Set(
+    db.prepare("PRAGMA table_info(home_banners)").all().map(column => column.name)
+  );
+  const migrateSideBanners = !bannersExist || !bannerColumns.has("placement");
+  if (!bannerColumns.has("placement")) {
+    db.exec(`
+      ALTER TABLE home_banners RENAME TO home_banners_legacy;
+      CREATE TABLE home_banners (
+        id INTEGER PRIMARY KEY AUTOINCREMENT CHECK (id BETWEEN 1 AND 9007199254740991),
+        placement TEXT NOT NULL DEFAULT 'hero' CHECK (placement IN ('hero', 'left', 'right')),
+        creation_key TEXT UNIQUE,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        image_url TEXT NOT NULL,
+        image_alt TEXT NOT NULL,
+        button_label TEXT NOT NULL DEFAULT '',
+        button_url TEXT NOT NULL DEFAULT '',
+        enabled INTEGER NOT NULL DEFAULT 1 CHECK (enabled IN (0, 1)),
+        sort_order INTEGER NOT NULL DEFAULT 0 CHECK (sort_order BETWEEN 0 AND 999),
+        revision INTEGER NOT NULL DEFAULT 0 CHECK (revision BETWEEN 0 AND 9007199254740991)
+      ) STRICT;
+      INSERT INTO home_banners (
+        id, title, description, image_url, image_alt, button_label, button_url,
+        enabled, sort_order, revision
+      ) SELECT id, title, description, image_url, image_alt, button_label, button_url,
+        enabled, sort_order, ${bannerColumns.has("revision") ? "revision" : "0"}
+        FROM home_banners_legacy;
+      DROP TABLE home_banners_legacy;
+    `);
+  }
 
   if (!bannersExist) {
     const seedBanner = db.prepare(`
@@ -130,6 +167,19 @@ function initializeSchema() {
     ];
     for (const banner of banners) seedBanner.run(...banner);
     seedBanner.close();
+  }
+
+  if (migrateSideBanners) {
+    const seedSideBanner = db.prepare(`
+      INSERT INTO home_banners (
+        placement, title, description, image_url, image_alt, button_label, button_url, sort_order
+      ) VALUES (?, ?, ?, ?, ?, ?, '/kem-danh-rang.html', 0)
+    `);
+    seedSideBanner.run("left", "Nụ cười tươi mới", "Chăm sóc mỗi ngày",
+      "/assets/side-banner-fresh.png", "Nụ cười tươi mới – Chăm sóc răng miệng mỗi ngày", "Xem sản phẩm");
+    seedSideBanner.run("right", "Chăm sóc răng miệng", "Chọn kem đánh răng phù hợp",
+      "/assets/side-banner-care.png", "Chăm sóc răng miệng – Chọn kem đánh răng phù hợp", "Khám phá ngay");
+    seedSideBanner.close();
   }
 
   const customerColumns = new Set(

@@ -28,62 +28,6 @@
       bubbles.append(bubble);
     }
     header.prepend(bubbles);
-
-    const sideBanners = document.createElement("aside");
-    sideBanners.className = "side-banners";
-    sideBanners.setAttribute("aria-label", "Gợi ý chăm sóc răng miệng");
-    const bannerItems = [
-      {
-        variant: "fresh",
-        title: "Nụ cười tươi mới",
-        description: "Chăm sóc mỗi ngày",
-        action: "Xem sản phẩm",
-        label: "Nụ cười tươi mới – Xem sản phẩm kem đánh răng"
-      },
-      {
-        variant: "care",
-        title: "Chăm sóc răng miệng",
-        description: "Chọn kem đánh răng phù hợp",
-        action: "Khám phá ngay",
-        label: "Chăm sóc răng miệng – Khám phá sản phẩm kem đánh răng"
-      }
-    ];
-
-    for (const item of bannerItems) {
-      const link = document.createElement("a");
-      link.className = "side-banner side-banner--" + item.variant;
-      link.href = "/kem-danh-rang.html";
-      link.setAttribute("aria-label", item.label);
-
-      const image = document.createElement("img");
-      image.className = "side-banner-image";
-      image.src = "/assets/side-banner-" + item.variant + ".png";
-      image.alt = "";
-      image.width = 724;
-      image.height = 2172;
-      image.loading = "lazy";
-      image.decoding = "async";
-      image.fetchPriority = "low";
-      image.addEventListener("error", () => { image.hidden = true; });
-
-      const copy = document.createElement("span");
-      copy.className = "side-banner-copy";
-      const title = document.createElement("strong");
-      title.className = "side-banner-title";
-      title.textContent = item.title;
-      const description = document.createElement("span");
-      description.className = "side-banner-description";
-      description.textContent = item.description;
-      copy.append(title, description);
-
-      const action = document.createElement("span");
-      action.className = "side-banner-cta";
-      action.textContent = item.action;
-      link.append(image, copy, action);
-      link.addEventListener("click", event => window.ShopStorefront?.prepareNavigation(event, link));
-      sideBanners.append(link);
-    }
-    header.after(sideBanners);
   }
 
   function setProductsMenu(menu, open) {
@@ -322,4 +266,207 @@
   });
 
   void refreshCart();
+})();
+
+(() => {
+  const header = document.querySelector(".commerce-header");
+  if (!header) return;
+  const motionPreference = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+  const desktopPreference = window.matchMedia?.("(min-width: 1280px)");
+  const container = document.createElement("div");
+  container.className = "side-banners";
+  header.after(container);
+  let active = true;
+  let controller = null;
+
+  function bannerUrl(value) {
+    if (typeof value !== "string" || value.length > 2048 || /[\\\u0000-\u0020\u007f]/.test(value)) return null;
+    try {
+      const url = new URL(value, window.location.origin);
+      if (url.username || url.password || /%(?:2f|5c|25|2e)/i.test(url.pathname) ||
+        /[\\\u0000-\u001f\u007f]/.test(decodeURIComponent(url.pathname))) return null;
+      return url;
+    } catch {
+      return null;
+    }
+  }
+
+  function validLink(value) {
+    const url = bannerUrl(value);
+    return Boolean(url && url.origin === window.location.origin &&
+      ((value.startsWith("#") && value.length > 1) ||
+        (value.startsWith("/") && !value.startsWith("//") && !url.pathname.startsWith("//"))));
+  }
+
+  function validImage(value) {
+    const url = bannerUrl(value);
+    if (!url || /\.svgz?$/i.test(decodeURIComponent(url.pathname))) return false;
+    return /^https:\/\//i.test(value) || (value.startsWith("/") && !value.startsWith("//") &&
+      /^\/(?:assets|uploads\/products)\/.+\.(?:png|jpe?g|webp|gif|avif)$/i.test(decodeURIComponent(url.pathname)));
+  }
+
+  function validBanner(banner) {
+    return banner && Number.isSafeInteger(banner.id) && banner.id >= 1 &&
+      ["left", "right"].includes(banner.placement) &&
+      typeof banner.title === "string" && banner.title.trim() !== "" && banner.title.length <= 120 &&
+      typeof banner.description === "string" && banner.description.length <= 400 &&
+      validImage(banner.imageUrl) && typeof banner.imageAlt === "string" &&
+      banner.imageAlt.trim() !== "" && banner.imageAlt.length <= 200 &&
+      typeof banner.buttonLabel === "string" && banner.buttonLabel.length <= 60 &&
+      typeof banner.buttonUrl === "string" &&
+      ((banner.buttonLabel === "" && banner.buttonUrl === "") ||
+        (banner.buttonLabel.trim() !== "" && validLink(banner.buttonUrl))) &&
+      typeof banner.enabled === "boolean" && Number.isSafeInteger(banner.sortOrder) &&
+      banner.sortOrder >= 0 && banner.sortOrder <= 999 &&
+      Number.isSafeInteger(banner.revision) && banner.revision >= 0;
+  }
+
+  const rails = ["left", "right"].map(placement => {
+    const element = document.createElement("aside");
+    element.className = "side-banner-rail side-banner-rail--" + placement;
+    element.setAttribute("aria-label", placement === "left" ? "Quảng cáo bên trái" : "Quảng cáo bên phải");
+    element.hidden = true;
+    container.append(element);
+    const rail = { placement, element, banners: [], index: 0, timer: null, pointerWithin: false, animation: null };
+    element.addEventListener("pointerenter", event => {
+      if (event.pointerType === "touch") return;
+      rail.pointerWithin = true;
+      updatePlayback(rail);
+    });
+    element.addEventListener("pointerleave", () => {
+      rail.pointerWithin = false;
+      updatePlayback(rail);
+    });
+    element.addEventListener("focusin", () => updatePlayback(rail));
+    element.addEventListener("focusout", () => queueMicrotask(() => updatePlayback(rail)));
+    return rail;
+  });
+
+  function updatePlayback(rail) {
+    clearTimeout(rail.timer);
+    rail.timer = null;
+    if (!active || controller || document.hidden || desktopPreference?.matches === false ||
+      rail.banners.length < 2 || rail.pointerWithin || rail.element.contains(document.activeElement)) return;
+    rail.timer = setTimeout(() => {
+      rail.index = (rail.index + 1) % rail.banners.length;
+      renderRail(rail, true);
+      updatePlayback(rail);
+    }, 5000);
+  }
+
+  function renderRail(rail, animate = false) {
+    rail.animation?.cancel();
+    rail.animation = null;
+    const restoreFocus = rail.element.contains(document.activeElement);
+    const banner = rail.banners[rail.index];
+    rail.element.hidden = !banner;
+    if (!banner) {
+      rail.element.replaceChildren();
+      if (restoreFocus) header.querySelector("[data-header-search-input]")?.focus();
+      return;
+    }
+    const card = document.createElement(banner.buttonUrl ? "a" : "div");
+    card.className = "side-banner";
+    if (banner.buttonUrl) {
+      card.href = banner.buttonUrl;
+      card.addEventListener("click", event => window.ShopStorefront?.prepareNavigation(event, card));
+    }
+    const image = document.createElement("img");
+    image.className = "side-banner-image";
+    image.src = banner.imageUrl;
+    image.alt = banner.imageAlt;
+    image.width = 724;
+    image.height = 2172;
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.fetchPriority = "low";
+    image.addEventListener("error", () => { image.hidden = true; });
+    const copy = document.createElement("span");
+    copy.className = "side-banner-copy";
+    const title = document.createElement("strong");
+    title.className = "side-banner-title";
+    title.textContent = banner.title;
+    const description = document.createElement("span");
+    description.className = "side-banner-description";
+    description.textContent = banner.description;
+    description.hidden = banner.description === "";
+    copy.append(title, description);
+    card.append(image, copy);
+    if (banner.buttonLabel) {
+      const action = document.createElement("span");
+      action.className = "side-banner-cta";
+      action.textContent = banner.buttonLabel;
+      card.append(action);
+    }
+    rail.element.replaceChildren(card);
+    if (restoreFocus) {
+      const focusTarget = banner.buttonUrl ? card : header.querySelector("[data-header-search-input]");
+      focusTarget?.focus();
+    }
+    if (animate && !motionPreference?.matches && typeof card.animate === "function") {
+      rail.animation = card.animate([
+        { opacity: 0, transform: "translateY(8px)" },
+        { opacity: 1, transform: "translateY(0)" }
+      ], { duration: 300, easing: "ease-out" });
+    }
+  }
+
+  async function loadBanners() {
+    if (!active || controller) return;
+    const requestController = new AbortController();
+    controller = requestController;
+    rails.forEach(updatePlayback);
+    try {
+      const response = await fetch("/api/banners?placement=side", {
+        cache: "no-store", signal: AbortSignal.any([requestController.signal, AbortSignal.timeout(15000)])
+      });
+      const result = await response.json();
+      if (!active || controller !== requestController) return;
+      if (!response.ok || !Array.isArray(result) || !result.every(validBanner) ||
+        new Set(result.map(banner => banner.id)).size !== result.length) {
+        throw new Error("Quảng cáo hai bên chưa hợp lệ");
+      }
+      for (const rail of rails) {
+        const currentId = rail.banners[rail.index]?.id;
+        rail.banners = result.filter(banner => banner.enabled && banner.placement === rail.placement)
+          .sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
+        rail.index = Math.max(0, rail.banners.findIndex(banner => banner.id === currentId));
+        document.body.classList.toggle("has-side-banner-" + rail.placement, rail.banners.length > 0);
+        renderRail(rail);
+      }
+      document.body.classList.toggle("has-side-banners", rails.some(rail => rail.banners.length > 0));
+    } catch {
+      // Side advertisements stay optional when the request is unavailable.
+    } finally {
+      if (controller === requestController) {
+        controller = null;
+        rails.forEach(updatePlayback);
+      }
+    }
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) rails.forEach(rail => rail.animation?.cancel());
+    rails.forEach(updatePlayback);
+  });
+  desktopPreference?.addEventListener("change", () => rails.forEach(updatePlayback));
+  motionPreference?.addEventListener("change", () => {
+    if (motionPreference.matches) rails.forEach(rail => rail.animation?.cancel());
+  });
+  window.addEventListener("pagehide", () => {
+    active = false;
+    controller?.abort();
+    controller = null;
+    for (const rail of rails) {
+      rail.pointerWithin = false;
+      rail.animation?.cancel();
+      updatePlayback(rail);
+    }
+  });
+  window.addEventListener("pageshow", event => {
+    active = true;
+    if (event.persisted) void loadBanners();
+    else rails.forEach(updatePlayback);
+  });
+  void loadBanners();
 })();

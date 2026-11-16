@@ -96,6 +96,7 @@
 
   function validBanner(banner) {
     return banner && Number.isSafeInteger(banner.id) && banner.id >= 1 &&
+      (banner.placement === undefined || banner.placement === "hero") &&
       typeof banner.title === "string" && banner.title.trim() !== "" && banner.title.length <= 120 &&
       typeof banner.description === "string" && banner.description.length <= 400 &&
       validImage(banner.imageUrl) && typeof banner.imageAlt === "string" &&
@@ -116,7 +117,7 @@
     controls.hidden = banners.length < 2;
     if (!banner) {
       status.textContent = "";
-      if (hero.contains(document.activeElement)) document.getElementById("catalog-title").focus();
+      if (hero.contains(document.activeElement)) document.getElementById("catalog-title")?.focus();
       return;
     }
     if (controls.hidden && controls.contains(document.activeElement)) hero.focus();
