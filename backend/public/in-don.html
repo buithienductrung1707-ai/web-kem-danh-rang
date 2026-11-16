@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="same-origin">
+    <title>In phiếu đơn hàng</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="print-order.js" defer></script>
+  </head>
+  <body>
+    <main id="print-main" class="print-document" aria-busy="true">
+      <nav class="print-actions" aria-label="Thao tác phiếu đơn hàng">
+        <a class="navigation-link" href="/admin.html">Về quản trị</a>
+        <button type="button" id="print-order-button" disabled>In phiếu / Lưu PDF</button>
+        <button type="button" id="reload-print-order" class="secondary-button" disabled>Tải lại phiếu</button>
+      </nav>
+      <h1>Phiếu đơn hàng</h1>
+      <p id="print-message" role="status" aria-atomic="true">Đang tải phiếu đơn hàng...</p>
+      <section id="print-order-content" hidden>
+        <h2>Cửa hàng kem đánh răng</h2>
+        <dl class="print-summary">
+          <dt>Mã đơn hàng</dt>
+          <dd id="print-order-id"></dd>
+          <dt>Ngày đặt</dt>
+          <dd id="print-order-created"></dd>
+          <dt>Trạng thái</dt>
+          <dd id="print-order-status"></dd>
+          <dt>Người nhận</dt>
+          <dd id="print-customer-name"></dd>
+          <dt>Số điện thoại</dt>
+          <dd id="print-customer-phone"></dd>
+          <dt>Địa chỉ nhận hàng</dt>
+          <dd id="print-customer-address"></dd>
+        </dl>
+        <div class="print-table-wrapper">
+          <table class="print-order-table">
+            <caption>Chi tiết sản phẩm</caption>
+            <thead>
+              <tr>
+                <th scope="col">Sản phẩm</th>
+                <th scope="col">Số lượng</th>
+                <th scope="col">Đơn giá</th>
+                <th scope="col">Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody id="print-order-items"></tbody>
+            <tfoot>
+              <tr>
+                <th scope="row" colspan="3">Tổng tiền sản phẩm</th>
+                <td id="print-order-total"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <p id="print-order-payment"></p>
+      </section>
+    </main>
+  </body>
+</html>

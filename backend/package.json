@@ -1,0 +1,25 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.cjs",
+  "scripts": {
+    "start": "node server.cjs",
+    "tao-admin": "node scripts/tao-admin.cjs",
+    "xem-don": "node scripts/xem-don.cjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.4",
+    "express-session": "^1.19.0",
+    "nodemailer": "^10.5.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.162.0"
+  }
+}

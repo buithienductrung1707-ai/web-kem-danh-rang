@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Đơn hàng của tôi — Cửa hàng kem đánh răng</title>
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="shop-memory.js" defer></script>
+    <script src="account.js" defer></script>
+    <script src="header.js" defer></script>
+    <script src="order-history.js" defer></script>
+  </head>
+
+  <body class="tracking-page order-history-page">
+    <a class="skip-link" href="#main-content">Đến nội dung chính</a>
+    <header class="site-header commerce-header">
+      <div class="site-header-inner">
+        <a class="header-brand" href="/" aria-label="Trang chủ cửa hàng kem đánh răng">
+          <img src="/assets/shop-logo.png" width="48" height="48" alt="">
+          <span class="header-brand-name">Kem đánh răng</span>
+        </a>
+        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/kem-danh-rang.html#catalog" method="get">
+          <label class="visually-hidden" for="header-search-input">Tìm sản phẩm</label>
+          <input id="header-search-input" data-header-search-input name="q" type="search" autocomplete="off" placeholder="Tìm tên hoặc mô tả sản phẩm...">
+          <button class="header-search-button" type="submit">
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg>
+            <span>Tìm</span>
+          </button>
+        </form>
+        <div class="header-actions">
+          <nav class="site-nav" aria-label="Điều hướng chính">
+            <a class="header-action-link" href="/tra-cuu.html">
+              <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 17h4V6H3v11h2m9-8h4l3 4v4h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+              <span class="header-link-copy"><span class="header-link-label">Tra cứu</span><strong>Đơn hàng</strong></span>
+            </a>
+            <a class="header-action-link" href="/dang-nhap.html" data-account-link>
+              <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+              <span class="header-link-copy"><span class="header-link-label">Tài khoản</span><strong data-account-label>Đăng nhập</strong></span>
+            </a>
+            <a class="header-action-link header-cart cart-navigation" href="/gio-hang.html">
+              <span class="header-link-icon" aria-hidden="true"><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m3 3 2 2 2.4 11.5h11.2L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span id="header-cart-count" class="cart-count" hidden>0</span></span>
+              <span class="header-link-copy"><span class="header-link-label">Giỏ hàng</span><strong id="header-cart-total" data-header-cart-total>0 ₫</strong></span>
+            </a>
+          </nav>
+          <button class="theme-toggle button-secondary" type="button" data-theme-toggle aria-label="Chế độ tối" aria-pressed="false" title="Bật chế độ tối">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>
+          </button>
+        </div>
+        <p id="theme-message" role="status" aria-atomic="true"></p>
+        <p id="header-message" role="status" aria-atomic="true"></p>
+      </div>
+      <nav class="catalog-nav" aria-label="Điều hướng cửa hàng">
+        <div class="catalog-nav-inner">
+          <a class="catalog-nav-link" href="/">Trang chủ</a>
+          <div class="catalog-nav-products" data-products-menu>
+            <a class="catalog-nav-link" data-products-link href="/#catalog">Khám phá sản phẩm</a>
+            <button class="catalog-nav-toggle" type="button" data-products-toggle aria-expanded="false" aria-controls="products-menu" aria-label="Các lựa chọn sản phẩm">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <ul class="catalog-nav-menu" id="products-menu" hidden>
+              <li><a href="/kem-danh-rang.html">Kem đánh răng</a></li>
+            </ul>
+          </div>
+          <a class="catalog-nav-link" href="/don-hang.html" aria-current="page">Đơn hàng của tôi</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main-content" class="orders-shell">
+      <header class="page-heading">
+        <h1>Đơn hàng của tôi</h1>
+        <p>Theo dõi trạng thái và xem lại thông tin các đơn đã đặt.</p>
+      </header>
+
+      <section id="orders-account-prompt" class="panel" aria-labelledby="orders-account-title">
+        <h2 id="orders-account-title">Đăng nhập để xem đơn hàng</h2>
+        <div class="form-actions">
+          <a class="button-link" href="/dang-nhap.html?returnTo=%2Fdon-hang.html">Đăng nhập</a>
+          <a class="navigation-link" href="/tra-cuu.html">Tra cứu bằng mã đơn</a>
+        </div>
+      </section>
+      <p id="orders-message" role="status" aria-atomic="true"></p>
+      <button id="orders-account-retry" class="button-secondary" type="button" hidden>Kiểm tra lại tài khoản</button>
+
+      <section id="orders-panel" class="customer-orders-panel" aria-label="Danh sách đơn hàng" hidden>
+        <div class="orders-toolbar">
+          <div class="field">
+            <label for="orders-status-filter">Lọc theo trạng thái</label>
+            <select id="orders-status-filter" disabled>
+              <option value="all">Tất cả trạng thái</option>
+              <option value="NEW">Mới nhận</option>
+              <option value="CONFIRMED">Đã xác nhận</option>
+              <option value="SHIPPING">Đang giao</option>
+              <option value="COMPLETED">Hoàn thành</option>
+              <option value="CANCELLED">Đã hủy</option>
+            </select>
+          </div>
+          <button id="orders-reload" class="button-secondary" type="button" disabled>Tải lại đơn hàng</button>
+        </div>
+        <p id="orders-summary"></p>
+        <div id="orders-list" aria-busy="false"></div>
+        <nav class="orders-pagination" aria-label="Phân trang đơn hàng">
+          <button id="orders-previous" class="button-secondary" type="button" disabled>Trang trước</button>
+          <span id="orders-page">Trang 1</span>
+          <button id="orders-next" class="button-secondary" type="button" disabled>Trang sau</button>
+        </nav>
+      </section>
+
+      <details id="orders-claim-panel" class="panel orders-claim" hidden>
+        <summary>Thêm đơn hàng đã có mã</summary>
+        <p class="field-help">Nhập mã đơn và số điện thoại nhận hàng để liên kết với tài khoản đang đăng nhập.</p>
+        <form id="orders-claim-form" method="post" action="/api/account/orders/claim">
+          <div class="field">
+            <label for="orders-claim-code">Mã đơn hàng</label>
+            <input id="orders-claim-code" name="orderId" type="text" autocomplete="off" required>
+          </div>
+          <div class="field">
+            <label for="orders-claim-phone">Số điện thoại nhận hàng</label>
+            <input id="orders-claim-phone" name="customerPhone" type="tel" autocomplete="tel" required>
+          </div>
+          <button id="orders-claim-submit" type="submit" disabled>Thêm vào đơn hàng của tôi</button>
+        </form>
+        <p id="orders-claim-message" role="status" aria-atomic="true"></p>
+      </details>
+    </main>
+
+    <footer class="site-footer store-footer">
+      <div class="site-footer-inner">
+        <div class="footer-brand">
+          <a class="brand-name" href="/">Kem đánh răng</a>
+          <p>Lựa chọn kem đánh răng cho nhu cầu chăm sóc răng miệng hằng ngày.</p>
+        </div>
+        <section class="footer-column" aria-labelledby="footer-shop-title">
+          <h2 id="footer-shop-title">Mua sắm</h2>
+          <nav aria-label="Mua sắm cuối trang">
+            <a href="/">Trang chủ</a>
+            <a href="/kem-danh-rang.html">Kem đánh răng</a>
+            <a class="cart-navigation" href="/gio-hang.html">Giỏ hàng</a>
+          </nav>
+        </section>
+        <section class="footer-column" aria-labelledby="footer-account-title">
+          <h2 id="footer-account-title">Đơn hàng &amp; tài khoản</h2>
+          <nav aria-label="Tài khoản và đơn hàng cuối trang">
+            <a href="/don-hang.html" aria-current="page">Đơn hàng của tôi</a>
+            <a href="/tra-cuu.html">Tra cứu đơn hàng</a>
+            <a href="/dang-nhap.html">Tài khoản của bạn</a>
+            <a href="/dang-ky.html">Đăng ký tài khoản</a>
+          </nav>
+        </section>
+        <section class="footer-column" aria-labelledby="footer-payment-title">
+          <h2 id="footer-payment-title">Thanh toán</h2>
+          <ul class="footer-payment-list">
+            <li><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9h.01M18 15h.01"/></svg><span>Thanh toán khi nhận hàng</span></li>
+            <li><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m3 9 9-6 9 6H3Zm2 3v6m7-6v6m7-6v6M3 21h18"/></svg><span>Chuyển khoản ngân hàng</span></li>
+          </ul>
+        </section>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Cửa hàng kem đánh răng</p>
+        <a href="/admin.html">Quản trị cửa hàng</a>
+      </div>
+    </footer>
+  </body>
+</html>
