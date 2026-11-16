@@ -231,8 +231,9 @@ p {
 }
 
 main {
+  --main-max-width: 1240px;
   width: 100%;
-  max-width: 1240px;
+  max-width: var(--main-max-width);
   margin: 0 auto;
   padding: 36px 32px;
 }
@@ -2329,8 +2330,8 @@ button.button-danger:disabled:hover {
 }
 
 .account-shell {
+  --main-max-width: 544px;
   width: 100%;
-  max-width: 544px;
   min-height: calc(100vh - 270px);
   margin: 0 auto;
   padding: 48px 24px 32px;
@@ -4090,7 +4091,7 @@ button.button-danger:disabled:hover {
 
 @media screen {
   .order-history-page .orders-shell {
-    max-width: 1040px;
+    --main-max-width: 1040px;
   }
 
   .order-history-page #orders-account-prompt .form-actions {
@@ -4451,7 +4452,7 @@ button.button-danger:disabled:hover {
   }
 
   body:is(.storefront-page, .cart-page, .tracking-page, .account-page).has-side-banners > main {
-    --commerce-max-width: 1240px;
+    --commerce-max-width: var(--main-max-width);
   }
 
   body:is(.storefront-page, .cart-page, .tracking-page, .account-page).has-side-banners > .store-footer .footer-bottom {
