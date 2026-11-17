@@ -6,7 +6,9 @@
     <title>Quản trị cửa hàng</title>
     <script src="theme.js"></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin-support.css">
     <script src="admin.js" defer></script>
+    <script src="admin-support.js" defer></script>
   </head>
 
   <body class="admin-page">
@@ -76,6 +78,7 @@
           </div>
           <nav class="sidebar-nav" aria-label="Các mục quản trị">
             <a href="#summary-title">Tổng quan</a>
+            <a href="#support-title">Chăm sóc khách hàng</a>
             <a href="#banner-editor-title">Quảng cáo</a>
             <a href="#product-editor-title">Sản phẩm</a>
             <a href="#orders-title">Đơn hàng</a>
@@ -93,6 +96,39 @@
             </div>
             <p id="summary-message" role="status" aria-atomic="true"></p>
             <dl id="orders-summary" class="order-summary"></dl>
+          </section>
+
+          <section id="admin-support" class="panel admin-support" aria-labelledby="support-title">
+            <div class="panel-heading">
+              <h2 id="support-title">Chăm sóc khách hàng</h2>
+              <button id="support-reload" type="button" class="button-secondary" disabled>Tải lại tin nhắn</button>
+            </div>
+            <p id="support-status" class="support-status" role="status" aria-atomic="true">Chọn mục Chăm sóc khách hàng để xem tin nhắn.</p>
+            <div class="support-inbox">
+              <nav class="support-conversations" aria-label="Cuộc trò chuyện với khách hàng">
+                <h3>Cuộc trò chuyện</h3>
+                <p id="support-empty" class="support-placeholder">Chưa tải cuộc trò chuyện.</p>
+                <ul id="support-conversation-list"></ul>
+              </nav>
+              <div class="support-thread">
+                <div class="support-thread-heading">
+                  <h3 id="support-thread-title">Chọn một cuộc trò chuyện</h3>
+                  <p id="support-thread-state" class="field-help"></p>
+                </div>
+                <div id="support-messages" class="support-messages" role="log" aria-label="Tin nhắn chăm sóc khách hàng" aria-live="polite" aria-relevant="additions" tabindex="0">
+                  <p class="support-placeholder">Nội dung trao đổi sẽ xuất hiện tại đây.</p>
+                </div>
+                <form id="support-reply-form" class="support-reply-form">
+                  <label for="support-reply">Nội dung trả lời</label>
+                  <textarea id="support-reply" rows="3" maxlength="2000" aria-describedby="support-reply-help support-reply-status" required disabled></textarea>
+                  <div class="support-reply-actions">
+                    <p id="support-reply-help" class="field-help">Tối đa 2.000 ký tự.</p>
+                    <button id="support-send" type="submit" disabled>Gửi trả lời</button>
+                  </div>
+                  <p id="support-reply-status" class="support-status" role="status" aria-atomic="true"></p>
+                </form>
+              </div>
+            </div>
           </section>
 
           <section class="panel admin-banners" aria-labelledby="banner-editor-title">

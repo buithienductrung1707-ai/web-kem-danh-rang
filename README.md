@@ -17,7 +17,7 @@ Website bán hàng bằng tiếng Việt, gồm cửa hàng cho khách và trang
 
 Bản demo chạy trên Cloudflare Workers và SQLite-backed Durable Object thuộc gói miễn phí, sử dụng tên miền phụ `workers.dev`. Website tiếp tục hoạt động khi tắt máy tính cá nhân. Đăng nhập admin bằng tài khoản có trong database tại lần triển khai đầu tiên.
 
-Đơn hàng, tài khoản, tồn kho, quảng cáo, phiên đăng nhập và ảnh tải lên được lưu trên Cloudflare. Dữ liệu trực tuyến và [database trên máy](backend/shop.sqlite) được quản lý riêng. Lần triển khai đầu tiên nhập dữ liệu từ database của repo. Những lần cập nhật mã nguồn tiếp theo tiếp tục sử dụng dữ liệu trực tuyến đang có.
+Đơn hàng, tài khoản, tồn kho, quảng cáo, tin nhắn chăm sóc khách hàng, phiên đăng nhập và ảnh tải lên được lưu trên Cloudflare. Dữ liệu trực tuyến và [database trên máy](backend/shop.sqlite) được quản lý riêng. Lần triển khai đầu tiên nhập dữ liệu từ database của repo. Những lần cập nhật mã nguồn tiếp theo tiếp tục sử dụng dữ liệu trực tuyến đang có.
 
 Bản demo hiện dùng thanh toán khi nhận hàng (COD). Để bật chuyển khoản, cần khai báo ba biến thông tin ngân hàng trong cấu hình Worker. Hướng dẫn SMTP bên dưới áp dụng cho bản Node.js local. Bật email trên Workers cần cấu hình SMTP và bộ xử lý gửi email, gồm hàng đợi thông báo đơn hàng.
 
@@ -99,9 +99,25 @@ Các trạng thái đơn hàng được hiển thị theo luồng xử lý.
 | `COMPLETED` | Đã hoàn thành |
 | `CANCELLED` | Đã hủy |
 
+## Trò chuyện với cửa hàng
+
+Bấm bong bóng chat ở góc phải dưới các trang cửa hàng để mở cửa sổ **Chăm sóc khách hàng**. Nhập nội dung rồi bấm **Gửi tin nhắn**. Có thể thêm tên trước tin nhắn đầu tiên. Khách có thể gửi tin khi chưa đăng nhập và dùng các liên kết trong cửa sổ để tra cứu đơn hoặc xem sản phẩm.
+
+Tin nhắn và phản hồi của cửa hàng được lưu trong database. Cuộc trò chuyện tự cập nhật mỗi **10 giây** khi cửa sổ chat đang mở và trang đang hiển thị. Bấm nút đóng hoặc phím **Escape** để thu gọn về bong bóng.
+
+Trình duyệt lưu mã truy cập riêng để mở lại cuộc trò chuyện trên cùng website. Dùng lại trình duyệt đó để xem phản hồi. Xóa dữ liệu website hoặc đổi trình duyệt sẽ tạo cuộc trò chuyện mới. Nếu trình duyệt chặn lưu dữ liệu, cửa sổ sẽ thông báo cần giữ trang để tiếp tục xem tin nhắn.
+
+Khi mất kết nối, nội dung chưa xác nhận được giữ lại. Bấm **Thử gửi lại** để hệ thống kiểm tra kết quả và tiếp tục gửi, tránh tạo tin nhắn trùng.
+
 ## Sử dụng trang quản trị
 
 Mở [trang quản trị trực tuyến](https://web-kem-danh-rang.buithienductrung1707.workers.dev/admin.html) và đăng nhập bằng tài khoản quản trị của bản demo.
+
+### Chăm sóc khách hàng
+
+Chọn **Chăm sóc khách hàng** trong menu quản trị. Danh sách sắp xếp theo tin nhắn mới nhất, cuộc trò chuyện có tin cuối từ khách hiển thị **Chờ phản hồi**. Chọn một cuộc trò chuyện, nhập câu trả lời rồi bấm **Gửi trả lời**. Khách xem được câu trả lời trong cửa sổ chat của họ.
+
+Tin nhắn tự cập nhật mỗi **10 giây** khi đang xem mục này. Bấm **Tải lại tin nhắn** để kiểm tra ngay. Khi kết quả gửi chưa xác nhận, giữ nội dung và bấm **Kiểm tra và gửi lại**. Đăng xuất sẽ đóng quyền xem tin nhắn trong phiên quản trị.
 
 ### Sản phẩm
 
@@ -212,6 +228,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | [backend/src/app.cjs](backend/src/app.cjs) | Ứng dụng Express, API công khai và phục vụ frontend |
 | [backend/src/routes/admin.cjs](backend/src/routes/admin.cjs) | Đăng nhập và API quản trị |
 | [backend/src/routes/account.cjs](backend/src/routes/account.cjs) | Tài khoản, hồ sơ, đơn của khách và khôi phục mật khẩu |
+| [backend/src/routes/support.cjs](backend/src/routes/support.cjs), [backend/src/services/support.cjs](backend/src/services/support.cjs) | API và lưu trữ tin nhắn chăm sóc khách hàng |
 | [backend/src/db/database.cjs](backend/src/db/database.cjs) | Schema, nâng cấp cấu trúc và dữ liệu mẫu |
 | [backend/src/services/](backend/src/services/) | Xử lý đơn, ảnh, quảng cáo và email |
 | [backend/src/utils/](backend/src/utils/) | Lọc đơn và xuất CSV |
@@ -231,6 +248,8 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Ảnh logo dùng chung | [shop-logo.png](backend/public/assets/shop-logo.png) |
 | Danh mục sản phẩm, giỏ hàng và đặt hàng | [app.js](backend/public/app.js) |
 | Trình chiếu quảng cáo trang chủ | [carousel.js](backend/public/carousel.js) |
+| Bong bóng và cửa sổ chăm sóc khách hàng | [support-chat.js](backend/public/support-chat.js), [support-chat.css](backend/public/support-chat.css) |
+| Đọc và trả lời tin nhắn trong quản trị | [admin-support.js](backend/public/admin-support.js), [admin-support.css](backend/public/admin-support.css) |
 | Giao diện quản trị | [admin.html](backend/public/admin.html), [admin.js](backend/public/admin.js) |
 
 Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải lại. Sau khi sửa mã backend hoặc biến môi trường, dừng và chạy lại máy chủ.

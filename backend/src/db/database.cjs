@@ -112,6 +112,26 @@ function initializeSchema() {
     CREATE TABLE IF NOT EXISTS deleted_banner_requests (
       creation_key TEXT PRIMARY KEY
     ) STRICT;
+
+    CREATE TABLE IF NOT EXISTS support_conversations (
+      id TEXT PRIMARY KEY,
+      token_hash TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    ) STRICT;
+
+    CREATE TABLE IF NOT EXISTS support_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT CHECK (id BETWEEN 1 AND 9007199254740991),
+      conversation_id TEXT NOT NULL REFERENCES support_conversations(id) ON DELETE CASCADE,
+      author TEXT NOT NULL CHECK (author IN ('customer', 'admin')),
+      request_id TEXT NOT NULL,
+      text TEXT NOT NULL CHECK (length(text) BETWEEN 1 AND 2000),
+      created_at TEXT NOT NULL,
+      UNIQUE (conversation_id, author, request_id)
+    ) STRICT;
+
+    CREATE INDEX IF NOT EXISTS support_messages_conversation
+      ON support_messages(conversation_id, id);
   `);
 
   const bannerColumns = new Set(

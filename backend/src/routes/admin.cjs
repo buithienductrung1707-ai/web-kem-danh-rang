@@ -11,6 +11,12 @@ const { ordersToCsv } = require("../utils/order-export.cjs");
 const { getAdminBanners, createBanner, updateBanner, deleteBanner } = require("../services/banners.cjs");
 const { outboxSummary, retryFailedEmails } = require("../services/email-outbox.cjs");
 const { getSessionOptions } = require("../services/session-options.cjs");
+const {
+  getSupportConversations, getAdminMessages, sendAdminMessage
+} = require("../services/support.cjs");
+const {
+  requireSupportOrigin, createSupportLimiter, supportErrorHandler
+} = require("./support.cjs");
 
 const router = express.Router();
 const deriveKey = promisify(scrypt);
@@ -40,6 +46,7 @@ router.use((req, res, next) => {
 });
 
 router.use(session(getSessionOptions(cookieName, cookieOptions)));
+router.use("/support", requireSupportOrigin, express.json({ limit: "16kb" }));
 
 const loginLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -141,6 +148,25 @@ function requireAdmin(req, res, next) {
 router.get("/me", requireAdmin, (req, res) => {
   res.json(res.locals.admin);
 });
+
+const supportReadLimiter = createSupportLimiter(120);
+const supportWriteLimiter = createSupportLimiter(10);
+
+router.get("/support/conversations", requireAdmin, supportReadLimiter, (req, res) => {
+  res.json(getSupportConversations());
+});
+
+router.get("/support/conversations/:id/messages", requireAdmin, supportReadLimiter, (req, res) => {
+  const result = getAdminMessages(req.params.id, req.query.after);
+  res.status(result.status).json(result.body);
+});
+
+router.post("/support/conversations/:id/messages", requireAdmin, supportWriteLimiter, (req, res) => {
+  const result = sendAdminMessage(req.params.id, req.body);
+  res.status(result.status).json(result.body);
+});
+
+router.use("/support", supportErrorHandler);
 
 router.get("/email-outbox", requireAdmin, (req, res) => {
   res.json(outboxSummary());

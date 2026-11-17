@@ -4,6 +4,7 @@ const { publicDirectory } = require("../config/paths.cjs");
 const db = require("./db/database.cjs");
 const adminRouter = require("./routes/admin.cjs");
 const accountRouter = require("./routes/account.cjs");
+const { customerSupportRouter } = require("./routes/support.cjs");
 const { createOrder, getOrderItems, getOrderHistory } = require("./services/orders.cjs");
 const { getPublicBanners } = require("./services/banners.cjs");
 const { getRuntime } = require("./runtime.cjs");
@@ -12,12 +13,14 @@ const app = express();
 if (getRuntime()) app.set("trust proxy", 1);
 
 app.use("/api/account", accountRouter);
+app.use("/api/support", customerSupportRouter);
 app.use(["/api/banners", "/api/admin/banners", "/api/orders"], (req, res, next) => {
   res.set("Cache-Control", "no-store");
   next();
 });
 app.use(express.json({
-  type: req => !/^\/api\/admin\/product-images\/?$/i.test(req.path) && req.is("application/json")
+  type: req => !/^\/api\/admin\/product-images\/?$/i.test(req.path) &&
+    !/^\/api\/admin\/support(?:\/|$)/i.test(req.path) && req.is("application/json")
 }));
 app.use("/api/admin", adminRouter);
 
