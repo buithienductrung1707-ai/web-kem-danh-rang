@@ -16,6 +16,7 @@
   const profileForm = document.getElementById("account-profile-form");
   const dashboard = window.ShopAccountDashboard;
   const workspace = window.ShopAccountWorkspace;
+  const menu = window.ShopAccountMenu;
   const saveProfileButton = document.getElementById("account-save-profile");
   const profileMessage = document.getElementById("account-profile-message");
   const fields = {
@@ -32,7 +33,7 @@
     address: document.getElementById("profile-address")
   };
   const guestFocusTarget = workspace && workspace.currentView !== "profile"
-    ? document.getElementById("workspace-login") : fields.email;
+    ? document.getElementById("workspace-login") : fields.email ?? menu?.trigger;
   const returnTargets = new Set(["/", "/kem-danh-rang.html", "/san-pham.html", "/gio-hang.html", "/tra-cuu.html", "/don-hang.html"]);
   function safeReturnTarget(value) {
     if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//")) return null;
@@ -134,7 +135,7 @@
     } else {
       avatar?.remove();
     }
-    const accessibleLabel = identity ? "Xin chào " + identity.name + ", mở tài khoản" : "Tài khoản, Đăng nhập";
+    const accessibleLabel = identity ? "Xin chào " + identity.name + ", mở menu tài khoản" : "Mở menu tài khoản";
     link.setAttribute("aria-label", accessibleLabel);
     link.title = accessibleLabel;
     link.href = authUrl("/dang-nhap.html");
@@ -144,8 +145,9 @@
     return path + (returnTo === "/" ? "" : "?returnTo=" + encodeURIComponent(returnTo));
   }
 
-  function setStatus(message) {
+  function setStatus(message, canRetry = false) {
     if (status) status.textContent = message;
+    menu?.setMessage(message, canRetry);
   }
 
   function setBusy(value) {
@@ -162,7 +164,8 @@
       if (logoutButton) (logoutButton.querySelector("span") ?? logoutButton).textContent = "Đăng xuất";
       if (saveProfileButton) saveProfileButton.textContent = "Lưu thông tin";
     }
-    dashboard?.setBusy(value);
+    if (dashboard) dashboard.setBusy(value);
+    else menu?.setBusy(value);
   }
 
   function validateAccount(account) {
@@ -214,6 +217,7 @@
     }
     if (retryButton) retryButton.hidden = true;
     workspace?.renderAccount(account);
+    menu?.render(account, account ? identityFor(account) : null, authUrl);
   }
 
   function acceptAccount(account, preserveProfile = false) {
@@ -322,13 +326,13 @@
         return;
       }
       setStatus("");
-      if (focusAfter) focusTarget = account ? logoutButton : guestFocusTarget;
+      if (focusAfter) focusTarget = account ? logoutButton ?? menu?.trigger : guestFocusTarget;
     } catch {
       if (!isCurrent(controller)) return;
       renderAccount(null);
-      setStatus("Chưa kiểm tra được phiên. Bạn có thể đăng nhập hoặc bấm Kiểm tra lại phiên.");
+      setStatus("Chưa kiểm tra được phiên. Bạn có thể đăng nhập hoặc bấm Kiểm tra lại phiên.", true);
       if (retryButton) retryButton.hidden = false;
-      if (focusAfter) focusTarget = retryButton;
+      if (focusAfter) focusTarget = retryButton ?? menu?.trigger;
     } finally {
       finishRequest(controller, focusTarget);
     }
@@ -526,11 +530,11 @@
     }
   });
 
-  logoutButton?.addEventListener("click", async () => {
+  async function logoutAccount() {
     if (busy || !pageActive) return;
     const controller = startRequest("Đang đăng xuất...");
-    (logoutButton.querySelector("span") ?? logoutButton).textContent = "Đang đăng xuất...";
-    let focusTarget = logoutButton;
+    if (logoutButton) (logoutButton.querySelector("span") ?? logoutButton).textContent = "Đang đăng xuất...";
+    let focusTarget = logoutButton ?? menu?.trigger;
     try {
       const { response, result } = await request("/logout", {
         method: "POST",
@@ -567,12 +571,13 @@
         }
       } catch {
         if (!isCurrent(controller)) return;
-        setStatus("Chưa xác nhận được kết quả đăng xuất. Kiểm tra kết nối rồi bấm Đăng xuất để thử lại.");
+        setStatus("Chưa xác nhận được kết quả đăng xuất. Kiểm tra kết nối rồi kiểm tra lại phiên.", true);
       }
     } finally {
       finishRequest(controller, focusTarget);
     }
-  });
+  }
+  logoutButton?.addEventListener("click", logoutAccount);
 
   for (const field of Object.values(fields)) {
     field?.addEventListener("input", () => {
@@ -616,6 +621,7 @@
     acceptAccount,
     identityFor,
     isActive: () => !workspace || workspace.currentView === "profile",
+    onBusy: value => menu?.setBusy(value),
     onUnauthorized(reason) {
       activeRequest?.abort();
       activeRequest = null;
@@ -627,6 +633,7 @@
       guestFocusTarget?.focus();
     }
   });
+  menu?.configure({ onLogout: logoutAccount, onRetry: () => checkSession(true) });
   renderAccount(null);
   void checkSession();
 })();

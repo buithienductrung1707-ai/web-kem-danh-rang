@@ -94,9 +94,11 @@ Khách có thể đăng ký bằng email, mật khẩu, họ tên, số điện 
 
 Sau khi đăng nhập, góc tài khoản hiện **Xin chào** và hai từ đầu, cuối trong họ tên. Ví dụ **Nguyễn Văn An** hiện **Nguyễn An**. Avatar mặc định có chữ **NA**, màu nền và chữ được chọn ngẫu nhiên từ các cặp màu có tương phản rõ, giữ ổn định trên cùng trình duyệt. Tên một từ dùng hai chữ cái đầu, ví dụ **Trung** có avatar **TR**. Ảnh đại diện đã tải lên được hiển thị trên header và trang tài khoản.
 
+Bấm khu vực **Xin chào** trên header để mở menu tài khoản, gồm **Giỏ hàng của tôi**, **Đơn hàng của tôi**, **Cài đặt tài khoản** và **Đăng xuất**. Chọn mục cần sử dụng hoặc bấm ra ngoài, nhấn **Escape** để đóng menu. Khi chưa đăng nhập, menu có lựa chọn đăng nhập, đăng ký và mở giỏ hàng.
+
 ### Quản lý tài khoản cá nhân
 
-Bấm khu vực tài khoản trên header để mở trang **Thông tin tài khoản**. Thanh bên hiển thị họ tên, số điện thoại và mã khách hàng được ghép từ `KH` cùng ID tài khoản.
+Chọn **Cài đặt tài khoản** trong menu tài khoản trên header để mở trang **Thông tin tài khoản**. Thanh bên hiển thị họ tên, số điện thoại và mã khách hàng được ghép từ `KH` cùng ID tài khoản.
 
 - Trong tab **Thông tin tài khoản**, chỉnh **Họ**, **Tên**, **Số điện thoại** rồi bấm **Cập nhật**. Bấm **Hoàn tác** để đưa các ô nhập về thông tin đã lưu. Email dùng để đăng nhập được hiển thị ở chế độ chỉ xem.
 - Bấm **Thay đổi** ở ảnh đại diện để chọn JPG, PNG hoặc WebP. Ảnh đầu vào tối đa **20 MiB**, được cắt vuông ở giữa, thu về **512 × 512px** và nén trước khi tải lên. Bấm **Xoá ảnh** để dùng lại avatar chữ cái.
@@ -111,7 +113,7 @@ Khách mua bằng thông tin nhận hàng nhập tại giỏ có thể điền t
 
 ### Theo dõi đơn hàng
 
-- Mở **Tra cứu đơn hàng**, nhập mã đơn và số điện thoại nhận hàng để xem trạng thái.
+- Mở **Tra cứu đơn hàng** ở cuối trang, nhập mã đơn và số điện thoại nhận hàng để xem trạng thái.
 - Mở **Đơn hàng** trên thanh bên tài khoản sau khi đăng nhập để xem lịch sử. Có thể lọc theo khoảng ngày, mã đơn hoặc tên sản phẩm, trạng thái và sắp xếp mới nhất hoặc cũ nhất.
 - Thẻ đơn hiển thị ảnh sản phẩm, tổng tiền và tiến trình xử lý. Mốc thời gian dùng lịch sử trạng thái thực tế của đơn. Bấm **Xem chi tiết** để xem thông tin nhận hàng và các sản phẩm, hoặc **Mua lại** để thêm sản phẩm vào giỏ.
 - Dùng **Thêm đơn hàng đã có mã** cùng mã đơn và số điện thoại để liên kết đơn phù hợp với tài khoản.
@@ -282,7 +284,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Thẻ tiện ích và xem nhanh sản phẩm | [storefront-widgets.css](backend/public/storefront-widgets.css) |
 | Hiệu ứng thêm sản phẩm vào giỏ hàng | [cart-feedback.js](backend/public/cart-feedback.js), [cart-feedback.css](backend/public/cart-feedback.css) |
 | Tìm kiếm, menu và hiển thị banner hai bên từ API | [header.js](backend/public/header.js) |
-| Lời chào và avatar tài khoản trên header | [account.js](backend/public/account.js), [account-header.css](backend/public/account-header.css) |
+| Lời chào, avatar và menu tài khoản trên header | [account.js](backend/public/account.js), [account-menu.js](backend/public/account-menu.js), [account-header.css](backend/public/account-header.css) |
 | Giao diện và thao tác cài đặt tài khoản cá nhân | [account-dashboard.js](backend/public/account-dashboard.js), [account-dashboard.css](backend/public/account-dashboard.css), [dang-nhap.html](backend/public/dang-nhap.html) |
 | Điều hướng chung tài khoản, giỏ hàng và đơn hàng | [account-workspace.js](backend/public/account-workspace.js), [account-workspace.css](backend/public/account-workspace.css) |
 | Giỏ hàng và bước xác nhận mua hàng | [account-cart.html](backend/public/account-cart.html), [account-cart.css](backend/public/account-cart.css), [app.js](backend/public/app.js) |
@@ -300,7 +302,9 @@ Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải 
 
 Ảnh [danh mục bàn chải](backend/public/assets/category-toothbrush.png) được tạo bằng công cụ imagegen tích hợp. [Prompt tạo ảnh](backend/public/assets/category-toothbrush.prompt.txt) được lưu cùng ảnh để có thể tạo lại theo cùng phong cách.
 
-Trên điện thoại, header sắp xếp logo và các biểu tượng thao tác ở hàng đầu, ô tìm kiếm ở hàng riêng, tiếp theo là menu một hàng gồm **Trang chủ**, **Sản phẩm** và **Đơn của tôi**. Biểu tượng xe giao hàng mở tra cứu đơn, hình người mở tài khoản, giỏ hàng mở trang giỏ và mặt trăng/mặt trời đổi giao diện sáng/tối.
+Trên điện thoại, header sắp xếp logo, tài khoản, giỏ hàng và nút đổi giao diện ở hàng đầu. Ô tìm kiếm nằm ở hàng riêng, tiếp theo là menu gồm **Trang chủ** và **Sản phẩm**. Mặt trăng/mặt trời đổi giao diện sáng/tối.
+
+Liên kết **Tra cứu đơn hàng** trên hàng thao tác của header và **Đơn hàng của tôi** trên thanh menu ngang đang được tạm ẩn. Có thể mở **Đơn hàng** trong menu tài khoản hoặc thanh bên, và mở **Tra cứu đơn hàng** từ cuối trang.
 
 ## Kiểm tra nhanh và xử lý lỗi
 

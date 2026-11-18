@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="account-header.css">
     <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
+    <script src="account-menu.js" defer></script>
     <script src="account.js" defer></script>
     <script src="header.js" defer></script>
     <script src="support-chat.js" defer></script>
@@ -34,7 +35,7 @@
         </form>
         <div class="header-actions">
           <nav class="site-nav" aria-label="Điều hướng chính">
-            <a class="header-action-link" href="/tra-cuu.html">
+            <a class="header-action-link" href="/tra-cuu.html" data-temporary-hidden="order-tracking" hidden>
               <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 17h4V6H3v11h2m9-8h4l3 4v4h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
               <span class="header-link-copy"><span class="header-link-label">Tra cứu</span><strong>Đơn hàng</strong></span>
             </a>
@@ -68,7 +69,7 @@
               <li><a href="/san-pham.html?danh-muc=ban-chai-danh-rang">Bàn chải đánh răng</a></li>
             </ul>
           </div>
-          <a class="catalog-nav-link" href="/dang-nhap.html?view=orders"><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>
+          <a class="catalog-nav-link" href="/dang-nhap.html?view=orders" data-temporary-hidden="my-orders" hidden><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>
         </div>
       </nav>
     </header>

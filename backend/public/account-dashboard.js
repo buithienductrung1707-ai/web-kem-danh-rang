@@ -71,6 +71,7 @@
     get("dashboard-add-address").disabled = busy || !addressLoaded || addresses.length >= 5;
     addressFields.isDefault.disabled = busy || Boolean(editingAddress?.isDefault) || addresses.length === 0;
     panel.setAttribute("aria-busy", String(busy));
+    hooks.onBusy?.(busy);
   }
 
   function replaceAccount(next) {

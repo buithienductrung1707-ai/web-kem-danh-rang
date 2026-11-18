@@ -1957,7 +1957,11 @@ function prepareNavigation(event, link) {
 }
 
 for (const link of document.querySelectorAll?.("a[href]") ?? []) {
-  link.addEventListener("click", event => prepareNavigation(event, link));
+  link.addEventListener("click", event => {
+    if (link.hasAttribute("data-account-menu-trigger") && event.button === 0 &&
+      !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) return;
+    prepareNavigation(event, link);
+  });
 }
 
 window.ShopStorefront = {
