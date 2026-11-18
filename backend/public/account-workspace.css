@@ -1,0 +1,27 @@
+.account-dashboard [hidden] {
+  display: none !important;
+}
+
+.workspace-loading,
+.workspace-load-error {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  min-height: 280px;
+  gap: 16px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--muted);
+  text-align: center;
+}
+
+.workspace-load-error p {
+  margin: 0;
+}
+
+#account-commerce-view,
+#workspace-commerce-content {
+  min-width: 0;
+}

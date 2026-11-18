@@ -10,10 +10,11 @@ Website bán hàng bằng tiếng Việt, gồm cửa hàng cho khách và trang
 | Kem đánh răng | [Xem sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/kem-danh-rang.html) |
 | Bàn chải đánh răng | [Xem danh mục bàn chải](https://web-kem-danh-rang.buithienductrung1707.workers.dev/san-pham.html?danh-muc=ban-chai-danh-rang) |
 | Tất cả sản phẩm | [Khám phá sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/san-pham.html) |
-| Giỏ hàng và đặt hàng | [Mở giỏ hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/gio-hang.html) |
+| Giỏ hàng | [Mở giỏ hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=cart) |
+| Xác nhận mua hàng | [Kiểm tra đơn hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=checkout) |
 | Đăng ký | [Tạo tài khoản](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-ky.html) |
 | Đăng nhập, thông tin tài khoản | [Mở tài khoản](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html) |
-| Đơn hàng của tôi | [Xem đơn đã đặt](https://web-kem-danh-rang.buithienductrung1707.workers.dev/don-hang.html) |
+| Đơn hàng của tôi | [Xem đơn đã đặt](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=orders) |
 | Tra cứu đơn hàng | [Tra cứu trạng thái đơn](https://web-kem-danh-rang.buithienductrung1707.workers.dev/tra-cuu.html) |
 | Quản trị cửa hàng | [Đăng nhập quản trị](https://web-kem-danh-rang.buithienductrung1707.workers.dev/admin.html) |
 
@@ -77,9 +78,15 @@ npm.cmd start
 
 1. Chọn danh mục trên trang chủ hoặc trong menu **Khám phá sản phẩm**, tìm sản phẩm hoặc dùng bộ lọc và sắp xếp. Ô tìm kiếm trên header tìm trong toàn bộ sản phẩm của các danh mục đang hiển thị.
 2. Bấm **Xem nhanh** để xem ảnh, mô tả, giá và số lượng có thể thêm. Chọn **Thêm vào giỏ** hoặc **Mua nhanh**.
-3. Mở **Giỏ hàng**, điều chỉnh số lượng và kiểm tra tổng tiền.
-4. Điền thông tin nhận hàng, chọn cách thanh toán và bấm **Xem lại đơn hàng**.
-5. Kiểm tra nội dung rồi bấm **Xác nhận đặt hàng**. Lưu mã đơn sau khi đặt thành công.
+3. Mở **Giỏ hàng** trong khu vực tài khoản. Chọn từng sản phẩm hoặc **Chọn tất cả**, điều chỉnh số lượng và kiểm tra tiền của các sản phẩm đã chọn. Dùng biểu tượng thùng rác để xóa riêng hoặc **Xóa đã chọn** để xóa nhiều sản phẩm.
+4. Bấm **Tiếp tục đặt hàng** để mở bước xác nhận. Kiểm tra sản phẩm, địa chỉ nhận hàng, phương thức thanh toán và tổng tiền. Khách chưa đăng nhập điền thông tin nhận hàng ở bước này.
+5. Bấm **Tạo đơn hàng** để gửi đơn. Lưu mã đơn sau khi đặt thành công. Các sản phẩm chưa chọn tiếp tục nằm trong giỏ hàng.
+
+**Tài khoản**, **Giỏ hàng** và **Đơn hàng** dùng chung bố cục có thanh điều hướng bên trái. Có thể mở trực tiếp [hồ sơ](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html), [giỏ hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=cart), [xác nhận mua hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=checkout) và [đơn hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=orders). Giỏ rỗng hiển thị nút khám phá sản phẩm và xem đơn hàng. Các đường dẫn giỏ hàng, đơn hàng cũ tự chuyển về khu vực tương ứng.
+
+Giỏ hàng và bước xác nhận hỗ trợ mua khi chưa đăng nhập. Lựa chọn sản phẩm được giữ khi chuyển giữa giỏ và xác nhận trong cùng tab. Khi chưa nhận được kết quả gửi đơn, giữ trang hoặc mở lại bước xác nhận rồi bấm **Thử gửi lại** để tiếp tục cùng lần đặt hàng.
+
+Lần gửi đang chờ giữ nguyên mã yêu cầu khi đổi phiên đăng nhập. Đăng nhập đúng tài khoản đã bắt đầu lần gửi để xem thông tin nhận hàng và kiểm tra lại kết quả.
 
 Khi thêm sản phẩm thành công, ảnh sản phẩm bay tới biểu tượng giỏ hàng trên header và số lượng trên giỏ nhấn sáng nhẹ. Nếu thiết bị bật chế độ giảm chuyển động, phản hồi được rút gọn để hạn chế hiệu ứng.
 
@@ -105,7 +112,8 @@ Khách mua bằng thông tin nhận hàng nhập tại giỏ có thể điền t
 ### Theo dõi đơn hàng
 
 - Mở **Tra cứu đơn hàng**, nhập mã đơn và số điện thoại nhận hàng để xem trạng thái.
-- Mở **Đơn hàng của tôi** sau khi đăng nhập để xem lịch sử, lọc trạng thái và chuyển trang.
+- Mở **Đơn hàng** trên thanh bên tài khoản sau khi đăng nhập để xem lịch sử. Có thể lọc theo khoảng ngày, mã đơn hoặc tên sản phẩm, trạng thái và sắp xếp mới nhất hoặc cũ nhất.
+- Thẻ đơn hiển thị ảnh sản phẩm, tổng tiền và tiến trình xử lý. Mốc thời gian dùng lịch sử trạng thái thực tế của đơn. Bấm **Xem chi tiết** để xem thông tin nhận hàng và các sản phẩm, hoặc **Mua lại** để thêm sản phẩm vào giỏ.
 - Dùng **Thêm đơn hàng đã có mã** cùng mã đơn và số điện thoại để liên kết đơn phù hợp với tài khoản.
 
 Các trạng thái đơn hàng được hiển thị theo luồng xử lý.
@@ -276,6 +284,9 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Tìm kiếm, menu và hiển thị banner hai bên từ API | [header.js](backend/public/header.js) |
 | Lời chào và avatar tài khoản trên header | [account.js](backend/public/account.js), [account-header.css](backend/public/account-header.css) |
 | Giao diện và thao tác cài đặt tài khoản cá nhân | [account-dashboard.js](backend/public/account-dashboard.js), [account-dashboard.css](backend/public/account-dashboard.css), [dang-nhap.html](backend/public/dang-nhap.html) |
+| Điều hướng chung tài khoản, giỏ hàng và đơn hàng | [account-workspace.js](backend/public/account-workspace.js), [account-workspace.css](backend/public/account-workspace.css) |
+| Giỏ hàng và bước xác nhận mua hàng | [account-cart.html](backend/public/account-cart.html), [account-cart.css](backend/public/account-cart.css), [app.js](backend/public/app.js) |
+| Lịch sử đơn hàng và tiến trình xử lý | [account-orders.html](backend/public/account-orders.html), [order-history.js](backend/public/order-history.js), [account-orders.css](backend/public/account-orders.css) |
 | Danh mục nổi bật, menu danh mục và trang sản phẩm chung | [catalog-categories.js](backend/public/catalog-categories.js), [catalog-categories.css](backend/public/catalog-categories.css), [san-pham.html](backend/public/san-pham.html) |
 | Quản lý danh mục trong trang admin | [admin-categories.js](backend/public/admin-categories.js), [admin-categories.css](backend/public/admin-categories.css) |
 | Ảnh logo dùng chung | [shop-logo.png](backend/public/assets/shop-logo.png) |

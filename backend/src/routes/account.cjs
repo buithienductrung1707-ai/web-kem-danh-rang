@@ -5,11 +5,12 @@ const { randomBytes, scrypt, timingSafeEqual, createHash } = require("node:crypt
 const { promisify } = require("node:util");
 const db = require("../db/database.cjs");
 const { runTransaction } = require("../db/transaction.cjs");
-const { getOrderItems } = require("../services/orders.cjs");
+const { getOrderItems, getOrderHistory } = require("../services/orders.cjs");
 const mailer = require("../services/mailer.cjs");
 const { getSessionOptions } = require("../services/session-options.cjs");
 const { createProductImageUpload } = require("../services/product-images.cjs");
 const addresses = require("../services/customer-addresses.cjs");
+const { parseOrderFilters, orderFilterSql, orderFilterParameters } = require("../utils/order-filters.cjs");
 
 const router = express.Router();
 const deriveKey = promisify(scrypt);
@@ -134,13 +135,23 @@ const createCustomer = db.prepare(`
   ON CONFLICT(email) DO NOTHING
   RETURNING id, name, email, phone, address, avatar_url, addresses_initialized
 `);
-const countCustomerOrders = db.prepare(`
-  SELECT COUNT(*) AS total FROM orders WHERE customer_id = ? AND (? = 'all' OR status = ?)
+const customerOrderFilterSql = `
+  customer_id = ? AND ${orderFilterSql}
+  AND (? = '' OR CAST(order_number AS TEXT) LIKE ? ESCAPE '\\'
+    OR id LIKE ? ESCAPE '\\' OR product_name LIKE ? ESCAPE '\\'
+    OR EXISTS (SELECT 1 FROM order_items
+      WHERE order_items.order_id = orders.id AND product_name LIKE ? ESCAPE '\\'))
+`;
+const countCustomerOrders = db.prepare(`SELECT COUNT(*) AS total FROM orders WHERE ${customerOrderFilterSql}`);
+const customerOrdersNewest = db.prepare(`
+  SELECT * FROM orders WHERE ${customerOrderFilterSql}
+  ORDER BY datetime(created_at) DESC, rowid DESC LIMIT 10 OFFSET ?
 `);
-const customerOrdersQuery = db.prepare(`
-  SELECT * FROM orders WHERE customer_id = ? AND (? = 'all' OR status = ?)
-  ORDER BY created_at DESC, rowid DESC LIMIT 10 OFFSET ?
+const customerOrdersOldest = db.prepare(`
+  SELECT * FROM orders WHERE ${customerOrderFilterSql}
+  ORDER BY datetime(created_at) ASC, rowid ASC LIMIT 10 OFFSET ?
 `);
+const customerOrderImage = db.prepare("SELECT image_url AS imageUrl FROM products WHERE id = ?");
 const claimOrderQuery = db.prepare(`
   UPDATE orders SET customer_id = ?
   WHERE (id = ? OR CAST(order_number AS TEXT) = ?) AND customer_phone = ?
@@ -170,7 +181,10 @@ function customerOrderResponse(order) {
     status: order.status,
     createdAt: order.created_at,
     customerPhone: order.customer_phone,
-    items: getOrderItems(order)
+    statusHistory: getOrderHistory(order.id),
+    items: getOrderItems(order).map(item => ({
+      ...item, imageUrl: customerOrderImage.get(item.productId)?.imageUrl || ""
+    }))
   };
 }
 
@@ -359,18 +373,30 @@ router.post("/password", requireCustomer, requireCustomerContext, passwordChange
 router.get("/orders", requireCustomer, requireCustomerContext, (req, res) => {
   const pageValue = req.query.page ?? "1";
   const status = req.query.status ?? "all";
+  const search = req.query.q ?? "";
+  const sort = req.query.sort ?? "newest";
   const statuses = ["all", "NEW", "CONFIRMED", "SHIPPING", "COMPLETED", "CANCELLED"];
-  if (Object.keys(req.query).some(key => !["page", "status"].includes(key)) ||
+  if (Object.keys(req.query).some(key => !["page", "status", "dateFrom", "dateTo", "q", "sort"].includes(key)) ||
     typeof pageValue !== "string" || !/^[1-9]\d*$/.test(pageValue) ||
-    !Number.isSafeInteger(Number(pageValue)) || !statuses.includes(status)) {
-    return res.status(400).json({ error: "Trang hoặc trạng thái lọc chưa hợp lệ." });
+    !Number.isSafeInteger(Number(pageValue)) || !statuses.includes(status) ||
+    typeof search !== "string" || search.length > 120 || !["newest", "oldest"].includes(sort)) {
+    return res.status(400).json({ error: "Trang hoặc bộ lọc đơn hàng chưa hợp lệ." });
   }
-
+  const parsed = parseOrderFilters({
+    status: status === "all" ? "" : status,
+    fromDate: req.query.dateFrom,
+    toDate: req.query.dateTo
+  }, statuses.slice(1));
+  if (parsed.error) return res.status(400).json({ error: parsed.error });
   const customerId = res.locals.customer.id;
-  const totalOrders = countCustomerOrders.get(customerId, status, status).total;
+  const term = search.trim().replace(/^#/, "");
+  const pattern = "%" + term.replace(/[\\%_]/g, "\\$&") + "%";
+  const parameters = [customerId, ...orderFilterParameters(parsed.filters), term, pattern, pattern, pattern, pattern];
+  const totalOrders = countCustomerOrders.get(...parameters).total;
   const totalPages = Math.max(1, Math.ceil(totalOrders / 10));
   const page = Math.min(Number(pageValue), totalPages);
-  const orders = customerOrdersQuery.all(customerId, status, status, (page - 1) * 10)
+  const query = sort === "oldest" ? customerOrdersOldest : customerOrdersNewest;
+  const orders = query.all(...parameters, (page - 1) * 10)
     .map(customerOrderResponse);
   res.json({ orders, page, totalPages, totalOrders });
 });

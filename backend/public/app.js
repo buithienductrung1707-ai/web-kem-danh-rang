@@ -69,6 +69,14 @@ const recentOrdersMessage = document.getElementById("recent-orders-message");
 const reorderMessage = document.getElementById("reorder-message");
 const pendingOrderMessage = document.getElementById("pending-order-message");
 const pendingCartLink = document.getElementById("pending-cart-link");
+const cartWorkspace = document.querySelector(".account-cart-workspace");
+const cartEmptyState = document.getElementById("cart-empty-state");
+const cartFilledState = document.getElementById("cart-filled-state");
+const cartSelectAll = document.getElementById("cart-select-all");
+const removeSelectedButton = document.getElementById("remove-selected-cart");
+const cartContinueButton = document.getElementById("cart-continue");
+const checkoutReviewItems = document.getElementById("checkout-review-items");
+const cartSelectionStorageKey = "toothpaste-cart-unselected";
 const customerFields = [customerNameField, customerPhoneField, customerAddressField, customerEmailField].filter(Boolean);
 const storageKey = "toothpaste-cart-items";
 const legacyStorageKey = "toothpaste-cart-quantity";
@@ -112,6 +120,47 @@ let favoriteProducts = new Set();
 const favoriteChanges = new Map();
 let previewProductId = null;
 let previewOpener = null;
+let unselectedCartProducts = new Set();
+let reviewedCartSnapshot = null;
+let removingCartQuantity = null;
+let currentReceiptItems = null;
+
+if (cartWorkspace) {
+  try {
+    const savedSelection = JSON.parse(sessionStorage.getItem(cartSelectionStorageKey) ?? "[]");
+    if (Array.isArray(savedSelection) && savedSelection.every(id => Number.isSafeInteger(id) && id > 0)) {
+      unselectedCartProducts = new Set(savedSelection);
+    }
+  } catch {
+    storageMessage.textContent = "Chưa đọc được lựa chọn trước đó. Các sản phẩm trong giỏ được chọn lại.";
+  }
+}
+
+function selectedCart() {
+  return cartWorkspace ? new Map([...cart].filter(([id]) => !unselectedCartProducts.has(id))) : cart;
+}
+
+function saveCartSelection() {
+  if (!cartWorkspace) return true;
+  try {
+    sessionStorage.setItem(cartSelectionStorageKey, JSON.stringify([...unselectedCartProducts]));
+    return true;
+  } catch {
+    storageMessage.textContent = "Chưa lưu được lựa chọn sản phẩm. Hãy cho phép trình duyệt lưu dữ liệu rồi thử lại.";
+    return false;
+  }
+}
+
+function workspaceRender(view = window.ShopAccountWorkspace?.currentView ?? "cart") {
+  if (!cartWorkspace) return;
+  const step = view === "checkout" ? "checkout" : "cart";
+  for (const panel of cartWorkspace.querySelectorAll("[data-cart-step]")) {
+    panel.hidden = panel.dataset.cartStep !== step;
+  }
+  if (step === "checkout") renderCheckoutVisuals();
+}
+
+window.addEventListener("shop-workspace-view", event => workspaceRender(event.detail?.view));
 
 function paymentLabel(method) {
   return method === "BANK_TRANSFER" ? "Chuyển khoản ngân hàng" : "Thanh toán khi nhận hàng (COD)";
@@ -375,6 +424,9 @@ window.addEventListener("storage", event => {
 function savePendingOrder() {
   try {
     sessionStorage.setItem(pendingStorageKey, JSON.stringify({ version: 1, order: reviewedOrder,
+      ...(reviewedCartSnapshot === null ? {} : {
+        cartSnapshot: [...reviewedCartSnapshot].map(([productId, quantity]) => ({ productId, quantity }))
+      }),
       ...(reviewedCustomerContext === undefined ? {} : { expectedCustomerId: reviewedCustomerContext }) }));
     pendingOrderStored = true;
     pendingOrderReadFailed = false;
@@ -435,12 +487,21 @@ function restorePendingOrder() {
       !Number.isSafeInteger(order.items.reduce((sum, item) => sum + item.quantity * item.expectedUnitPrice, 0))) {
       throw new Error("Lần gửi đã lưu chưa hợp lệ");
     }
+    const snapshot = record.cartSnapshot;
+    if (snapshot !== undefined && (!Array.isArray(snapshot) || !snapshot.every(item => item &&
+      Number.isSafeInteger(item.productId) && item.productId > 0 && Number.isSafeInteger(item.quantity) && item.quantity > 0) ||
+      new Set(snapshot.map(item => item.productId)).size !== snapshot.length ||
+      !order.items.every(item => snapshot.some(saved => saved.productId === item.productId && saved.quantity === item.quantity)))) {
+      throw new Error("Giỏ hàng của lần gửi đã lưu chưa hợp lệ");
+    }
     reviewedOrder = order;
+    reviewedCartSnapshot = new Map((snapshot ?? order.items).map(item => [item.productId, item.quantity]));
     reviewedCustomerContext = record.expectedCustomerId;
     orderPending = true;
     pendingOrderStored = true;
     catalogReady = false;
-    cart = new Map(order.items.map(item => [item.productId, item.quantity]));
+    cart = new Map(reviewedCartSnapshot);
+    if (cartWorkspace) unselectedCartProducts = new Set([...cart.keys()].filter(id => !order.items.some(item => item.productId === id)));
     cartPersisted = false;
     cartReadFailed = false;
     products = new Map(order.items.map(item => [item.productId, {
@@ -589,10 +650,16 @@ function finishSubmittedCart(submittedItems) {
     const submitted = new Map(submittedItems.map(item => [item.productId, item.quantity]));
     const saved = new Map(latest.items.map(item => [item.productId, item.quantity]));
     applyStoredCart(latest);
-    if (cartSignature(saved) !== cartSignature(submitted)) {
+    if (cartSignature(saved) !== cartSignature(reviewedCartSnapshot ?? submitted)) {
       return "Giỏ hiện tại đã thay đổi từ lúc gửi đơn và được giữ lại. Hãy kiểm tra giỏ trước khi mua tiếp.";
     }
-    cart.clear();
+    for (const [id, quantity] of submitted) {
+      const remaining = (cart.get(id) ?? 0) - quantity;
+      if (remaining > 0) cart.set(id, remaining);
+      else cart.delete(id);
+      unselectedCartProducts.delete(id);
+    }
+    saveCartSelection();
     saveCart();
     return "";
   } catch {
@@ -656,12 +723,14 @@ function importReorder() {
 
 function clearOrderReview() {
   reviewedOrder = null;
+  reviewedCartSnapshot = null;
   reviewedAccountId = null;
   reviewedCustomerContext = undefined;
   bankTransferReceipt = null;
   if (orderPreview) orderPreview.textContent = "";
   if (orderMessage) orderMessage.textContent = "";
   renderPaymentDetails();
+  renderCheckoutVisuals();
 }
 
 function completeCheckoutProfile(account) {
@@ -672,19 +741,44 @@ function completeCheckoutProfile(account) {
     account.address.trim().length >= 5 && account.address.length <= 500;
 }
 
+function pendingContextMatches() {
+  if (checkoutAccountChecking || !["guest", "member"].includes(checkoutAccountState)) return false;
+  if (reviewedCustomerContext === undefined) return true;
+  const currentContext = checkoutAccount ? String(checkoutAccount.id) : "guest";
+  return reviewedCustomerContext === currentContext;
+}
+
 function renderCheckoutAccount() {
   if (!checkoutForm) return;
   const guest = checkoutAccountState === "guest";
   recipientFields.hidden = !guest || orderPending;
   recipientFields.disabled = !guest || orderPending || isSubmitting;
-  savedRecipient.hidden = checkoutAccountState !== "member" || orderPending;
+  const verified = !checkoutAccountChecking && ["guest", "member"].includes(checkoutAccountState);
+  const pendingRecipientVisible = orderPending && reviewedCustomerContext !== undefined && pendingContextMatches();
+  savedRecipient.hidden = orderPending ? !pendingRecipientVisible : !verified || checkoutAccountState !== "member";
+  if (cartWorkspace) {
+    const recipient = pendingRecipientVisible && reviewedOrder ? {
+      name: reviewedOrder.customerName, phone: reviewedOrder.customerPhone, address: reviewedOrder.customerAddress
+    } : !orderPending && verified ? checkoutAccount : null;
+    document.getElementById("checkout-recipient-name").textContent = recipient?.name ?? "";
+    document.getElementById("checkout-recipient-phone").textContent = recipient?.phone ?? "";
+    document.getElementById("checkout-recipient-address").textContent = recipient?.address ?? "";
+    const pendingLogin = document.getElementById("checkout-pending-login");
+    pendingLogin.hidden = !orderPending || !verified || checkoutAccountState !== "guest" ||
+      reviewedCustomerContext === undefined || reviewedCustomerContext === "guest";
+    pendingLogin.href = "/dang-nhap.html?returnTo=" + encodeURIComponent("/dang-nhap.html?view=checkout");
+  }
   checkoutAccountRetry.hidden = checkoutAccountState !== "error";
   checkoutAccountRetry.disabled = checkoutAccountChecking || isSubmitting;
   if (checkoutAccountChecking || checkoutAccountState === "loading") {
     checkoutAccountStatus.textContent = "Đang kiểm tra tài khoản...";
   } else if (checkoutAccountState === "error") {
     checkoutAccountStatus.textContent = "Chưa kiểm tra được tài khoản. Bấm Kiểm tra lại tài khoản trước khi đặt đơn mới.";
-  } else if (checkoutAccount && !completeCheckoutProfile(checkoutAccount)) {
+  } else if (orderPending && !pendingContextMatches()) {
+    checkoutAccountStatus.textContent = reviewedCustomerContext === "guest"
+      ? "Lần gửi này được tạo khi chưa đăng nhập. Hãy đăng xuất để tiếp tục kiểm tra cùng đơn hàng."
+      : "Hãy đăng nhập đúng tài khoản đã tạo lần gửi đang chờ để kiểm tra kết quả. Mã lần gửi được giữ lại.";
+  } else if (!orderPending && checkoutAccount && !completeCheckoutProfile(checkoutAccount)) {
     checkoutAccountStatus.textContent = "Hãy bổ sung số điện thoại và địa chỉ trong Tài khoản để đặt hàng.";
   } else {
     checkoutAccountStatus.textContent = "";
@@ -711,7 +805,9 @@ function applyCheckoutAccount(account) {
   checkoutAccountState = account === null ? "guest" : "member";
   if (changed && reviewedOrder && !orderPending && !isSubmitting) {
     clearOrderReview();
-    orderMessage.textContent = "Tài khoản hoặc thông tin nhận hàng đã thay đổi. Hãy bấm Xem lại đơn hàng.";
+    orderMessage.textContent = cartWorkspace
+      ? "Tài khoản hoặc thông tin nhận hàng đã thay đổi. Kiểm tra thông tin rồi bấm Tạo đơn hàng."
+      : "Tài khoản hoặc thông tin nhận hàng đã thay đổi. Hãy bấm Xem lại đơn hàng.";
   }
   renderCheckoutAccount();
   if (reviewedOrder) renderOrderReview();
@@ -761,11 +857,11 @@ checkoutAccountRetry?.addEventListener("click", () => {
   if (!isSubmitting && !checkoutAccountChecking) void refreshCheckoutAccount();
 });
 
-function cartTotals() {
+function cartTotals(items = cart) {
   let total = 0;
   let quantity = 0;
   let valid = catalogReady;
-  for (const [id, count] of cart) {
+  for (const [id, count] of items) {
     quantity += count;
     const product = products.get(id);
     if (!product) {
@@ -908,13 +1004,37 @@ function updateControls() {
   }
   for (const button of activeFilters?.querySelectorAll("button") ?? []) button.disabled = locked || !catalogReady;
   if (checkoutForm) {
-    quantityLabel.textContent = quantityText;
+    const selected = selectedCart();
+    const selectedTotals = cartTotals(selected);
+    quantityLabel.textContent = cartWorkspace ? String(selectedTotals.quantity) : quantityText;
     totalLabel.textContent = orderPending && Number.isSafeInteger(pendingTotal)
-      ? money.format(pendingTotal) : totals.valid ? money.format(totals.total) : "—";
+      ? money.format(pendingTotal) : selectedTotals.valid ? money.format(selectedTotals.total) : "—";
     clearButton.disabled = locked || cart.size === 0;
     const recipientReady = checkoutAccountState === "guest" ||
       (checkoutAccountState === "member" && completeCheckoutProfile(checkoutAccount));
-    reviewButton.disabled = locked || !recipientReady || !totals.valid || cart.size === 0 || stockIssue() !== "";
+    const selectedItems = [...selected].map(([productId, quantity]) => ({ productId, quantity }));
+    const selectionValid = selectedTotals.valid && selected.size > 0 && stockIssue(selectedItems) === "";
+    reviewButton.disabled = locked || !recipientReady || !selectionValid;
+    if (cartWorkspace) {
+      cartEmptyState.hidden = cart.size !== 0;
+      cartFilledState.hidden = cart.size === 0;
+      cartSelectAll.checked = selected.size === cart.size && cart.size > 0;
+      cartSelectAll.indeterminate = selected.size > 0 && selected.size < cart.size;
+      cartSelectAll.disabled = locked || cart.size === 0;
+      removeSelectedButton.disabled = locked || selected.size === 0;
+      removeSelectedButton.textContent = "Xóa đã chọn" + (selected.size ? " (" + selected.size + ")" : "");
+      document.getElementById("cart-selection-count").textContent = "· " + cart.size + " sản phẩm";
+      document.getElementById("cart-selected-lines").textContent = String(selected.size);
+      document.getElementById("cart-lines").textContent = String(cart.size);
+      cartContinueButton.disabled = orderPending ? isSubmitting || checkoutAccountChecking : locked || !selectionValid;
+      cartContinueButton.textContent = orderPending ? "Kiểm tra lần đặt hàng đang chờ →" : "Tiếp tục đặt hàng →";
+      for (const checkbox of cartItems.querySelectorAll('input[type="checkbox"]')) checkbox.disabled = locked;
+      const editCart = document.getElementById("checkout-edit-cart");
+      editCart.disabled = isSubmitting;
+      editCart.textContent = orderPending ? "← Về giỏ hàng" : "← Sửa giỏ hàng";
+      reviewButton.hidden = reviewedOrder !== null || currentReceipt !== null;
+      renderCheckoutVisuals();
+    }
     for (const field of customerFields) field.readOnly = locked;
     paymentMethodField.disabled = locked;
     for (const button of cartItems.querySelectorAll("button")) {
@@ -923,7 +1043,8 @@ function updateControls() {
     }
     if (cartRemoveConfirm) cartRemoveConfirm.disabled = locked;
     confirmButton.hidden = reviewedOrder === null;
-    confirmButton.disabled = reviewedOrder === null || isSubmitting || (!orderPending && (checkoutAccountChecking || !recipientReady));
+    confirmButton.disabled = reviewedOrder === null || isSubmitting ||
+      (orderPending ? !pendingContextMatches() : checkoutAccountChecking || !recipientReady);
     checkoutForm.setAttribute("aria-busy", String(isSubmitting || checkoutAccountChecking));
     renderCheckoutAccount();
     renderPaymentDetails();
@@ -972,11 +1093,13 @@ function focusCartQuantity(id, action = "decrease") {
 
 function finishCartRemoval(remove) {
   const id = removingCartProductId;
+  const quantity = removingCartQuantity;
   removingCartProductId = null;
+  removingCartQuantity = null;
   if (cartRemoveDialog.open) cartRemoveDialog.close();
   if (id === null || !storefrontActive) return;
   if (remove) {
-    changeQuantity(id, "remove");
+    changeQuantity(id, "remove", quantity);
     return;
   }
   if (!orderPending && !isSubmitting && refreshQuantityCart() && !cartPersisted) saveCart();
@@ -994,7 +1117,7 @@ cartRemoveDialog?.addEventListener("close", () => {
   if (removingCartProductId !== null && !cartRemoveDialog.open) finishCartRemoval(false);
 });
 
-function changeQuantity(id, action) {
+function changeQuantity(id, action, expectedQuantity = null) {
   if (orderPending || isSubmitting || checkoutAccountChecking || !storefrontActive || cartRemoveDialog?.open) return;
   if (!refreshQuantityCart()) {
     renderCart();
@@ -1007,15 +1130,16 @@ function changeQuantity(id, action) {
     focusCartQuantity(id, action);
     return;
   }
-  if (action === "decrease" && current === 1) {
+  if ((action === "decrease" && current === 1) || action === "delete") {
     removingCartProductId = id;
+    removingCartQuantity = current;
     const name = products.get(id)?.name ?? "Sản phẩm #" + id;
     cartRemoveDescription.textContent = "Bạn có muốn xoá " + name + " khỏi giỏ hàng?";
     cartRemoveDialog.showModal();
     cartRemoveCancel.focus();
     return;
   }
-  if (action === "remove" && current !== 1) {
+  if (action === "remove" && current !== (expectedQuantity ?? 1)) {
     cartMessage.textContent = "Số lượng sản phẩm đã thay đổi ở tab khác. Hãy kiểm tra giỏ hàng và bấm giảm lại nếu muốn xoá.";
     renderCart();
     focusCartQuantity(id);
@@ -1027,7 +1151,11 @@ function changeQuantity(id, action) {
     renderCart();
     return;
   }
-  if (next === 0) cart.delete(id);
+  if (next === 0) {
+    cart.delete(id);
+    unselectedCartProducts.delete(id);
+    saveCartSelection();
+  }
   else cart.set(id, next);
   clearOrderReview();
   cartMessage.textContent = "Đã cập nhật giỏ hàng.";
@@ -1065,6 +1193,25 @@ function renderCart() {
     const name = product?.name ?? "Sản phẩm #" + id;
     const row = document.createElement("article");
     row.className = "cart-item";
+    if (cartWorkspace) {
+      const selectLabel = document.createElement("label");
+      selectLabel.className = "account-cart-item-select";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = "cart-" + id + "-selected";
+      checkbox.checked = !unselectedCartProducts.has(id);
+      checkbox.setAttribute("aria-label", "Chọn " + name);
+      checkbox.addEventListener("change", () => {
+        if (orderPending || isSubmitting) return;
+        if (checkbox.checked) unselectedCartProducts.delete(id);
+        else unselectedCartProducts.add(id);
+        saveCartSelection();
+        clearOrderReview();
+        updateControls();
+      });
+      selectLabel.append(checkbox);
+      row.append(selectLabel);
+    }
     const media = document.createElement("div");
     media.className = "cart-item-media";
     const fallback = document.createElement("span");
@@ -1109,7 +1256,25 @@ function renderCart() {
     count.className = "cart-quantity-value";
     count.textContent = String(quantity);
     actions.append(cartAction(id, "−", "decrease", name), count, cartAction(id, "+", "increase", name));
-    content.append(heading, detail, actions);
+    if (cartWorkspace) {
+      const bottom = document.createElement("div");
+      bottom.className = "account-cart-item-bottom";
+      const price = document.createElement("strong");
+      price.className = "account-cart-line-price";
+      const total = product ? product.price * quantity : null;
+      price.textContent = Number.isSafeInteger(total) ? money.format(total) : "—";
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.id = "cart-" + id + "-delete";
+      remove.className = "account-cart-delete-item";
+      remove.setAttribute("aria-label", "Xóa " + name + " khỏi giỏ");
+      remove.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></svg>';
+      remove.addEventListener("click", () => changeQuantity(id, "delete"));
+      bottom.append(actions, price, remove);
+      content.append(heading, detail, bottom);
+    } else {
+      content.append(heading, detail, actions);
+    }
     row.append(media, content);
     fragment.append(row);
   }
@@ -1122,6 +1287,68 @@ function renderCart() {
     cartMessage.textContent = "Số lượng hoặc tổng tiền quá lớn. Hãy giảm số lượng để tiếp tục.";
   }
   updateControls();
+}
+
+function renderCheckoutVisuals() {
+  if (!checkoutReviewItems) return;
+  const items = reviewedOrder?.items ?? currentReceiptItems ?? [...selectedCart()].map(([productId, quantity]) => ({
+    productId, quantity, expectedUnitPrice: products.get(productId)?.price,
+    expectedProductName: products.get(productId)?.name ?? "Sản phẩm #" + productId
+  }));
+  const fragment = document.createDocumentFragment();
+  let total = 0;
+  let validTotal = true;
+  let quantity = 0;
+  for (const item of items) {
+    const product = products.get(item.productId);
+    const row = document.createElement("article");
+    row.className = "account-checkout-item";
+    const media = document.createElement("div");
+    media.className = "account-checkout-item-media";
+    const fallback = document.createElement("span");
+    fallback.textContent = "Chưa có ảnh";
+    media.append(fallback);
+    if (product?.imageUrl && validImageUrl(product.imageUrl)) {
+      const image = document.createElement("img");
+      image.src = product.imageUrl;
+      image.alt = "";
+      image.width = 68;
+      image.height = 80;
+      image.loading = "lazy";
+      image.decoding = "async";
+      fallback.hidden = true;
+      image.addEventListener("error", () => { image.hidden = true; fallback.hidden = false; });
+      media.append(image);
+    }
+    const content = document.createElement("div");
+    const title = document.createElement("h3");
+    title.textContent = item.expectedProductName;
+    const detail = document.createElement("p");
+    detail.textContent = "Số lượng " + item.quantity + (Number.isSafeInteger(item.expectedUnitPrice)
+      ? " · " + money.format(item.expectedUnitPrice) + "/" + productUnit(product) : " · Đang cập nhật giá");
+    const price = document.createElement("strong");
+    const lineTotal = item.quantity * item.expectedUnitPrice;
+    price.textContent = Number.isSafeInteger(lineTotal) ? money.format(lineTotal) : "—";
+    total += lineTotal;
+    quantity += item.quantity;
+    validTotal = validTotal && Number.isSafeInteger(lineTotal) && Number.isSafeInteger(total);
+    content.append(title, detail, price);
+    row.append(media, content);
+    fragment.append(row);
+  }
+  if (items.length === 0 && currentReceipt === null) {
+    const empty = document.createElement("p");
+    empty.className = "account-checkout-products-note";
+    empty.textContent = "Bạn chưa chọn sản phẩm nào. Quay lại giỏ hàng để chọn sản phẩm muốn mua.";
+    fragment.append(empty);
+  }
+  checkoutReviewItems.replaceChildren(fragment);
+  document.getElementById("checkout-item-count").textContent = items.length + " sản phẩm · " + quantity + " món";
+  const shownTotal = currentReceipt && !reviewedOrder ? money.format(currentReceipt.total)
+    : validTotal && (catalogReady || orderPending || items.length === 0) ? money.format(total) : "—";
+  document.getElementById("checkout-subtotal").textContent = shownTotal;
+  document.getElementById("checkout-total").textContent = shownTotal;
+  document.getElementById("checkout-payment-label").textContent = paymentLabel(reviewedOrder?.paymentMethod ?? paymentMethodField.value);
 }
 
 function renderCatalog() {
@@ -1462,10 +1689,54 @@ clearButton?.addEventListener("click", () => {
   if (orderPending || isSubmitting) return;
   refreshPersistedCart();
   cart.clear();
+  unselectedCartProducts.clear();
+  saveCartSelection();
   clearOrderReview();
   cartMessage.textContent = "Đã xóa giỏ hàng.";
   saveCart();
   renderCart();
+});
+
+cartSelectAll?.addEventListener("change", () => {
+  if (orderPending || isSubmitting) return;
+  for (const id of cart.keys()) {
+    if (cartSelectAll.checked) unselectedCartProducts.delete(id);
+    else unselectedCartProducts.add(id);
+  }
+  saveCartSelection();
+  clearOrderReview();
+  renderCart();
+  cartSelectAll.focus();
+});
+
+removeSelectedButton?.addEventListener("click", () => {
+  if (orderPending || isSubmitting) return;
+  const selected = new Map(selectedCart());
+  if (!refreshQuantityCart()) return;
+  let removed = 0;
+  for (const [id, quantity] of selected) {
+    if (cart.get(id) !== quantity) continue;
+    cart.delete(id);
+    unselectedCartProducts.delete(id);
+    removed += 1;
+  }
+  clearOrderReview();
+  saveCartSelection();
+  saveCart();
+  cartMessage.textContent = "Đã xóa " + removed + " sản phẩm đã chọn khỏi giỏ hàng." +
+    (removed < selected.size ? " Sản phẩm đã thay đổi ở tab khác được giữ lại. Hãy kiểm tra lại giỏ hàng." : "");
+  renderCart();
+  if (cart.size === 0) cartEmptyState.querySelector("a")?.focus();
+  else cartSelectAll.focus();
+});
+
+cartContinueButton?.addEventListener("click", () => {
+  if (isSubmitting || !saveCartSelection()) return;
+  window.ShopAccountWorkspace?.open("checkout");
+});
+
+document.getElementById("checkout-edit-cart")?.addEventListener("click", () => {
+  if (!isSubmitting) window.ShopAccountWorkspace?.open("cart");
 });
 
 checkoutForm?.addEventListener("input", () => {
@@ -1488,13 +1759,14 @@ checkoutForm?.addEventListener("submit", async event => {
   refreshPersistedCart();
   clearOrderReview();
   updateControls();
-  const totals = cartTotals();
-  const availabilityMessage = stockIssue();
+  const selected = selectedCart();
+  const totals = cartTotals(selected);
+  const availabilityMessage = stockIssue([...selected].map(([productId, quantity]) => ({ productId, quantity })));
   if (availabilityMessage) {
     orderMessage.textContent = availabilityMessage;
     return;
   }
-  if (!totals.valid || cart.size === 0) {
+  if (!totals.valid || selected.size === 0) {
     orderMessage.textContent = "Kiểm tra sản phẩm, số lượng trong giỏ và tải lại sản phẩm trước khi đặt hàng.";
     return;
   }
@@ -1505,7 +1777,7 @@ checkoutForm?.addEventListener("submit", async event => {
     paymentMethodField.focus();
     return;
   }
-  const items = [...cart].map(([productId, quantity]) => ({
+  const items = [...selected].map(([productId, quantity]) => ({
     productId, quantity, expectedUnitPrice: products.get(productId).price,
     expectedProductName: products.get(productId).name
   }));
@@ -1519,9 +1791,11 @@ checkoutForm?.addEventListener("submit", async event => {
   };
   reviewedAccountId = checkoutAccount?.id ?? null;
   reviewedCustomerContext = checkoutAccount ? String(checkoutAccount.id) : "guest";
+  reviewedCartSnapshot = new Map(cart);
   renderOrderReview();
-  confirmButton.textContent = "Xác nhận đặt hàng";
+  confirmButton.textContent = cartWorkspace ? "Tạo đơn hàng" : "Xác nhận đặt hàng";
   updateControls();
+  if (cartWorkspace) await submitReviewedOrder();
 });
 
 function renderOrderReview() {
@@ -1540,11 +1814,18 @@ function renderOrderReview() {
     "Tiền sản phẩm " + money.format(total),
     paymentLabel(reviewedOrder.paymentMethod) + "."
   ].join("\n");
+  renderCheckoutVisuals();
 }
 
-confirmButton?.addEventListener("click", async () => {
+async function submitReviewedOrder() {
   if (!reviewedOrder || isSubmitting || (!orderPending && checkoutAccountChecking)) return;
-  if (!orderPending) {
+  if (orderPending) {
+    if (!await refreshCheckoutAccount() || !pendingContextMatches()) {
+      orderMessage.textContent = "Lần gửi đơn đang được giữ lại. Kiểm tra tài khoản trước khi thử gửi lại.";
+      updateControls();
+      return;
+    }
+  } else {
     if (!await refreshCheckoutAccount() || !reviewedOrder) return;
     if (reviewedAccountId !== (checkoutAccount?.id ?? null) ||
       (checkoutAccount && !completeCheckoutProfile(checkoutAccount))) {
@@ -1553,7 +1834,9 @@ confirmButton?.addEventListener("click", async () => {
       return;
     }
     if (refreshPersistedCart()) {
-      orderMessage.textContent = "Giỏ đã thay đổi từ tab khác. Hãy bấm Xem lại đơn hàng để kiểm tra giỏ mới.";
+      orderMessage.textContent = cartWorkspace
+        ? "Giỏ đã thay đổi từ tab khác. Hãy kiểm tra giỏ trước khi tạo đơn hàng."
+        : "Giỏ đã thay đổi từ tab khác. Hãy bấm Xem lại đơn hàng để kiểm tra giỏ mới.";
       renderCart();
       return;
     }
@@ -1580,12 +1863,16 @@ confirmButton?.addEventListener("click", async () => {
       body: JSON.stringify(reviewedOrder), signal: AbortSignal.timeout(15000)
     });
     const result = await response.json();
-    if ([400, 401, 409].includes(response.status) && typeof result?.error === "string") {
+    if (response.status === 401 && typeof result?.error === "string") {
+      await refreshCheckoutAccount();
+      orderMessage.textContent = result.error;
+      return;
+    }
+    if ([400, 409].includes(response.status) && typeof result?.error === "string") {
       orderPending = false;
       clearPendingOrder();
       clearOrderReview();
       orderMessage.textContent = result.error;
-      if (response.status === 401) await refreshCheckoutAccount();
       if (response.status === 409) {
         isSubmitting = false;
         await loadCatalog();
@@ -1601,6 +1888,7 @@ confirmButton?.addEventListener("click", async () => {
       throw new Error("Kết quả đặt hàng chưa hợp lệ");
     }
     const receiptPhone = reviewedOrder.customerPhone;
+    currentReceiptItems = reviewedOrder.items.map(item => ({ ...item }));
     const cartNotice = finishSubmittedCart(reviewedOrder.items);
     orderPending = false;
     clearPendingOrder();
@@ -1627,19 +1915,21 @@ confirmButton?.addEventListener("click", async () => {
     receiptActions.hidden = false;
     receiptCopyMessage.textContent = "";
     renderRecentOrders();
-    if (savedReceipt.error) recentOrdersMessage.textContent = savedReceipt.error;
+    if (savedReceipt.error && recentOrdersMessage) recentOrdersMessage.textContent = savedReceipt.error;
     orderSucceeded = true;
   } catch {
     orderMessage.textContent = "Chưa nhận được kết quả đặt hàng. Giữ trang đang mở và bấm Thử gửi lại.";
   } finally {
     isSubmitting = false;
-    confirmButton.textContent = orderPending ? "Thử gửi lại" : "Xác nhận đặt hàng";
+    confirmButton.textContent = orderPending ? "Thử gửi lại" : cartWorkspace ? "Tạo đơn hàng" : "Xác nhận đặt hàng";
     if (!orderPending && (orderSucceeded || !catalogReady)) await loadCatalog();
     renderCart();
     if (orderPending) confirmButton.focus();
     else if (!receiptActions.hidden) receiptTracking.focus();
   }
-});
+}
+
+confirmButton?.addEventListener("click", () => void submitReviewedOrder());
 
 function prepareNavigation(event, link) {
   const href = typeof link === "string" ? link : link.getAttribute?.("href") ?? link.href;
@@ -1674,7 +1964,8 @@ window.ShopStorefront = {
   hasCatalog: Boolean(productList),
   managesCart: true,
   searchCatalog,
-  prepareNavigation
+  prepareNavigation,
+  workspaceRender
 };
 
 if (productList) {
@@ -1692,4 +1983,5 @@ renderCart();
 if (checkoutForm) void refreshCheckoutAccount();
 if (checkoutForm) void refreshBankTransferDetails();
 if (!orderPending) loadCatalog();
+workspaceRender();
 

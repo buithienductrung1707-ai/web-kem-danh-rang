@@ -61,7 +61,11 @@
 
   function syncBusy() {
     const busy = authBusy || operationBusy || addressLoading;
-    for (const control of panel.querySelectorAll("button, input, textarea")) {
+    for (const control of panel.querySelectorAll(`
+      #account-settings-view :is(button, input, textarea),
+      #dashboard-address-dialog :is(button, input, textarea),
+      #account-logout
+    `)) {
       control.disabled = busy;
     }
     get("dashboard-add-address").disabled = busy || !addressLoaded || addresses.length >= 5;
@@ -221,7 +225,7 @@
     renderIdentity();
     if (!profileDirty || changedUser) fillProfile();
     syncBusy();
-    if (changedUser) void loadAddresses();
+    if (changedUser && hooks.isActive?.() !== false) void loadAddresses();
   }
 
   function acceptBook(result) {

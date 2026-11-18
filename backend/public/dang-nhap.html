@@ -12,6 +12,10 @@
     <link rel="stylesheet" href="account-dashboard.css">
     <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
+    <link rel="stylesheet" href="account-workspace.css">
+    <link rel="stylesheet" href="account-cart.css">
+    <link rel="stylesheet" href="account-orders.css">
+    <script src="account-workspace.js" defer></script>
     <script src="account-dashboard.js" defer></script>
     <script src="account.js" defer></script>
     <script src="header.js" defer></script>
@@ -43,7 +47,7 @@
               <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
               <span class="header-link-copy"><span class="header-link-label">Tài khoản</span><strong data-account-label>Đăng nhập</strong></span>
             </a>
-            <a class="header-action-link header-cart cart-navigation" href="/gio-hang.html">
+            <a class="header-action-link header-cart cart-navigation" href="/dang-nhap.html?view=cart">
               <span class="header-link-icon" aria-hidden="true"><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m3 3 2 2 2.4 11.5h11.2L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span id="header-cart-count" class="cart-count" hidden>0</span></span>
               <span class="header-link-copy"><span class="header-link-label">Giỏ hàng</span><strong id="header-cart-total" data-header-cart-total>0 ₫</strong></span>
             </a>
@@ -69,7 +73,7 @@
               <li><a href="/san-pham.html?danh-muc=ban-chai-danh-rang">Bàn chải đánh răng</a></li>
             </ul>
           </div>
-          <a class="catalog-nav-link" href="/don-hang.html"><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>
+          <a class="catalog-nav-link" href="/dang-nhap.html?view=orders"><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>
         </div>
       </nav>
     </header>
@@ -117,14 +121,14 @@
             </dl>
           </div>
           <nav class="account-dashboard-nav" aria-label="Tài khoản của bạn">
-            <a href="/dang-nhap.html" aria-current="page">
+            <a href="/dang-nhap.html" data-account-view="profile" aria-current="page">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="12" cy="7" r="4"/>
                 <path d="M4 21a8 8 0 0 1 16 0"/>
               </svg>
               Tài khoản
             </a>
-            <a class="cart-navigation" href="/gio-hang.html">
+            <a class="cart-navigation" href="/dang-nhap.html?view=cart" data-account-view="cart">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="m3 3 2 2 2.4 11.5h11.2L21 7H6"/>
                 <circle cx="9" cy="20" r="1"/>
@@ -132,11 +136,17 @@
               </svg>
               Giỏ hàng
             </a>
-            <a href="/don-hang.html">
+            <a href="/dang-nhap.html?view=orders" data-account-view="orders">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="m3 7 9-4 9 4v10l-9 4-9-4V7Zm0 0 9 4 9-4m-9 4v10"/>
               </svg>
               Đơn hàng
+            </a>
+            <a id="workspace-login" href="/dang-nhap.html" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 4H4v16h5m6-12 4 4-4 4m4-4H9"/>
+              </svg>
+              Đăng nhập
             </a>
             <button id="account-logout" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -147,205 +157,219 @@
           </nav>
         </aside>
         <div class="account-dashboard-content">
-          <h1 class="visually-hidden">Thông tin tài khoản</h1>
+          <h1 id="workspace-page-title" class="visually-hidden">Thông tin tài khoản</h1>
           <nav class="dashboard-breadcrumb" aria-label="Đường dẫn trang">
             <a href="/">Trang chủ</a>
             <span aria-hidden="true">›</span>
-            <span aria-current="page">Thông tin tài khoản</span>
+            <a id="workspace-cart-breadcrumb" href="/dang-nhap.html?view=cart" hidden>Giỏ hàng</a>
+            <span id="workspace-cart-separator" aria-hidden="true" hidden>›</span>
+            <span id="workspace-breadcrumb-current" aria-current="page">Thông tin tài khoản</span>
           </nav>
-          <div class="dashboard-tabs" role="tablist" aria-label="Cài đặt tài khoản">
-            <button
-              id="dashboard-profile-tab"
-              type="button"
-              role="tab"
-              aria-selected="true"
-              aria-controls="dashboard-profile-panel"
-              tabindex="0"
+          <div id="account-settings-view" data-workspace-panel="profile">
+            <div class="dashboard-tabs" role="tablist" aria-label="Cài đặt tài khoản">
+              <button
+                id="dashboard-profile-tab"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                aria-controls="dashboard-profile-panel"
+                tabindex="0"
+              >
+                Thông tin tài khoản
+              </button>
+              <button
+                id="dashboard-password-tab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-controls="dashboard-password-panel"
+                tabindex="-1"
+              >
+                Thay đổi mật khẩu
+              </button>
+            </div>
+            <div id="dashboard-profile-panel" role="tabpanel" aria-labelledby="dashboard-profile-tab">
+              <section class="dashboard-card" aria-labelledby="dashboard-personal-title">
+                <header class="dashboard-card-heading">
+                  <h2 id="dashboard-personal-title">Thông tin cá nhân</h2>
+                </header>
+                <div class="dashboard-card-body">
+                  <div class="dashboard-avatar-editor">
+                    <span class="dashboard-avatar dashboard-avatar-large" data-dashboard-avatar aria-hidden="true"></span>
+                    <div class="dashboard-avatar-controls">
+                      <strong>Ảnh đại diện</strong>
+                      <div class="dashboard-avatar-buttons">
+                        <button
+                          class="dashboard-secondary dashboard-compact"
+                          id="dashboard-change-avatar"
+                          type="button"
+                          aria-label="Thay đổi ảnh đại diện"
+                        >
+                          Thay đổi
+                        </button>
+                        <button class="dashboard-text-button" id="dashboard-remove-avatar" type="button" hidden>
+                          Xoá ảnh
+                        </button>
+                      </div>
+                      <p>Hỗ trợ JPG, PNG, WEBP. Ảnh lớn sẽ được tự động nén.</p>
+                    </div>
+                    <input id="dashboard-avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+                  </div>
+                  <p id="dashboard-avatar-message" class="dashboard-message" role="status" aria-atomic="true"></p>
+                  <form id="dashboard-profile-form" action="/api/account/profile" method="post">
+                    <div class="dashboard-fields">
+                      <div class="field">
+                        <label for="dashboard-family-name">Họ</label>
+                        <input
+                          id="dashboard-family-name"
+                          name="familyName"
+                          autocomplete="family-name"
+                          maxlength="120"
+                          required
+                          aria-describedby="dashboard-family-name-error"
+                        >
+                        <p id="dashboard-family-name-error" class="field-error" aria-live="polite"></p>
+                      </div>
+                      <div class="field">
+                        <label for="dashboard-given-name">Tên</label>
+                        <input
+                          id="dashboard-given-name"
+                          name="givenName"
+                          autocomplete="given-name"
+                          maxlength="120"
+                          aria-describedby="dashboard-given-name-error"
+                        >
+                        <p id="dashboard-given-name-error" class="field-error" aria-live="polite"></p>
+                      </div>
+                      <div class="field">
+                        <label for="dashboard-profile-phone">Số điện thoại</label>
+                        <input
+                          id="dashboard-profile-phone"
+                          name="phone"
+                          type="tel"
+                          autocomplete="tel"
+                          maxlength="32"
+                          aria-describedby="dashboard-profile-phone-error"
+                        >
+                        <p id="dashboard-profile-phone-error" class="field-error" aria-live="polite"></p>
+                      </div>
+                      <div class="field">
+                        <label for="account-customer-email">Email</label>
+                        <input
+                          id="account-customer-email"
+                          name="email"
+                          type="email"
+                          autocomplete="email"
+                          readonly
+                          aria-describedby="dashboard-email-help"
+                        >
+                        <p id="dashboard-email-help" class="field-help">Email đang được dùng để đăng nhập.</p>
+                      </div>
+                    </div>
+                    <div class="dashboard-form-actions">
+                      <button id="dashboard-save-profile" type="submit">Cập nhật</button>
+                      <button class="dashboard-secondary" id="dashboard-reset-profile" type="button">Hoàn tác</button>
+                    </div>
+                    <p id="dashboard-profile-message" class="dashboard-message" role="status" aria-atomic="true"></p>
+                  </form>
+                </div>
+              </section>
+              <section class="dashboard-card dashboard-address-book" aria-labelledby="dashboard-address-title">
+                <header class="dashboard-card-heading">
+                  <h2 id="dashboard-address-title">Sổ địa chỉ giao nhận</h2>
+                  <button class="dashboard-add-address" id="dashboard-add-address" type="button">
+                    <span aria-hidden="true">+</span>
+                    Thêm địa chỉ
+                  </button>
+                </header>
+                <div class="dashboard-card-body">
+                  <p id="dashboard-address-help" class="dashboard-address-help">
+                    Lưu tối đa 5 địa chỉ. Địa chỉ mặc định được dùng khi đặt hàng.
+                  </p>
+                  <div id="dashboard-addresses" class="dashboard-address-list" aria-live="polite"></div>
+                  <p id="dashboard-address-message" class="dashboard-message" role="status" aria-atomic="true"></p>
+                  <button id="dashboard-reload-addresses" class="dashboard-secondary" type="button" hidden>
+                    Tải lại địa chỉ
+                  </button>
+                </div>
+              </section>
+            </div>
+            <section
+              id="dashboard-password-panel"
+              class="dashboard-card"
+              role="tabpanel"
+              aria-labelledby="dashboard-password-tab"
+              hidden
             >
-              Thông tin tài khoản
-            </button>
-            <button
-              id="dashboard-password-tab"
-              type="button"
-              role="tab"
-              aria-selected="false"
-              aria-controls="dashboard-password-panel"
-              tabindex="-1"
-            >
-              Thay đổi mật khẩu
-            </button>
-          </div>
-          <div id="dashboard-profile-panel" role="tabpanel" aria-labelledby="dashboard-profile-tab">
-            <section class="dashboard-card" aria-labelledby="dashboard-personal-title">
               <header class="dashboard-card-heading">
-                <h2 id="dashboard-personal-title">Thông tin cá nhân</h2>
+                <h2>Thay đổi mật khẩu</h2>
               </header>
               <div class="dashboard-card-body">
-                <div class="dashboard-avatar-editor">
-                  <span class="dashboard-avatar dashboard-avatar-large" data-dashboard-avatar aria-hidden="true"></span>
-                  <div class="dashboard-avatar-controls">
-                    <strong>Ảnh đại diện</strong>
-                    <div class="dashboard-avatar-buttons">
-                      <button
-                        class="dashboard-secondary dashboard-compact"
-                        id="dashboard-change-avatar"
-                        type="button"
-                        aria-label="Thay đổi ảnh đại diện"
-                      >
-                        Thay đổi
-                      </button>
-                      <button class="dashboard-text-button" id="dashboard-remove-avatar" type="button" hidden>
-                        Xoá ảnh
-                      </button>
-                    </div>
-                    <p>Hỗ trợ JPG, PNG, WEBP. Ảnh lớn sẽ được tự động nén.</p>
+                <form id="dashboard-password-form" action="/api/account/password" method="post">
+                  <div class="field">
+                    <label for="dashboard-current-password">Mật khẩu hiện tại</label>
+                    <input
+                      id="dashboard-current-password"
+                      name="currentPassword"
+                      type="password"
+                      autocomplete="current-password"
+                      maxlength="128"
+                      required
+                      aria-describedby="dashboard-current-password-error"
+                    >
+                    <p id="dashboard-current-password-error" class="field-error" aria-live="polite"></p>
                   </div>
-                  <input id="dashboard-avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-                </div>
-                <p id="dashboard-avatar-message" class="dashboard-message" role="status" aria-atomic="true"></p>
-                <form id="dashboard-profile-form" action="/api/account/profile" method="post">
                   <div class="dashboard-fields">
                     <div class="field">
-                      <label for="dashboard-family-name">Họ</label>
+                      <label for="dashboard-new-password">Mật khẩu mới</label>
                       <input
-                        id="dashboard-family-name"
-                        name="familyName"
-                        autocomplete="family-name"
-                        maxlength="120"
+                        id="dashboard-new-password"
+                        name="newPassword"
+                        type="password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        maxlength="128"
                         required
-                        aria-describedby="dashboard-family-name-error"
+                        aria-describedby="dashboard-password-help dashboard-new-password-error"
                       >
-                      <p id="dashboard-family-name-error" class="field-error" aria-live="polite"></p>
+                      <p id="dashboard-password-help" class="field-help">Sử dụng từ 8 đến 128 ký tự.</p>
+                      <p id="dashboard-new-password-error" class="field-error" aria-live="polite"></p>
                     </div>
                     <div class="field">
-                      <label for="dashboard-given-name">Tên</label>
+                      <label for="dashboard-confirm-password">Nhập lại mật khẩu mới</label>
                       <input
-                        id="dashboard-given-name"
-                        name="givenName"
-                        autocomplete="given-name"
-                        maxlength="120"
-                        aria-describedby="dashboard-given-name-error"
+                        id="dashboard-confirm-password"
+                        name="confirmPassword"
+                        type="password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        maxlength="128"
+                        required
+                        aria-describedby="dashboard-confirm-password-error"
                       >
-                      <p id="dashboard-given-name-error" class="field-error" aria-live="polite"></p>
-                    </div>
-                    <div class="field">
-                      <label for="dashboard-profile-phone">Số điện thoại</label>
-                      <input
-                        id="dashboard-profile-phone"
-                        name="phone"
-                        type="tel"
-                        autocomplete="tel"
-                        maxlength="32"
-                        aria-describedby="dashboard-profile-phone-error"
-                      >
-                      <p id="dashboard-profile-phone-error" class="field-error" aria-live="polite"></p>
-                    </div>
-                    <div class="field">
-                      <label for="account-customer-email">Email</label>
-                      <input
-                        id="account-customer-email"
-                        name="email"
-                        type="email"
-                        autocomplete="email"
-                        readonly
-                        aria-describedby="dashboard-email-help"
-                      >
-                      <p id="dashboard-email-help" class="field-help">Email đang được dùng để đăng nhập.</p>
+                      <p id="dashboard-confirm-password-error" class="field-error" aria-live="polite"></p>
                     </div>
                   </div>
-                  <div class="dashboard-form-actions">
-                    <button id="dashboard-save-profile" type="submit">Cập nhật</button>
-                    <button class="dashboard-secondary" id="dashboard-reset-profile" type="button">Hoàn tác</button>
-                  </div>
-                  <p id="dashboard-profile-message" class="dashboard-message" role="status" aria-atomic="true"></p>
+                  <label class="account-password-option" for="dashboard-show-password">
+                    <input id="dashboard-show-password" type="checkbox">
+                    Hiện mật khẩu
+                  </label>
+                  <button id="dashboard-save-password" type="submit">Cập nhật mật khẩu</button>
+                  <p id="dashboard-password-message" class="dashboard-message" role="status" aria-atomic="true"></p>
                 </form>
               </div>
             </section>
-            <section class="dashboard-card dashboard-address-book" aria-labelledby="dashboard-address-title">
-              <header class="dashboard-card-heading">
-                <h2 id="dashboard-address-title">Sổ địa chỉ giao nhận</h2>
-                <button class="dashboard-add-address" id="dashboard-add-address" type="button">
-                  <span aria-hidden="true">+</span>
-                  Thêm địa chỉ
-                </button>
-              </header>
-              <div class="dashboard-card-body">
-                <p id="dashboard-address-help" class="dashboard-address-help">
-                  Lưu tối đa 5 địa chỉ. Địa chỉ mặc định được dùng khi đặt hàng.
-                </p>
-                <div id="dashboard-addresses" class="dashboard-address-list" aria-live="polite"></div>
-                <p id="dashboard-address-message" class="dashboard-message" role="status" aria-atomic="true"></p>
-                <button id="dashboard-reload-addresses" class="dashboard-secondary" type="button" hidden>
-                  Tải lại địa chỉ
-                </button>
-              </div>
-            </section>
           </div>
-          <section
-            id="dashboard-password-panel"
-            class="dashboard-card"
-            role="tabpanel"
-            aria-labelledby="dashboard-password-tab"
-            hidden
-          >
-            <header class="dashboard-card-heading">
-              <h2>Thay đổi mật khẩu</h2>
-            </header>
-            <div class="dashboard-card-body">
-              <form id="dashboard-password-form" action="/api/account/password" method="post">
-                <div class="field">
-                  <label for="dashboard-current-password">Mật khẩu hiện tại</label>
-                  <input
-                    id="dashboard-current-password"
-                    name="currentPassword"
-                    type="password"
-                    autocomplete="current-password"
-                    maxlength="128"
-                    required
-                    aria-describedby="dashboard-current-password-error"
-                  >
-                  <p id="dashboard-current-password-error" class="field-error" aria-live="polite"></p>
-                </div>
-                <div class="dashboard-fields">
-                  <div class="field">
-                    <label for="dashboard-new-password">Mật khẩu mới</label>
-                    <input
-                      id="dashboard-new-password"
-                      name="newPassword"
-                      type="password"
-                      autocomplete="new-password"
-                      minlength="8"
-                      maxlength="128"
-                      required
-                      aria-describedby="dashboard-password-help dashboard-new-password-error"
-                    >
-                    <p id="dashboard-password-help" class="field-help">Sử dụng từ 8 đến 128 ký tự.</p>
-                    <p id="dashboard-new-password-error" class="field-error" aria-live="polite"></p>
-                  </div>
-                  <div class="field">
-                    <label for="dashboard-confirm-password">Nhập lại mật khẩu mới</label>
-                    <input
-                      id="dashboard-confirm-password"
-                      name="confirmPassword"
-                      type="password"
-                      autocomplete="new-password"
-                      minlength="8"
-                      maxlength="128"
-                      required
-                      aria-describedby="dashboard-confirm-password-error"
-                    >
-                    <p id="dashboard-confirm-password-error" class="field-error" aria-live="polite"></p>
-                  </div>
-                </div>
-                <label class="account-password-option" for="dashboard-show-password">
-                  <input id="dashboard-show-password" type="checkbox">
-                  Hiện mật khẩu
-                </label>
-                <button id="dashboard-save-password" type="submit">Cập nhật mật khẩu</button>
-                <p id="dashboard-password-message" class="dashboard-message" role="status" aria-atomic="true"></p>
-              </form>
+          <div id="account-commerce-view" hidden>
+            <div id="workspace-loading" class="workspace-loading" role="status" aria-live="polite">
+              Đang tải nội dung...
             </div>
-          </section>
+            <div id="workspace-load-error" class="workspace-load-error" hidden>
+              <p id="workspace-load-message" role="alert"></p>
+              <button id="workspace-load-retry" class="button-secondary" type="button">Thử tải lại</button>
+            </div>
+            <div id="workspace-commerce-content"></div>
+          </div>
         </div>
         <dialog id="dashboard-address-dialog" class="dashboard-dialog" aria-labelledby="dashboard-address-dialog-title">
           <form id="dashboard-address-form" action="/api/account/addresses" method="post">
@@ -429,13 +453,13 @@
           <nav aria-label="Mua sắm cuối trang">
             <a href="/">Trang chủ</a>
             <a href="/kem-danh-rang.html">Kem đánh răng</a>
-            <a class="cart-navigation" href="/gio-hang.html">Giỏ hàng</a>
+            <a class="cart-navigation" href="/dang-nhap.html?view=cart">Giỏ hàng</a>
           </nav>
         </section>
         <section class="footer-column" aria-labelledby="footer-account-title">
           <h2 id="footer-account-title">Đơn hàng &amp; tài khoản</h2>
           <nav aria-label="Tài khoản và đơn hàng cuối trang">
-            <a href="/don-hang.html">Đơn hàng của tôi</a>
+            <a href="/dang-nhap.html?view=orders">Đơn hàng của tôi</a>
             <a href="/tra-cuu.html">Tra cứu đơn hàng</a>
             <a href="/dang-nhap.html">Tài khoản của bạn</a>
             <a href="/dang-ky.html">Đăng ký tài khoản</a>

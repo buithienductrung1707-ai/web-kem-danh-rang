@@ -1,0 +1,448 @@
+.account-orders {
+  min-width: 0;
+}
+
+.workspace-orders-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.workspace-orders-heading h1 {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 30px);
+}
+
+.workspace-orders-heading p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.workspace-orders-heading > .button-link {
+  flex-shrink: 0;
+  border-radius: 24px;
+}
+
+.account-orders #orders-message:empty {
+  display: none;
+}
+
+.workspace-orders-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 12px;
+  padding: 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.account-orders .workspace-orders-filters .field {
+  margin: 0;
+}
+
+.workspace-orders-search {
+  grid-column: span 2;
+}
+
+.account-orders select {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--control-border);
+  border-radius: 14px;
+  background: var(--background);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+
+.workspace-orders-filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+  grid-column: span 3;
+}
+
+.account-orders :is(button, .button-link) {
+  min-height: 44px;
+}
+
+.workspace-orders-results {
+  padding: 0 20px 20px;
+}
+
+.account-orders #orders-summary {
+  margin: 18px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.account-orders #orders-list {
+  display: grid;
+  gap: 18px;
+}
+
+.account-orders .customer-order-card {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--background);
+}
+
+.account-orders .customer-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 15px 18px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--line);
+}
+
+.account-orders .customer-order-header h2 {
+  margin: 0;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.account-orders .customer-order-meta {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.account-orders .customer-order-status {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--primary-dark);
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.account-orders .customer-order-status[data-status="CANCELLED"] {
+  color: var(--danger);
+}
+
+.account-orders .customer-order-items {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  padding: 0 18px;
+  margin: 0;
+}
+
+.account-orders .customer-order-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.account-orders .customer-order-thumbnail {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.account-orders .customer-order-product {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-orders .customer-order-product h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.account-orders .customer-order-product p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.account-orders .customer-order-item-total {
+  margin: 0;
+  color: var(--primary-dark);
+  font-weight: 750;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.account-orders .customer-order-payment {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 16px 18px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.account-orders .customer-order-payment p {
+  margin: 0;
+}
+
+.account-orders .customer-order-total {
+  color: var(--primary-dark);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.account-orders .customer-order-progress {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  padding: 20px 18px 16px;
+  margin: 0;
+}
+
+.customer-order-progress li {
+  position: relative;
+  min-width: 0;
+  padding: 22px 4px 0;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.customer-order-stage-label {
+  display: block;
+  min-height: 3.2em;
+}
+
+.customer-order-progress time {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+
+.customer-order-progress li::before {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--line);
+  content: "";
+}
+
+.customer-order-progress li:first-child::before {
+  left: 50%;
+}
+
+.customer-order-progress li:last-child::before {
+  right: 50%;
+}
+
+.customer-order-progress li::after {
+  position: absolute;
+  top: 0;
+  left: calc(50% - 6px);
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  content: "";
+}
+
+.customer-order-progress li.is-complete::before {
+  background: var(--primary);
+}
+
+.customer-order-progress li.is-complete::after {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.customer-order-progress li[aria-current="step"] {
+  font-weight: 750;
+  color: var(--primary-dark);
+}
+
+.customer-order-progress li[aria-current="step"]::after {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 16%, transparent);
+}
+
+.account-orders .customer-order-cancelled {
+  margin: 16px 18px 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--soft);
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.account-orders .customer-order-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 0 18px 18px;
+}
+
+.account-orders .customer-order-actions :is(a, button) {
+  margin: 0;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 22px;
+  font-size: 13px;
+}
+
+.account-orders .orders-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+
+.account-orders .orders-pagination span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.workspace-orders-empty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 42px 20px;
+  text-align: center;
+}
+
+.workspace-orders-empty h2 {
+  font-size: 19px;
+  margin: 0;
+}
+
+.workspace-orders-empty p {
+  color: var(--muted);
+  max-width: 460px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.workspace-orders-claim summary {
+  min-height: 58px;
+  padding: 18px 22px;
+  color: var(--primary-dark);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.workspace-orders-claim .dashboard-card-body {
+  padding-top: 0;
+}
+
+.account-orders .customer-order-action-message {
+  margin: 0 18px 18px;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.account-orders .customer-order-action-message:empty {
+  display: none;
+}
+
+@media (max-width: 1120px) {
+  .workspace-orders-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .workspace-orders-filter-actions {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 540px) {
+  .workspace-orders-heading {
+    gap: 12px;
+  }
+  .workspace-orders-heading > .button-link {
+    width: 100%;
+    text-align: center;
+  }
+  .workspace-orders-filters {
+    padding: 16px;
+    gap: 14px 10px;
+  }
+  .workspace-orders-results {
+    padding: 0 12px 16px;
+  }
+  .workspace-orders-filter-actions {
+    align-items: stretch;
+  }
+  .workspace-orders-filter-actions button {
+    flex: 1 1 auto;
+    font-size: 13px;
+    padding: 10px;
+  }
+  .account-orders .customer-order-header {
+    padding: 14px;
+  }
+  .account-orders .customer-order-items {
+    padding: 0 14px;
+  }
+  .account-orders .customer-order-item {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .account-orders .customer-order-thumbnail {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+  }
+  .account-orders .customer-order-item-total {
+    width: 100%;
+    text-align: right;
+  }
+  .account-orders .customer-order-product p {
+    font-size: 12px;
+  }
+  .account-orders .customer-order-payment {
+    padding: 16px 14px 0;
+  }
+  .account-orders .customer-order-actions {
+    padding: 0 14px 16px;
+  }
+  .account-orders .customer-order-actions :is(a, button) {
+    flex: 1;
+    text-align: center;
+  }
+  .account-orders .customer-order-progress {
+    padding-inline: 10px;
+  }
+  .account-orders .orders-pagination {
+    gap: 8px;
+  }
+  .account-orders .orders-pagination button {
+    padding-inline: 12px;
+    font-size: 13px;
+  }
+}

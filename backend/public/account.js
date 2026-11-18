@@ -15,6 +15,7 @@
   const showPassword = document.getElementById("account-show-password");
   const profileForm = document.getElementById("account-profile-form");
   const dashboard = window.ShopAccountDashboard;
+  const workspace = window.ShopAccountWorkspace;
   const saveProfileButton = document.getElementById("account-save-profile");
   const profileMessage = document.getElementById("account-profile-message");
   const fields = {
@@ -30,12 +31,16 @@
     phone: document.getElementById("profile-phone"),
     address: document.getElementById("profile-address")
   };
+  const guestFocusTarget = workspace && workspace.currentView !== "profile"
+    ? document.getElementById("workspace-login") : fields.email;
   const returnTargets = new Set(["/", "/kem-danh-rang.html", "/san-pham.html", "/gio-hang.html", "/tra-cuu.html", "/don-hang.html"]);
   function safeReturnTarget(value) {
     if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//")) return null;
     try {
       const url = new URL(value, window.location.origin);
-      return url.origin === window.location.origin && returnTargets.has(url.pathname)
+      const accountView = url.pathname === "/dang-nhap.html" &&
+        ["cart", "checkout", "orders"].includes(url.searchParams.get("view"));
+      return url.origin === window.location.origin && (returnTargets.has(url.pathname) || accountView)
         ? url.pathname + url.search + url.hash : null;
     } catch {
       return null;
@@ -43,7 +48,7 @@
   }
   const requestedReturn = new URLSearchParams(window.location.search).get("returnTo");
   const returnTo = form
-    ? (safeReturnTarget(requestedReturn) || "/")
+    ? (safeReturnTarget(requestedReturn) || safeReturnTarget(window.location.pathname + window.location.search) || "/")
     : (safeReturnTarget(window.location.pathname + window.location.search) || "/");
   let activeRequest = null;
   let busy = false;
@@ -208,6 +213,7 @@
       if (profileMessage) profileMessage.textContent = "";
     }
     if (retryButton) retryButton.hidden = true;
+    workspace?.renderAccount(account);
   }
 
   function acceptAccount(account, preserveProfile = false) {
@@ -316,7 +322,7 @@
         return;
       }
       setStatus("");
-      if (focusAfter) focusTarget = account ? logoutButton : fields.email;
+      if (focusAfter) focusTarget = account ? logoutButton : guestFocusTarget;
     } catch {
       if (!isCurrent(controller)) return;
       renderAccount(null);
@@ -497,7 +503,7 @@
         if (account === null) {
           acceptAccount(null);
           setStatus("Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.");
-          focusTarget = fields.email;
+          focusTarget = guestFocusTarget;
         } else if (account.id !== expectedId) {
           acceptAccount(account);
           setStatus("Phiên đăng nhập đã thay đổi. Hãy kiểm tra thông tin tài khoản trước khi lưu.");
@@ -544,7 +550,7 @@
       clearPasswords();
       clearErrors();
       setStatus("Đã đăng xuất.");
-      focusTarget = fields.email;
+      focusTarget = guestFocusTarget;
     } catch {
       if (!isCurrent(controller)) return;
       try {
@@ -555,7 +561,7 @@
           clearPasswords();
           clearErrors();
           setStatus("Đã đăng xuất.");
-          focusTarget = fields.email;
+          focusTarget = guestFocusTarget;
         } else {
           setStatus("Phiên đăng nhập đang hoạt động. Bấm Đăng xuất để thử lại.");
         }
@@ -609,6 +615,7 @@
   dashboard?.configure({
     acceptAccount,
     identityFor,
+    isActive: () => !workspace || workspace.currentView === "profile",
     onUnauthorized(reason) {
       activeRequest?.abort();
       activeRequest = null;
@@ -617,7 +624,7 @@
       clearPasswords();
       setStatus(typeof reason === "string" && reason.trim() !== ""
         ? reason : "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.");
-      fields.email?.focus();
+      guestFocusTarget?.focus();
     }
   });
   renderAccount(null);
