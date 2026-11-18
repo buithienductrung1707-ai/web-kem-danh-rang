@@ -886,10 +886,14 @@ function stockIssue(items = [...cart].map(([productId, quantity]) => ({ productI
   return "";
 }
 
-function canIncreaseQuantity(id) {
+function canIncreaseQuantity(id, quantity = 1) {
   const product = products.get(id);
-  const next = (cart.get(id) ?? 0) + 1;
-  return catalogReady && Boolean(product) && Number.isSafeInteger(next) &&
+  const next = (cart.get(id) ?? 0) + quantity;
+  const totals = cartTotals();
+  return catalogReady && Boolean(product) && Number.isSafeInteger(quantity) && quantity > 0 &&
+    Number.isSafeInteger(next) && Number.isSafeInteger(next * product.price) &&
+    Number.isSafeInteger(totals.quantity + quantity) &&
+    Number.isSafeInteger(totals.total + product.price * quantity) &&
     (!product.stockTracked || next <= product.stockQuantity);
 }
 
@@ -1049,6 +1053,9 @@ function updateControls() {
     renderCheckoutAccount();
     renderPaymentDetails();
   }
+  window.dispatchEvent(new CustomEvent("shop-cart-change", {
+    detail: { ready: catalogReady, loading: catalogLoading, persisted: cartPersisted, locked }
+  }));
 }
 
 function refreshQuantityCart() {
@@ -1392,10 +1399,22 @@ function renderCatalog() {
         image.hidden = true;
         card.className = "product";
       });
-      card.append(image);
+      const imageLink = document.createElement("a");
+      imageLink.href = "/chi-tiet-san-pham.html?id=" + product.id;
+      imageLink.className = "product-image-link";
+      imageLink.setAttribute("aria-label", "Xem chi tiết " + product.name);
+      imageLink.addEventListener("click", event => prepareNavigation(event, imageLink));
+      image.addEventListener("error", () => { imageLink.hidden = true; });
+      imageLink.append(image);
+      card.append(imageLink);
     }
     const heading = document.createElement("h3");
-    heading.textContent = product.name;
+    const detailLink = document.createElement("a");
+    detailLink.href = "/chi-tiet-san-pham.html?id=" + product.id;
+    detailLink.className = "product-title-link";
+    detailLink.textContent = product.name;
+    detailLink.addEventListener("click", event => prepareNavigation(event, detailLink));
+    heading.append(detailLink);
     const price = document.createElement("p");
     price.className = "price";
     price.textContent = money.format(product.price);
@@ -1538,14 +1557,15 @@ function searchCatalog({ query, scope, scroll = true }) {
   return true;
 }
 
-function addProductToCart(product, source = null, image = null) {
-  if (orderPending || isSubmitting || quickBuyNavigating || !storefrontActive) return false;
+function addProductToCart(product, source = null, image = null, quantity = 1) {
+  if (orderPending || isSubmitting || quickBuyNavigating || checkoutAccountChecking || !storefrontActive) return false;
   refreshPersistedCart();
-  if (!canIncreaseQuantity(product.id)) {
+  if (!canIncreaseQuantity(product.id, quantity)) {
+    cartMessage.textContent = "Kiểm tra số lượng sản phẩm và số lượng còn có thể thêm vào giỏ.";
     renderCart();
     return false;
   }
-  const next = (cart.get(product.id) ?? 0) + 1;
+  const next = (cart.get(product.id) ?? 0) + quantity;
   if (!Number.isSafeInteger(next)) return false;
   cart.set(product.id, next);
   clearOrderReview();
@@ -1554,7 +1574,7 @@ function addProductToCart(product, source = null, image = null) {
   renderCart();
   if (source) {
     try {
-      window.ShopCartFeedback?.added({ product, source, image });
+      window.ShopCartFeedback?.added({ product, source, image, quantity });
     } catch {
       // Cart updates remain successful when visual feedback is unavailable.
     }
@@ -1675,6 +1695,7 @@ async function loadCatalog() {
       if (!catalogReady) (productList ?? featuredProductList)?.replaceChildren();
       productList?.setAttribute("aria-busy", "false");
       renderCart();
+      window.dispatchEvent(new CustomEvent("shop-catalog-ready", { detail: { ready: catalogReady } }));
     }
   }
 }
@@ -1969,7 +1990,22 @@ window.ShopStorefront = {
   managesCart: true,
   searchCatalog,
   prepareNavigation,
-  workspaceRender
+  workspaceRender,
+  get ready() { return catalogReady; },
+  get loading() { return catalogLoading; },
+  get locked() { return orderPending || isSubmitting || quickBuyNavigating || checkoutAccountChecking || !storefrontActive; },
+  get persisted() { return cartPersisted; },
+  getProduct(id) { return catalogReady && products.has(id) ? { ...products.get(id) } : null; },
+  getCartQuantity(id) { return cart.get(id) ?? 0; },
+  canAddProduct(id, quantity = 1) {
+    return storefrontActive && !orderPending && !isSubmitting && !quickBuyNavigating &&
+      !checkoutAccountChecking && canIncreaseQuantity(id, quantity);
+  },
+  addProduct(id, quantity = 1, source = null, image = null) {
+    const product = products.get(id);
+    return Boolean(product) && addProductToCart(product, source, image, quantity);
+  },
+  reloadCatalog: loadCatalog
 };
 
 if (productList) {

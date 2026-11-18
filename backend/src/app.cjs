@@ -8,6 +8,7 @@ const { customerSupportRouter } = require("./routes/support.cjs");
 const { createOrder, getOrderItems, getOrderHistory } = require("./services/orders.cjs");
 const { getPublicBanners } = require("./services/banners.cjs");
 const { getPublicCategories } = require("./services/categories.cjs");
+const { productDetailsResponse } = require("./services/product-details.cjs");
 const { getRuntime } = require("./runtime.cjs");
 
 const app = express();
@@ -25,13 +26,20 @@ app.use(express.json({
 }));
 app.use("/api/admin", adminRouter);
 
-const productsQuery = db.prepare(`
-  SELECT p.id, p.name, p.price, p.description, p.image_url AS imageUrl,
+const publicProductFields = `p.id, p.name, p.price, p.description, p.image_url AS imageUrl,
     p.stock_tracked AS stockTracked, p.stock_quantity AS stockQuantity,
-    p.category_id AS categoryId, c.slug AS categorySlug, c.name AS categoryName
+    p.category_id AS categoryId, c.slug AS categorySlug, c.name AS categoryName`;
+const productsQuery = db.prepare(`
+  SELECT ${publicProductFields}
   FROM products p LEFT JOIN product_categories c ON c.id = p.category_id
   WHERE p.active = 1
   ORDER BY p.id
+`);
+const productDetailsQuery = db.prepare(`
+  SELECT ${publicProductFields}, p.detailed_description AS detailedDescription,
+    p.gallery_images AS galleryImagesJson, p.specifications AS specificationsJson
+  FROM products p LEFT JOIN product_categories c ON c.id = p.category_id
+  WHERE p.id = ? AND p.active = 1
 `);
 
 const trackedOrderQuery = db.prepare(`
@@ -46,6 +54,14 @@ app.get("/api/products", (req, res) => {
     ...product,
     stockTracked: product.stockTracked === 1
   })));
+});
+
+app.get("/api/products/:id", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  const id = /^[1-9]\d*$/.test(req.params.id) ? Number(req.params.id) : NaN;
+  const product = Number.isSafeInteger(id) ? productDetailsQuery.get(id) : null;
+  if (!product) return res.status(404).json({ error: "Không tìm thấy sản phẩm." });
+  res.json(productDetailsResponse({ ...product, stockTracked: product.stockTracked === 1 }));
 });
 
 app.get("/api/categories", (req, res) => {

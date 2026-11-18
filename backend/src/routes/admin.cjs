@@ -6,6 +6,7 @@ const { promisify } = require("node:util");
 const db = require("../db/database.cjs");
 const { getOrderItems, getOrderHistory, changeOrderStatus, deleteOrder } = require("../services/orders.cjs");
 const { createProductImageUpload } = require("../services/product-images.cjs");
+const { validProductImageUrl, productDetailsData, productDetailsResponse } = require("../services/product-details.cjs");
 const { parseOrderFilters, orderFilterSql, orderFilterParameters } = require("../utils/order-filters.cjs");
 const { ordersToCsv } = require("../utils/order-export.cjs");
 const { getAdminBanners, createBanner, updateBanner, deleteBanner } = require("../services/banners.cjs");
@@ -465,6 +466,7 @@ router.patch("/product", requireAdmin, (req, res) => {
 });
 
 const productFields = `id, name, price, description, image_url AS imageUrl, active, revision,
+  detailed_description AS detailedDescription, gallery_images AS galleryImagesJson, specifications AS specificationsJson,
   stock_tracked AS stockTracked, stock_quantity AS stockQuantity, category_id AS categoryId,
   (SELECT slug FROM product_categories WHERE id = products.category_id) AS categorySlug,
   (SELECT name FROM product_categories WHERE id = products.category_id) AS categoryName`;
@@ -473,14 +475,17 @@ const productByIdQuery = db.prepare(`SELECT ${productFields} FROM products WHERE
 const productByCreationQuery = db.prepare(`SELECT ${productFields} FROM products WHERE creation_key = ?`);
 const createProductQuery = db.prepare(`
   INSERT INTO products (
-    name, price, description, image_url, active, creation_key, stock_tracked, stock_quantity, category_id
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING
+    name, price, description, image_url, active, creation_key, stock_tracked, stock_quantity, category_id,
+    detailed_description, gallery_images, specifications
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING
   RETURNING ${productFields}
 `);
 const editProductQuery = db.prepare(`
   UPDATE products SET name = ?, price = ?, description = ?, image_url = ?,
     active = ?, stock_tracked = COALESCE(?, stock_tracked),
-    stock_quantity = COALESCE(?, stock_quantity), category_id = COALESCE(?, category_id), revision = revision + 1
+    stock_quantity = COALESCE(?, stock_quantity), category_id = COALESCE(?, category_id),
+    detailed_description = COALESCE(?, detailed_description), gallery_images = COALESCE(?, gallery_images),
+    specifications = COALESCE(?, specifications), revision = revision + 1
   WHERE id = ? AND revision = ? AND revision < 9007199254740991
   RETURNING ${productFields}
 `);
@@ -497,36 +502,33 @@ function productData(body) {
     (body.categoryId !== undefined && !categoryExists(body.categoryId))) return null;
 
   const imageUrl = body.imageUrl.trim();
-  if (imageUrl !== "") {
-    try {
-      const url = new URL(imageUrl, "http://localhost");
-      const relative = imageUrl.startsWith("/") && !imageUrl.startsWith("//");
-      const absolute = /^https?:\/\//i.test(imageUrl);
-      if ((!relative && !absolute) || imageUrl.includes("\\") ||
-        !["http:", "https:"].includes(url.protocol)) return null;
-    } catch {
-      return null;
-    }
-  }
+  if (!validProductImageUrl(imageUrl)) return null;
+  const details = productDetailsData(body);
+  if (!details) return null;
 
   return {
     name: body.name.trim(), price: body.price,
     description: body.description.trim(), imageUrl, active: body.active,
-    stockTracked: body.stockTracked, stockQuantity: body.stockQuantity, categoryId: body.categoryId
+    stockTracked: body.stockTracked, stockQuantity: body.stockQuantity, categoryId: body.categoryId,
+    ...details
   };
 }
 
 function productMatches(product, data) {
+  product = productDetailsResponse(product);
   return product.name === data.name && product.price === data.price &&
     product.description === data.description && product.imageUrl === data.imageUrl &&
     Boolean(product.active) === data.active &&
     (data.stockTracked === undefined || Boolean(product.stockTracked) === data.stockTracked) &&
     (data.stockQuantity === undefined || product.stockQuantity === data.stockQuantity) &&
-    (data.categoryId === undefined || product.categoryId === data.categoryId);
+    (data.categoryId === undefined || product.categoryId === data.categoryId) &&
+    (data.detailedDescription === undefined || product.detailedDescription === data.detailedDescription) &&
+    (data.galleryImages === undefined || JSON.stringify(product.galleryImages) === JSON.stringify(data.galleryImages)) &&
+    (data.specifications === undefined || JSON.stringify(product.specifications) === JSON.stringify(data.specifications));
 }
 
 function productResponse(product) {
-  return { ...product, active: product.active === 1, stockTracked: product.stockTracked === 1 };
+  return productDetailsResponse({ ...product, active: product.active === 1, stockTracked: product.stockTracked === 1 });
 }
 
 router.get("/products", requireAdmin, (req, res) => {
@@ -538,7 +540,7 @@ router.post("/products", requireAdmin, (req, res) => {
   const data = productData(body);
   if (!data || typeof body.requestId !== "string" || body.requestId.trim() === "") {
     return res.status(400).json({
-      error: "Kiểm tra tên, giá, mô tả, danh mục và đường dẫn ảnh. Ảnh có thể để trống hoặc dùng đường dẫn / hay http(s)."
+      error: "Kiểm tra tên, giá, mô tả, thông số, danh mục và ảnh. Ảnh có thể để trống hoặc dùng đường dẫn / hay http(s)."
     });
   }
 
@@ -546,8 +548,12 @@ router.post("/products", requireAdmin, (req, res) => {
   data.stockTracked ??= false;
   data.stockQuantity ??= 0;
   data.categoryId ??= DEFAULT_CATEGORY_ID;
+  data.detailedDescription ??= "";
+  data.galleryImages ??= [];
+  data.specifications ??= [];
   const created = createProductQuery.get(data.name, data.price, data.description,
-    data.imageUrl, Number(data.active), key, Number(data.stockTracked), data.stockQuantity, data.categoryId);
+    data.imageUrl, Number(data.active), key, Number(data.stockTracked), data.stockQuantity, data.categoryId,
+    data.detailedDescription, JSON.stringify(data.galleryImages), JSON.stringify(data.specifications));
   if (created) return res.status(201).json(productResponse(created));
 
   const existing = productByCreationQuery.get(key);
@@ -570,7 +576,9 @@ router.patch("/products/:id", requireAdmin, (req, res) => {
   const updated = editProductQuery.get(data.name, data.price, data.description,
     data.imageUrl, Number(data.active),
     data.stockTracked === undefined ? null : Number(data.stockTracked),
-    data.stockQuantity ?? null, data.categoryId ?? null, id, body.expectedRevision);
+    data.stockQuantity ?? null, data.categoryId ?? null, data.detailedDescription ?? null,
+    data.galleryImages === undefined ? null : JSON.stringify(data.galleryImages),
+    data.specifications === undefined ? null : JSON.stringify(data.specifications), id, body.expectedRevision);
   if (updated) return res.json(productResponse(updated));
 
   const current = productByIdQuery.get(id);

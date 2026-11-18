@@ -58,6 +58,7 @@ const productFields = [productNameField, productPriceField,
 const saveProductButton = document.getElementById("save-product");
 const reloadProductButton = document.getElementById("reload-product");
 const productEditorMessage = document.getElementById("product-editor-message");
+const productDetails = window.ShopAdminProductDetails;
 const bannerPicker = document.getElementById("banner-picker");
 const bannerForm = document.getElementById("banner-form");
 const bannerFields = {
@@ -143,6 +144,7 @@ function setBusy(value) {
     productImageFileField.files.length !== 1;
   clearProductImageButton.disabled = value || !productReady ||
     productImageField.value.trim() === "";
+  productDetails.setBusy(value || !productReady);
 
   const bannerEditable = ["edit", "new", "unknown"].includes(bannerMode);
   for (const field of Object.values(bannerFields)) field.disabled = value || !bannerEditable;
@@ -1098,6 +1100,8 @@ function clearProductEditor() {
   productImageFileField.disabled = true;
   uploadProductImageButton.disabled = true;
   clearProductImageButton.disabled = true;
+  productDetails.fill(null);
+  productDetails.setBusy(true);
 }
 
 function clearProductImageUpload() {
@@ -1107,6 +1111,8 @@ function clearProductImageUpload() {
   productImageMessage.textContent = "";
   productImagePreview.hidden = true;
   productImagePreview.removeAttribute("src");
+  productDetails.galleryFile.value = "";
+  productDetails.galleryMessage.textContent = "";
 }
 
 function showProductImagePreview() {
@@ -1178,20 +1184,23 @@ clearProductImageButton.addEventListener("click", () => {
   productImageField.focus();
 });
 
-uploadProductImageButton.addEventListener("click", async () => {
+async function uploadProductImage(gallery = false) {
   if (busy || !["edit", "new"].includes(productMode)) return;
-  const file = productImageFileField.files[0];
+  const fileField = gallery ? productDetails.galleryFile : productImageFileField;
+  const status = gallery ? productDetails.galleryMessage : productImageMessage;
+  const uploadButton = gallery ? productDetails.galleryUploadButton : uploadProductImageButton;
+  const file = fileField.files[0];
   const error = validateProductImageFile(file);
   if (error) {
-    productImageMessage.textContent = error;
+    status.textContent = error;
     return;
   }
 
   const controller = new AbortController();
   productImageUploadController = controller;
   setBusy(true);
-  uploadProductImageButton.textContent = "Đang tải ảnh...";
-  productImageMessage.textContent = "Đang tải " + file.name + " lên máy chủ...";
+  uploadButton.textContent = "Đang tải ảnh...";
+  status.textContent = "Đang tải " + file.name + " lên máy chủ...";
 
   try {
     const { response, result } = await callAdmin("/product-images", {
@@ -1210,7 +1219,7 @@ uploadProductImageButton.addEventListener("click", async () => {
       return;
     }
     if (!response.ok) {
-      productImageMessage.textContent = typeof result?.error === "string"
+      status.textContent = typeof result?.error === "string"
         ? result.error
         : "Tải ảnh gặp lỗi. Bấm Tải ảnh lên để thử lại.";
       return;
@@ -1220,26 +1229,34 @@ uploadProductImageButton.addEventListener("click", async () => {
       throw new Error("Đường dẫn ảnh tải lên chưa hợp lệ");
     }
 
-    productImageField.value = result.imageUrl;
-    productImageFileField.value = "";
-    showProductImagePreview();
-    productImageMessage.textContent =
+    if (gallery) productDetails.addImage(result.imageUrl);
+    else {
+      productImageField.value = result.imageUrl;
+      showProductImagePreview();
+    }
+    fileField.value = "";
+    status.textContent =
       "Đã tải ảnh lên. Bấm Lưu sản phẩm để áp dụng ảnh này.";
     productEditorMessage.textContent = "";
   } catch {
     if (productImageUploadController === controller && !sessionCheckQueued && pageActive) {
-      productImageMessage.textContent =
+      status.textContent =
         "Chưa xác nhận được kết quả tải ảnh. Giữ ảnh đã chọn và bấm Tải ảnh lên để thử lại.";
     }
   } finally {
     if (productImageUploadController === controller) productImageUploadController = null;
-    uploadProductImageButton.textContent = "Tải ảnh lên";
+    uploadButton.textContent = gallery ? "Tải ảnh vào bộ sưu tập" : "Tải ảnh lên";
     if (pageActive) {
-      finishRequest(productImageField);
+      finishRequest(gallery ? productDetails.galleryFile : productImageField);
     } else {
       setBusy(false);
     }
   }
+}
+uploadProductImageButton.addEventListener("click", () => { void uploadProductImage(); });
+productDetails.configure({
+  validateImageFile: validateProductImageFile,
+  upload: () => uploadProductImage(true)
 });
 
 function validateManagedProduct(product) {
@@ -1252,7 +1269,7 @@ function validateManagedProduct(product) {
     !(product.categoryId === undefined || (Number.isSafeInteger(product.categoryId) && product.categoryId > 0)) ||
     !((product.stockTracked === undefined && product.stockQuantity === undefined) ||
       (typeof product.stockTracked === "boolean" && Number.isSafeInteger(product.stockQuantity) && product.stockQuantity >= 0)) ||
-    !Number.isSafeInteger(product.revision) || product.revision < 0
+    !Number.isSafeInteger(product.revision) || product.revision < 0 || !productDetails.validate(product)
   ) {
     throw new Error("Thông tin sản phẩm chưa hợp lệ");
   }
@@ -1307,6 +1324,7 @@ function fillProductEditor(product) {
   productActiveField.checked = product.active;
   productStockTrackedField.checked = product.stockTracked ?? false;
   productStockQuantityField.value = String(product.stockQuantity ?? 0);
+  productDetails.fill(product);
   showProductImagePreview();
   saveProductButton.textContent = "Lưu sản phẩm";
   renderProductPicker();
@@ -1325,6 +1343,7 @@ function startNewProduct() {
   productActiveField.checked = true;
   productStockTrackedField.checked = false;
   productStockQuantityField.value = "0";
+  productDetails.fill(null);
   saveProductButton.textContent = "Thêm sản phẩm";
   renderProductPicker();
   productEditorMessage.textContent = "Nhập thông tin sản phẩm mới rồi bấm Thêm sản phẩm trong biểu mẫu. Để quản lý tồn kho, bật Theo dõi tồn kho và nhập số lượng thực tế.";
@@ -1429,7 +1448,10 @@ productForm.addEventListener("submit", async (event) => {
   }
 
   const creating = productMode === "new";
+  const details = productDetails.read(productImageField.value.trim());
+  if (!details) return;
   const data = {
+    ...details,
     name,
     price,
     categoryId,
@@ -1480,7 +1502,8 @@ productForm.addEventListener("submit", async (event) => {
     }
 
     validateManagedProduct(result);
-    if (!Object.entries(data).every(([field, value]) => result[field] === value)) {
+    if (!Object.entries(data).every(([field, value]) =>
+      Array.isArray(value) ? JSON.stringify(result[field]) === JSON.stringify(value) : result[field] === value)) {
       throw new Error("Kết quả lưu sản phẩm chưa hợp lệ");
     }
 

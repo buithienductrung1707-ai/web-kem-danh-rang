@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="admin-support.css">
     <link rel="stylesheet" href="admin-categories.css">
+    <link rel="stylesheet" href="admin-products.css">
     <script src="admin-categories.js" defer></script>
+    <script src="admin-products.js" defer></script>
     <script src="admin.js" defer></script>
     <script src="admin-support.js" defer></script>
   </head>
@@ -287,7 +289,10 @@
 
           <section class="panel admin-product" aria-labelledby="product-editor-title">
             <div class="panel-heading">
-              <h2 id="product-editor-title">Quản lý sản phẩm</h2>
+              <div>
+                <h2 id="product-editor-title">Quản lý sản phẩm</h2>
+                <p class="field-help">Biên tập thông tin và hình ảnh trên trang chi tiết sản phẩm.</p>
+              </div>
               <button type="button" id="new-product" class="button-secondary" disabled>Thêm sản phẩm</button>
             </div>
             <div class="product-select-row">
@@ -296,84 +301,232 @@
                 <select id="product-picker" disabled></select>
               </div>
             </div>
-
-            <form id="product-form" class="form-grid">
-              <div class="field">
-                <label for="edit-product-name">Tên sản phẩm</label>
-                <input
-                  id="edit-product-name"
-                  type="text"
-                  maxlength="200"
-                  required
-                  disabled
-                >
-              </div>
-              <div class="field">
-                <label for="edit-product-price">Đơn giá (đồng)</label>
-                <input
-                  id="edit-product-price"
-                  type="number"
-                  min="0"
-                  step="1"
-                  max="9007199254740991"
-                  required
-                  disabled
-                >
-              </div>
-              <div class="field field-wide">
-                <label for="edit-product-category">Danh mục sản phẩm</label>
-                <select id="edit-product-category" aria-describedby="product-category-help" required disabled></select>
-                <p id="product-category-help" class="field-help">Sản phẩm sẽ nằm trong danh mục này. Danh mục đang ẩn được ghi rõ trong danh sách.</p>
-              </div>
-              <div class="field field-wide">
-                <label for="edit-product-description">Mô tả sản phẩm</label>
-                <textarea id="edit-product-description" rows="4" maxlength="2000" disabled></textarea>
-              </div>
-              <div class="field field-wide">
-                <label for="edit-product-image">Đường dẫn ảnh</label>
-                <input id="edit-product-image" type="text" maxlength="2048"
-                  aria-describedby="product-image-help" disabled>
-                <p id="product-image-help" class="field-help">Nhập đường dẫn như /kem-danh-rang.jpg hoặc liên kết https:// đến ảnh. Có thể để trống.</p>
-              </div>
-
-              <div class="field field-wide image-upload-area">
-                <label for="product-image-file">Chọn ảnh từ máy tính</label>
-                <input id="product-image-file" type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  aria-describedby="product-image-file-help product-image-message" disabled>
-                <p id="product-image-file-help" class="field-help">Ảnh JPEG, PNG hoặc WebP, tối đa 5 MiB. Tải ảnh lên rồi bấm Lưu sản phẩm để áp dụng.</p>
-                <div class="product-image-tools">
-                  <button type="button" id="upload-product-image" class="button-secondary" disabled>Tải ảnh lên</button>
-                  <button type="button" id="clear-product-image" class="button-quiet" disabled>Gỡ ảnh khỏi sản phẩm</button>
+            <form id="product-form" class="admin-product-form">
+              <div class="admin-product-editor-grid">
+                <div class="admin-product-main">
+                  <section class="admin-product-group" aria-labelledby="product-basic-title">
+                    <div class="admin-product-group-heading">
+                      <h3 id="product-basic-title">
+                        Thông tin cơ bản
+                      </h3>
+                    </div>
+                    <div class="admin-product-group-body admin-product-field-grid">
+                      <div class="field field-wide">
+                        <label for="edit-product-name">
+                          Tên sản phẩm
+                        </label>
+                        <input id="edit-product-name" type="text" maxlength="200" required disabled >
+                      </div>
+                      <div class="field">
+                        <label for="edit-product-price">
+                          Đơn giá (đồng)
+                        </label>
+                        <input id="edit-product-price" type="number" min="0" step="1" max="9007199254740991" required disabled >
+                      </div>
+                      <div class="field field-wide">
+                        <label for="edit-product-category">
+                          Danh mục sản phẩm
+                        </label>
+                        <select id="edit-product-category" aria-describedby="product-category-help" required disabled>
+                        </select>
+                        <p id="product-category-help" class="field-help">
+                          Sản phẩm sẽ nằm trong danh mục này. Danh mục đang ẩn được ghi rõ trong danh sách.
+                        </p>
+                      </div>
+                      <div class="field field-wide">
+                        <label for="edit-product-description">
+                          Mô tả ngắn
+                        </label>
+                        <textarea id="edit-product-description" rows="3" maxlength="2000" aria-describedby="product-description-help" disabled>
+                        </textarea>
+                        <p id="product-description-help" class="field-help">
+                          Tóm tắt những đặc điểm chính. Tối đa 2.000 ký tự.
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+                  <section class="admin-product-group" aria-labelledby="product-images-title">
+                    <div class="admin-product-group-heading">
+                      <h3 id="product-images-title">
+                        Hình ảnh sản phẩm
+                      </h3>
+                      <p class="field-help">
+                        Ảnh chính hiển thị trong danh mục. Thêm tối đa 7 ảnh để khách xem trên trang chi tiết.
+                      </p>
+                    </div>
+                    <div class="admin-product-group-body">
+                      <div class="admin-product-primary-image">
+                        <div class="admin-product-image-frame">
+                          <img id="product-image-preview" class="product-image-preview" width="240" height="240" alt="Ảnh chính của sản phẩm" hidden>
+                          <span class="admin-product-image-placeholder">
+                            Ảnh chính
+                          </span>
+                        </div>
+                        <div>
+                          <div class="field field-wide">
+                            <label for="edit-product-image">
+                              Đường dẫn ảnh chính
+                            </label>
+                            <input id="edit-product-image" type="text" maxlength="2048" aria-describedby="product-image-help" disabled>
+                            <p id="product-image-help" class="field-help">
+                              Nhập đường dẫn như /kem-danh-rang.jpg hoặc liên kết https:// đến ảnh. Có thể để trống.
+                            </p>
+                          </div>
+                          <div class="field field-wide">
+                            <label for="product-image-file">
+                              Chọn ảnh từ máy tính
+                            </label>
+                            <input id="product-image-file" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="product-image-file-help product-image-message" disabled>
+                            <p id="product-image-file-help" class="field-help">
+                              Ảnh JPEG, PNG hoặc WebP, tối đa 5 MiB. Tải ảnh lên rồi bấm Lưu sản phẩm để áp dụng.
+                            </p>
+                            <div class="product-image-tools">
+                              <button type="button" id="upload-product-image" class="button-secondary" disabled>
+                                Tải ảnh lên
+                              </button>
+                              <button type="button" id="clear-product-image" class="button-quiet" disabled>
+                                Gỡ ảnh khỏi sản phẩm
+                              </button>
+                            </div>
+                            <p id="product-image-message" role="status" aria-atomic="true">
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="admin-product-gallery-heading">
+                        <h4>
+                          Bộ sưu tập ảnh
+                        </h4>
+                        <span id="product-gallery-count" class="field-help">
+                          0 / 7 ảnh
+                        </span>
+                      </div>
+                      <div id="product-gallery-list" class="admin-product-gallery-list">
+                      </div>
+                      <p id="product-gallery-empty" class="admin-product-empty">
+                        Chưa có ảnh bổ sung.
+                      </p>
+                      <div class="admin-product-gallery-add">
+                        <div class="field">
+                          <label for="product-gallery-url">
+                            Thêm bằng đường dẫn ảnh
+                          </label>
+                          <input id="product-gallery-url" type="text" maxlength="2048" placeholder="https:// hoặc /uploads/..." disabled>
+                        </div>
+                        <button id="product-gallery-add" type="button" class="button-secondary" disabled>
+                          Thêm ảnh
+                        </button>
+                      </div>
+                      <div class="admin-product-gallery-upload">
+                        <div class="field">
+                          <label for="product-gallery-file">
+                            Thêm ảnh từ máy tính
+                          </label>
+                          <input id="product-gallery-file" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="product-gallery-file-help product-gallery-message" disabled>
+                          <p id="product-gallery-file-help" class="field-help">
+                            JPEG, PNG hoặc WebP, tối đa 5 MiB mỗi ảnh.
+                          </p>
+                        </div>
+                        <button id="upload-product-gallery" type="button" class="button-secondary" disabled>
+                          Tải ảnh vào bộ sưu tập
+                        </button>
+                      </div>
+                      <p id="product-gallery-message" role="status" aria-atomic="true">
+                      </p>
+                    </div>
+                  </section>
+                  <section class="admin-product-group" aria-labelledby="product-details-title">
+                    <div class="admin-product-group-heading">
+                      <h3 id="product-details-title">
+                        Nội dung chi tiết
+                      </h3>
+                    </div>
+                    <div class="admin-product-group-body">
+                      <div class="field">
+                        <label for="edit-product-detailed-description">
+                          Giới thiệu và hướng dẫn sử dụng
+                        </label>
+                        <textarea id="edit-product-detailed-description" rows="9" maxlength="12000" aria-describedby="product-details-help" disabled>
+                        </textarea>
+                        <p id="product-details-help" class="field-help">
+                          Có thể xuống dòng để chia đoạn. Nội dung hiển thị dưới dạng văn bản trên trang sản phẩm, tối đa 12.000 ký tự.
+                        </p>
+                      </div>
+                      <div class="admin-product-spec-heading">
+                        <h4>
+                          Thông số sản phẩm
+                        </h4>
+                        <button id="product-spec-add" type="button" class="button-secondary" disabled>
+                          Thêm thông số
+                        </button>
+                      </div>
+                      <p class="field-help">
+                        Tối đa 12 thông số, ví dụ khối lượng, thương hiệu hoặc xuất xứ.
+                      </p>
+                      <div id="product-spec-list" class="admin-product-spec-list">
+                      </div>
+                      <p id="product-spec-empty" class="admin-product-empty">
+                        Chưa có thông số.
+                      </p>
+                    </div>
+                  </section>
                 </div>
-                <p id="product-image-message" role="status" aria-atomic="true"></p>
-                <img id="product-image-preview" class="product-image-preview"
-                  width="240" height="240" alt="Ảnh xem trước của sản phẩm" hidden>
+                <aside class="admin-product-sidebar" aria-label="Kho hàng và xuất bản">
+                  <section class="admin-product-group" aria-labelledby="product-publish-title">
+                    <div class="admin-product-group-heading">
+                      <h3 id="product-publish-title">
+                        Hiển thị trên cửa hàng
+                      </h3>
+                    </div>
+                    <div class="admin-product-group-body">
+                      <div class="field">
+                        <label class="checkbox-label" for="edit-product-active">
+                          <input id="edit-product-active" type="checkbox" disabled>
+                          Hiển thị trên cửa hàng
+                        </label>
+                      </div>
+                      <a id="product-detail-preview" class="button-link button-secondary" href="#" target="_blank" rel="noopener" hidden>
+                        Xem trang sản phẩm
+                        <span aria-hidden="true">
+                          ↗
+                        </span>
+                      </a>
+                      <p id="product-detail-preview-help" class="field-help">
+                        Lưu sản phẩm để cập nhật nội dung trên website.
+                      </p>
+                    </div>
+                  </section>
+                  <section class="admin-product-group" aria-labelledby="product-inventory-title">
+                    <div class="admin-product-group-heading">
+                      <h3 id="product-inventory-title">
+                        Quản lý tồn kho
+                      </h3>
+                    </div>
+                    <div class="admin-product-group-body">
+                      <div class="field">
+                        <label class="checkbox-label" for="edit-product-stock-tracked">
+                          <input id="edit-product-stock-tracked" type="checkbox" aria-describedby="product-stock-help" disabled>
+                          Theo dõi tồn kho
+                        </label>
+                        <label for="edit-product-stock-quantity">
+                          Số lượng có thể bán (sản phẩm)
+                        </label>
+                        <input id="edit-product-stock-quantity" type="number" min="0" step="1" max="9007199254740991" value="0" required aria-describedby="product-stock-help" disabled>
+                        <p id="product-stock-help" class="field-help">
+                          Bật Theo dõi tồn kho rồi nhập số lượng còn có thể bán sau khi trừ hàng dành cho các đơn đang xử lý. Đơn mới trừ số lượng này, hủy đơn hoàn lại số đã trừ.
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+                </aside>
               </div>
-
-              <div class="field field-wide">
-                <label class="checkbox-label" for="edit-product-active">
-                  <input id="edit-product-active" type="checkbox" disabled>
-                  Hiển thị trên cửa hàng
-                </label>
-              </div>
-
-              <div class="field field-wide inventory-settings">
-                <label class="checkbox-label" for="edit-product-stock-tracked">
-                  <input id="edit-product-stock-tracked" type="checkbox"
-                    aria-describedby="product-stock-help" disabled>
-                  Theo dõi tồn kho
-                </label>
-                <label for="edit-product-stock-quantity">Số lượng có thể bán (sản phẩm)</label>
-                <input id="edit-product-stock-quantity" type="number" min="0" step="1"
-                  max="9007199254740991" value="0" required
-                  aria-describedby="product-stock-help" disabled>
-                <p id="product-stock-help" class="field-help">Bật Theo dõi tồn kho rồi nhập số lượng còn có thể bán sau khi trừ hàng dành cho các đơn đang xử lý. Đơn mới trừ số lượng này, hủy đơn hoàn lại số đã trừ.</p>
-              </div>
-
-              <div class="form-actions field-wide">
-                <button type="submit" id="save-product" disabled>Lưu sản phẩm</button>
-                <button type="button" id="reload-product" class="button-secondary" disabled>Tải lại sản phẩm</button>
+              <div class="form-actions admin-product-save-bar">
+                <button type="submit" id="save-product" disabled>
+                  Lưu sản phẩm
+                </button>
+                <button type="button" id="reload-product" class="button-secondary" disabled>
+                  Tải lại sản phẩm
+                </button>
               </div>
             </form>
             <p id="product-editor-message" role="status" aria-atomic="true"></p>

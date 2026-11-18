@@ -323,6 +323,9 @@ function initializeSchema() {
   );
   const additions = {
     description: "TEXT NOT NULL DEFAULT ''",
+    detailed_description: "TEXT NOT NULL DEFAULT ''",
+    gallery_images: "TEXT NOT NULL DEFAULT '[]'",
+    specifications: "TEXT NOT NULL DEFAULT '[]'",
     image_url: "TEXT NOT NULL DEFAULT ''",
     active: "INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1))",
     revision: "INTEGER NOT NULL DEFAULT 0",
@@ -406,6 +409,39 @@ function initializeSchema() {
     db.exec("UPDATE products SET image_url = '/kem-danh-rang.jpg' WHERE id = 1");
   }
   db.exec("UPDATE products SET category_id = 1 WHERE category_id IS NULL");
+
+  if (!productColumns.has("detailed_description") || !productColumns.has("specifications")) {
+    const demoProducts = db.prepare(`
+      SELECT p.id, p.name, p.description, c.name AS categoryName
+      FROM products p LEFT JOIN product_categories c ON c.id = p.category_id
+      WHERE p.id IN (1, 2)
+    `).all();
+    const updateDemo = db.prepare(`
+      UPDATE products SET description = ?, detailed_description = ?, specifications = ?,
+        revision = MIN(revision + 1, 9007199254740991) WHERE id = ?
+    `);
+    const currentDetails = db.prepare("SELECT detailed_description, specifications FROM products WHERE id = ?");
+    for (const product of demoProducts) {
+      const brand = product.id === 1 && /\bsensodyne\b/i.test(product.name) ? "Sensodyne"
+        : product.id === 2 && /\bcrest\b/i.test(product.name) ? "Crest" : null;
+      if (!brand) continue;
+      const current = currentDetails.get(product.id);
+      const description = ["", "abc", "abs"].includes(product.description.trim())
+        ? "Kem đánh răng " + brand + ". Xem hình ảnh, giá bán và thông tin sản phẩm trước khi lựa chọn."
+        : product.description;
+      const detailedDescription = !productColumns.has("detailed_description")
+        ? "Khám phá kem đánh răng " + brand + " trong danh mục chăm sóc răng miệng của cửa hàng.\n\n" +
+          "Xem hình ảnh, giá bán và số lượng đang có trước khi thêm sản phẩm vào giỏ hàng.\n\n" +
+          "Đối chiếu thành phần, quy cách và hướng dẫn sử dụng trên bao bì sản phẩm. " +
+          "Cửa hàng sẽ cập nhật thông tin chi tiết khi có dữ liệu từ sản phẩm."
+        : current.detailed_description;
+      const specifications = !productColumns.has("specifications") ? JSON.stringify([
+        { label: "Thương hiệu", value: brand },
+        { label: "Danh mục", value: product.categoryName || "Kem đánh răng" }
+      ]) : current.specifications;
+      updateDemo.run(description, detailedDescription, specifications, product.id);
+    }
+  }
 }
 
 try {

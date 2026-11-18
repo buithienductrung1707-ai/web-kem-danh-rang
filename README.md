@@ -10,6 +10,8 @@ Website bán hàng bằng tiếng Việt, gồm cửa hàng cho khách và trang
 | Kem đánh răng | [Xem sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/kem-danh-rang.html) |
 | Bàn chải đánh răng | [Xem danh mục bàn chải](https://web-kem-danh-rang.buithienductrung1707.workers.dev/san-pham.html?danh-muc=ban-chai-danh-rang) |
 | Tất cả sản phẩm | [Khám phá sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/san-pham.html) |
+| Chi tiết Sensodyne | [Xem Sensodyne](https://web-kem-danh-rang.buithienductrung1707.workers.dev/chi-tiet-san-pham.html?id=1) |
+| Chi tiết Crest | [Xem Crest](https://web-kem-danh-rang.buithienductrung1707.workers.dev/chi-tiet-san-pham.html?id=2) |
 | Giỏ hàng | [Mở giỏ hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=cart) |
 | Xác nhận mua hàng | [Kiểm tra đơn hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=checkout) |
 | Đăng ký | [Tạo tài khoản](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-ky.html) |
@@ -77,7 +79,7 @@ npm.cmd start
 ## Mua hàng và xem đơn
 
 1. Chọn danh mục trên trang chủ hoặc trong menu **Khám phá sản phẩm**, tìm sản phẩm hoặc dùng bộ lọc và sắp xếp. Ô tìm kiếm trên header tìm trong toàn bộ sản phẩm của các danh mục đang hiển thị.
-2. Bấm **Xem nhanh** để xem ảnh, mô tả, giá và số lượng có thể thêm. Chọn **Thêm vào giỏ** hoặc **Mua nhanh**.
+2. Bấm ảnh hoặc tên sản phẩm để mở trang chi tiết. Xem ảnh lớn, chọn ảnh thu nhỏ, đọc thông tin và mô tả bên dưới, rồi chọn số lượng. Dùng **Thêm vào giỏ** hoặc **Mua ngay** để tiếp tục mua hàng. Các thẻ sản phẩm cũng có **Xem nhanh**, **Thêm vào giỏ** và **Mua nhanh**.
 3. Mở **Giỏ hàng** trong khu vực tài khoản. Chọn từng sản phẩm hoặc **Chọn tất cả**, điều chỉnh số lượng và kiểm tra tiền của các sản phẩm đã chọn. Dùng biểu tượng thùng rác để xóa riêng hoặc **Xóa đã chọn** để xóa nhiều sản phẩm.
 4. Bấm **Tiếp tục đặt hàng** để mở bước xác nhận. Kiểm tra sản phẩm, địa chỉ nhận hàng, phương thức thanh toán và tổng tiền. Khách chưa đăng nhập điền thông tin nhận hàng ở bước này.
 5. Bấm **Tạo đơn hàng** để gửi đơn. Lưu mã đơn sau khi đặt thành công. Các sản phẩm chưa chọn tiếp tục nằm trong giỏ hàng.
@@ -156,10 +158,20 @@ Dùng **Chọn ảnh từ máy tính** rồi **Tải ảnh lên**, hoặc nhập
 
 ### Sản phẩm
 
-- Chọn **Thêm sản phẩm** hoặc chọn một sản phẩm hiện có để chỉnh tên, giá, danh mục, mô tả, ảnh, tồn kho và trạng thái hiển thị.
+- Chọn **Thêm sản phẩm** hoặc chọn một sản phẩm hiện có. Biểu mẫu chia thành thông tin cơ bản, ảnh, nội dung chi tiết và tồn kho cùng trạng thái hiển thị.
+- Điền tên, giá bán bằng đồng Việt Nam, danh mục và mô tả ngắn. Mô tả ngắn dùng trong danh sách và cửa sổ xem nhanh.
+- Trong phần ảnh, đặt một ảnh chính và tối đa **7 ảnh bổ sung**. Có thể nhập đường dẫn ảnh hoặc tải ảnh từ máy tính, thay đổi thứ tự và gỡ ảnh bổ sung.
+- Trong **Nội dung chi tiết**, điền ô **Giới thiệu và hướng dẫn sử dụng** tối đa **12.000 ký tự**. Nội dung hiển thị theo đoạn văn bên dưới khu vực mua hàng của trang sản phẩm.
+- Thêm tối đa **12 thông số**, mỗi dòng gồm tên và giá trị. Chẳng hạn tên thông số là Thương hiệu, giá trị là tên thương hiệu trên bao bì.
 - Để thêm bàn chải, chọn **Bàn chải đánh răng** trong ô **Danh mục sản phẩm**, điền thông tin và lưu. Giỏ hàng hỗ trợ sản phẩm từ nhiều danh mục trong cùng đơn.
 - Khi dùng ảnh từ máy tính, chọn ảnh rồi bấm **Tải ảnh lên**. Tiếp tục bấm **Lưu sản phẩm** để áp dụng.
 - Định dạng ảnh hỗ trợ gồm JPEG, PNG và WebP, dung lượng tối đa **5 MiB**.
+
+Sau khi lưu và bật hiển thị, dùng liên kết xem trang sản phẩm để kiểm tra giao diện. Mỗi sản phẩm dùng địa chỉ chi tiết riêng theo ID và tự nhận nội dung mới sau khi tải lại trang.
+
+Khi báo thông tin đã thay đổi hoặc kết quả lưu chưa xác nhận, bấm **Tải lại sản phẩm** để kiểm tra dữ liệu hiện tại trước khi chỉnh tiếp.
+
+Hai sản phẩm Sensodyne và Crest có sẵn mô tả demo cùng thông số thương hiệu, danh mục. Admin có thể thay nội dung demo bằng thông tin từ bao bì và bổ sung ảnh thực tế.
 
 ### Quảng cáo
 
@@ -283,6 +295,8 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Màu sắc, header, menu và banner hai bên | [style.css](backend/public/style.css) |
 | Thẻ tiện ích và xem nhanh sản phẩm | [storefront-widgets.css](backend/public/storefront-widgets.css) |
 | Hiệu ứng thêm sản phẩm vào giỏ hàng | [cart-feedback.js](backend/public/cart-feedback.js), [cart-feedback.css](backend/public/cart-feedback.css) |
+| Trang thông tin từng sản phẩm | [chi-tiet-san-pham.html](backend/public/chi-tiet-san-pham.html), [product-detail.js](backend/public/product-detail.js), [product-detail.css](backend/public/product-detail.css) |
+| Biên tập ảnh bổ sung, mô tả và thông số sản phẩm | [admin-products.js](backend/public/admin-products.js), [admin-products.css](backend/public/admin-products.css) |
 | Tìm kiếm, menu và hiển thị banner hai bên từ API | [header.js](backend/public/header.js) |
 | Lời chào, avatar và menu tài khoản trên header | [account.js](backend/public/account.js), [account-menu.js](backend/public/account-menu.js), [account-header.css](backend/public/account-header.css) |
 | Giao diện và thao tác cài đặt tài khoản cá nhân | [account-dashboard.js](backend/public/account-dashboard.js), [account-dashboard.css](backend/public/account-dashboard.css), [dang-nhap.html](backend/public/dang-nhap.html) |

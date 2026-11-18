@@ -153,7 +153,7 @@
     return cue;
   }
 
-  function added({ product, source, image } = {}) {
+  function added({ product, source, image, quantity = 1 } = {}) {
     if (document.hidden) return;
     const viewport = {
       width: document.documentElement.clientWidth,
@@ -183,7 +183,7 @@
     if (reducedMotion.matches || localFallback) {
       const acknowledgement = document.createElement("span");
       acknowledgement.className = "cart-feedback-confirmation";
-      acknowledgement.textContent = "+1";
+      acknowledgement.textContent = "+" + quantity;
       const hostBounds = host.getBoundingClientRect();
       const scaleX = localFallback && host.clientWidth > 0 ? hostBounds.width / host.clientWidth : 1;
       const scaleY = localFallback && host.clientHeight > 0 ? hostBounds.height / host.clientHeight : 1;
@@ -208,10 +208,10 @@
       thumbnail.src = imageUrl;
       thumbnail.alt = "";
       thumbnail.draggable = false;
-      thumbnail.addEventListener("error", () => particle.replaceChildren(document.createTextNode("+1")), { once: true });
+      thumbnail.addEventListener("error", () => particle.replaceChildren(document.createTextNode("+" + quantity)), { once: true });
       particle.append(thumbnail);
     } else {
-      particle.textContent = "+1";
+      particle.textContent = "+" + quantity;
     }
     const deltaX = end.x - start.x;
     const deltaY = end.y - start.y;
