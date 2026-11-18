@@ -4611,10 +4611,6 @@ button.button-danger:disabled:hover {
     content: "";
     pointer-events: none;
   }
-
-  body.storefront-page.has-side-banners .shopping-cart-widget {
-    right: max(calc(var(--side-banner-right-width) + 32px), calc((100% - 1280px) / 2 + 16px));
-  }
 }
 
 @media screen and (min-width: 1280px) and (max-height: 420px) {

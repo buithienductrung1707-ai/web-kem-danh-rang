@@ -403,8 +403,7 @@ body.has-product-preview {
 
 .preview-copy .stock-status:empty,
 .preview-copy .product-description:empty,
-#product-preview-message:empty,
-#shopping-cart-feedback:empty {
+#product-preview-message:empty {
   display: none;
 }
 
@@ -421,66 +420,6 @@ body.has-product-preview {
 #product-preview-message {
   margin: 16px 0 0;
   color: var(--primary-dark);
-}
-
-.shopping-cart-widget {
-  position: fixed;
-  z-index: 30;
-  right: max(24px, env(safe-area-inset-right));
-  bottom: calc(24px + env(safe-area-inset-bottom));
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 44px;
-  align-items: center;
-  gap: 12px;
-  width: calc(100% - 48px);
-  max-width: 440px;
-  max-height: min(360px, 50svh);
-  padding: 20px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  border: 1px solid var(--control-border);
-  border-radius: 24px;
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow);
-}
-
-.cart-widget-copy {
-  grid-column: 1;
-  min-width: 0;
-}
-
-#shopping-cart-summary {
-  display: block;
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-
-#shopping-cart-feedback {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-#shopping-cart-link {
-  grid-row: 2;
-  grid-column: 1 / -1;
-  min-width: 0;
-  width: 100%;
-}
-
-#shopping-cart-dismiss {
-  align-self: start;
-  grid-row: 1;
-  grid-column: 2;
-  width: 44px;
-  min-height: 44px;
-  padding: 10px;
-  border-radius: 50%;
-}
-
-body.storefront-page.has-shopping-cart-widget > .site-footer.store-footer {
-  padding-bottom: calc(min(360px, 50svh) + 24px + env(safe-area-inset-bottom));
 }
 
 .storefront-page .product-skeleton {
@@ -629,14 +568,6 @@ body.storefront-page.has-shopping-cart-widget > .site-footer.store-footer {
   .preview-copy {
     padding: 24px;
   }
-
-  .shopping-cart-widget {
-    right: max(16px, env(safe-area-inset-right));
-    bottom: calc(16px + env(safe-area-inset-bottom));
-    width: calc(100% - 32px);
-    padding: 16px;
-    border-radius: 20px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -648,7 +579,6 @@ body.storefront-page.has-shopping-cart-widget > .site-footer.store-footer {
 }
 
 @media print {
-  .shopping-cart-widget,
   .product-preview-dialog {
     display: none !important;
   }

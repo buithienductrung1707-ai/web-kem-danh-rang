@@ -81,6 +81,8 @@ npm.cmd start
 4. Điền thông tin nhận hàng, chọn cách thanh toán và bấm **Xem lại đơn hàng**.
 5. Kiểm tra nội dung rồi bấm **Xác nhận đặt hàng**. Lưu mã đơn sau khi đặt thành công.
 
+Khi thêm sản phẩm thành công, ảnh sản phẩm bay tới biểu tượng giỏ hàng trên header và số lượng trên giỏ nhấn sáng nhẹ. Nếu thiết bị bật chế độ giảm chuyển động, phản hồi được rút gọn để hạn chế hiệu ứng.
+
 Khách có thể đăng ký bằng email, mật khẩu, họ tên, số điện thoại và địa chỉ. Mật khẩu khách hàng dài từ 8 đến 128 ký tự. Khi đã đăng nhập, giỏ hàng sử dụng thông tin nhận hàng đã lưu trong tài khoản.
 
 Sau khi đăng nhập, góc tài khoản hiện **Xin chào** và hai từ đầu, cuối trong họ tên. Ví dụ **Nguyễn Văn An** hiện **Nguyễn An**, avatar tròn có chữ **NA**. Màu nền và chữ được chọn ngẫu nhiên từ các cặp màu có tương phản rõ, giữ ổn định trên cùng trình duyệt. Tên một từ dùng hai chữ cái đầu, ví dụ **Trung** có avatar **TR**.
@@ -257,7 +259,8 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Mục cần sửa | Tệp |
 | --- | --- |
 | Màu sắc, header, menu và banner hai bên | [style.css](backend/public/style.css) |
-| Thẻ tiện ích, xem nhanh và giỏ hàng nổi | [storefront-widgets.css](backend/public/storefront-widgets.css) |
+| Thẻ tiện ích và xem nhanh sản phẩm | [storefront-widgets.css](backend/public/storefront-widgets.css) |
+| Hiệu ứng thêm sản phẩm vào giỏ hàng | [cart-feedback.js](backend/public/cart-feedback.js), [cart-feedback.css](backend/public/cart-feedback.css) |
 | Tìm kiếm, menu và hiển thị banner hai bên từ API | [header.js](backend/public/header.js) |
 | Lời chào và avatar tài khoản trên header | [account.js](backend/public/account.js), [account-header.css](backend/public/account-header.css) |
 | Danh mục nổi bật, menu danh mục và trang sản phẩm chung | [catalog-categories.js](backend/public/catalog-categories.js), [catalog-categories.css](backend/public/catalog-categories.css), [san-pham.html](backend/public/san-pham.html) |
