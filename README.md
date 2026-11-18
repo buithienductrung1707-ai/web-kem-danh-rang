@@ -83,7 +83,7 @@ npm.cmd start
 
 Khách có thể đăng ký bằng email, mật khẩu, họ tên, số điện thoại và địa chỉ. Mật khẩu khách hàng dài từ 8 đến 128 ký tự. Khi đã đăng nhập, giỏ hàng sử dụng thông tin nhận hàng đã lưu trong tài khoản.
 
-Sau khi đăng nhập, góc tài khoản hiện **Xin chào** và hai từ đầu, cuối trong họ tên. Ví dụ **Nguyễn Văn An** hiện **Nguyễn An**, avatar tròn có chữ **NA**. Màu nền và chữ được chọn ngẫu nhiên từ các cặp màu có tương phản rõ, giữ ổn định trên cùng trình duyệt. Tên một từ dùng một chữ cái đầu.
+Sau khi đăng nhập, góc tài khoản hiện **Xin chào** và hai từ đầu, cuối trong họ tên. Ví dụ **Nguyễn Văn An** hiện **Nguyễn An**, avatar tròn có chữ **NA**. Màu nền và chữ được chọn ngẫu nhiên từ các cặp màu có tương phản rõ, giữ ổn định trên cùng trình duyệt. Tên một từ dùng hai chữ cái đầu, ví dụ **Trung** có avatar **TR**.
 
 **Danh mục nổi bật** và menu **Khám phá sản phẩm** dùng chung danh sách do quản trị quản lý. Có sẵn **Kem đánh răng** và **Bàn chải đánh răng**. Trang bàn chải hiển thị sản phẩm đã được gán đúng danh mục. Khi danh mục chưa có sản phẩm, trang hiển thị thông báo đang cập nhật.
 

@@ -79,9 +79,11 @@
   function headerIdentity(name) {
     const words = name.normalize("NFC").trim().split(/\s+/u).filter(Boolean);
     const chosen = words.length > 1 ? [words[0], words[words.length - 1]] : words;
+    const initials = chosen.length === 1 ? Array.from(chosen[0]).slice(0, 2).join("")
+      : chosen.map(word => Array.from(word)[0]).join("");
     return {
       name: chosen.join(" ") || "Khách hàng",
-      initials: chosen.map(word => Array.from(word)[0]).join("").toLocaleUpperCase("vi-VN") || "KH"
+      initials: initials.toLocaleUpperCase("vi-VN") || "KH"
     };
   }
 
