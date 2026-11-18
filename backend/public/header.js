@@ -79,7 +79,7 @@
 
   function openSearchResults(query, scope, event) {
     const params = new URLSearchParams({ q: query, scope });
-    const target = "/kem-danh-rang.html?" + params.toString() + "#catalog";
+    const target = "/san-pham.html?" + params.toString() + "#catalog";
     const storefront = window.ShopStorefront;
     if (storefront && !storefront.prepareNavigation(event, target)) {
       searchMessage = "Chưa chuyển sang tìm kiếm. Hãy kiểm tra thông báo lưu giỏ hàng hoặc lần gửi đơn trên trang này.";
@@ -102,7 +102,7 @@
     const query = searchField.value.trim();
     const storefront = window.ShopStorefront;
     searchMessage = "";
-    if (storefront?.hasCatalog) {
+    if (storefront?.hasCatalog && !window.ShopCategories?.isCategoryPage) {
       if (!storefront.searchCatalog({ query, scroll: true })) {
         searchMessage = "Hãy hoàn tất lần gửi đơn đang chờ trước khi tìm sản phẩm.";
       }

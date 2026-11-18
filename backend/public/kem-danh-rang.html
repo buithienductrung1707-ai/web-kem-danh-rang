@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="storefront-widgets.css">
     <link rel="stylesheet" href="support-chat.css">
+    <link rel="stylesheet" href="catalog-categories.css">
+    <link rel="stylesheet" href="account-header.css">
+    <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
     <script src="app.js" defer></script>
     <script src="account.js" defer></script>
@@ -15,7 +18,7 @@
     <script src="support-chat.js" defer></script>
   </head>
 
-  <body class="storefront-page category-page">
+  <body class="storefront-page category-page" data-category-id="1">
     <a class="skip-link" href="#main-content">Đến nội dung</a>
     <header class="site-header commerce-header">
       <div class="site-header-inner">
@@ -23,7 +26,7 @@
           <img src="/assets/shop-logo.png" width="48" height="48" alt="">
           <span class="header-brand-name">Kem đánh răng</span>
         </a>
-        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/kem-danh-rang.html#catalog" method="get">
+        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/san-pham.html#catalog" method="get">
           <label class="visually-hidden" for="product-search">Tìm sản phẩm</label>
           <input id="product-search" data-header-search-input name="q" type="search" autocomplete="off" placeholder="Tìm tên hoặc mô tả sản phẩm...">
           <button class="header-search-button" type="submit">
@@ -64,6 +67,7 @@
             </button>
             <ul class="catalog-nav-menu" id="products-menu" hidden>
               <li><a href="/kem-danh-rang.html" aria-current="page">Kem đánh răng</a></li>
+              <li><a href="/san-pham.html?danh-muc=ban-chai-danh-rang">Bàn chải đánh răng</a></li>
             </ul>
           </div>
           <a class="catalog-nav-link" href="/don-hang.html"><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>
@@ -80,6 +84,7 @@
       <section class="category-intro" aria-labelledby="category-title">
         <div class="category-intro-copy">
           <h1 id="category-title">Kem đánh răng</h1>
+          <p id="category-description" hidden></p>
         </div>
         <aside class="category-intro-media" aria-label="Chăm sóc răng miệng">
           <img src="/assets/banner-mint.png" width="1536" height="1024"

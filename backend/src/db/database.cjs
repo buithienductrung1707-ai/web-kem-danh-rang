@@ -8,11 +8,31 @@ const db = getRuntime()?.database || new Database(databasePath);
 db.exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
 
 function initializeSchema() {
+  const categoriesExist = db.prepare(`
+    SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'product_categories'
+  `).get();
   const bannersExist = db.prepare(`
     SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'home_banners'
   `).get();
 
   db.exec(`
+    CREATE TABLE IF NOT EXISTS product_categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT CHECK (id BETWEEN 1 AND 9007199254740991),
+      slug TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      image_url TEXT NOT NULL DEFAULT '',
+      image_alt TEXT NOT NULL DEFAULT '',
+      enabled INTEGER NOT NULL DEFAULT 1 CHECK (enabled IN (0, 1)),
+      sort_order INTEGER NOT NULL DEFAULT 0 CHECK (sort_order BETWEEN 0 AND 999),
+      revision INTEGER NOT NULL DEFAULT 0 CHECK (revision BETWEEN 0 AND 9007199254740991),
+      creation_key TEXT UNIQUE
+    ) STRICT;
+
+    CREATE TABLE IF NOT EXISTS deleted_category_requests (
+      creation_key TEXT PRIMARY KEY
+    ) STRICT;
+
     CREATE TABLE IF NOT EXISTS products (
       id INTEGER PRIMARY KEY,
       name TEXT NOT NULL,
@@ -133,6 +153,18 @@ function initializeSchema() {
     CREATE INDEX IF NOT EXISTS support_messages_conversation
       ON support_messages(conversation_id, id);
   `);
+
+  if (!categoriesExist) {
+    const seedCategory = db.prepare(`
+      INSERT INTO product_categories (id, slug, name, description, image_url, image_alt, sort_order)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+    seedCategory.run(1, "kem-danh-rang", "Kem đánh răng", "",
+      "/kem-danh-rang.jpg", "Kem đánh răng", 1);
+    seedCategory.run(2, "ban-chai-danh-rang", "Bàn chải đánh răng", "",
+      "/assets/category-toothbrush.png", "Bàn chải đánh răng", 2);
+    seedCategory.close();
+  }
 
   const bannerColumns = new Set(
     db.prepare("PRAGMA table_info(home_banners)").all().map(column => column.name)
@@ -265,7 +297,8 @@ function initializeSchema() {
     revision: "INTEGER NOT NULL DEFAULT 0",
     creation_key: "TEXT",
     stock_tracked: "INTEGER NOT NULL DEFAULT 0 CHECK (stock_tracked IN (0, 1))",
-    stock_quantity: "INTEGER NOT NULL DEFAULT 0 CHECK (stock_quantity >= 0)"
+    stock_quantity: "INTEGER NOT NULL DEFAULT 0 CHECK (stock_quantity >= 0)",
+    category_id: "INTEGER REFERENCES product_categories(id) ON DELETE RESTRICT"
   };
 
   for (const [name, definition] of Object.entries(additions)) {
@@ -277,6 +310,7 @@ function initializeSchema() {
   db.exec(`
     CREATE UNIQUE INDEX IF NOT EXISTS products_creation_key
       ON products(creation_key) WHERE creation_key IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS products_category ON products(category_id);
 
     CREATE TABLE IF NOT EXISTS order_items (
       id INTEGER PRIMARY KEY,
@@ -329,8 +363,8 @@ function initializeSchema() {
   `);
 
   const seedProduct = db.prepare(`
-    INSERT INTO products (id, name, price, image_url)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO products (id, name, price, image_url, category_id)
+    VALUES (?, ?, ?, ?, 1)
     ON CONFLICT(id) DO NOTHING
   `);
 
@@ -340,6 +374,7 @@ function initializeSchema() {
   if (!productColumns.has("image_url")) {
     db.exec("UPDATE products SET image_url = '/kem-danh-rang.jpg' WHERE id = 1");
   }
+  db.exec("UPDATE products SET category_id = 1 WHERE category_id IS NULL");
 }
 
 try {

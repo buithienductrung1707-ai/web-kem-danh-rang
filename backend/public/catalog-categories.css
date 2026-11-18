@@ -1,0 +1,66 @@
+.catalog-nav-menu {
+  max-height: min(420px, 65svh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.featured-categories .featured-category-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.commerce-header .catalog-nav-menu button,
+.category-menu-message {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-size: 14px;
+}
+
+.commerce-header .catalog-nav-menu button:hover {
+  background: var(--soft);
+  color: var(--primary-dark);
+}
+
+.featured-category-arrow {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.featured-categories > [role="status"]:empty {
+  display: none;
+}
+
+.category-intro-copy {
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.category-intro-copy h1 {
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+}
+
+.category-intro-copy p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.category-intro:has(.category-intro-media[hidden]) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+[data-catalog-page="dynamic"] .category-intro-media img {
+  max-height: 240px;
+  padding: 16px;
+  object-fit: contain;
+  background: var(--surface);
+}
+
+.featured-category-body h3 {
+  overflow-wrap: anywhere;
+}

@@ -7,6 +7,9 @@
     <script src="theme.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="support-chat.css">
+    <link rel="stylesheet" href="catalog-categories.css">
+    <link rel="stylesheet" href="account-header.css">
+    <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
     <script src="account.js" defer></script>
     <script src="header.js" defer></script>
@@ -20,7 +23,7 @@
           <img src="/assets/shop-logo.png" width="48" height="48" alt="">
           <span class="header-brand-name">Kem đánh răng</span>
         </a>
-        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/kem-danh-rang.html#catalog" method="get">
+        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/san-pham.html#catalog" method="get">
           <label class="visually-hidden" for="header-search-input">Tìm sản phẩm</label>
           <input id="header-search-input" data-header-search-input name="q" type="search" autocomplete="off" placeholder="Tìm tên hoặc mô tả sản phẩm...">
           <button class="header-search-button" type="submit">
@@ -61,6 +64,7 @@
             </button>
             <ul class="catalog-nav-menu" id="products-menu" hidden>
               <li><a href="/kem-danh-rang.html">Kem đánh răng</a></li>
+              <li><a href="/san-pham.html?danh-muc=ban-chai-danh-rang">Bàn chải đánh răng</a></li>
             </ul>
           </div>
           <a class="catalog-nav-link" href="/don-hang.html"><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>

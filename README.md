@@ -8,6 +8,8 @@ Website bán hàng bằng tiếng Việt, gồm cửa hàng cho khách và trang
 | --- | --- |
 | Trang chủ | [Mở trang chủ](https://web-kem-danh-rang.buithienductrung1707.workers.dev/) |
 | Kem đánh răng | [Xem sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/kem-danh-rang.html) |
+| Bàn chải đánh răng | [Xem danh mục bàn chải](https://web-kem-danh-rang.buithienductrung1707.workers.dev/san-pham.html?danh-muc=ban-chai-danh-rang) |
+| Tất cả sản phẩm | [Khám phá sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/san-pham.html) |
 | Giỏ hàng và đặt hàng | [Mở giỏ hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/gio-hang.html) |
 | Đăng ký | [Tạo tài khoản](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-ky.html) |
 | Đăng nhập, thông tin tài khoản | [Mở tài khoản](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html) |
@@ -17,7 +19,7 @@ Website bán hàng bằng tiếng Việt, gồm cửa hàng cho khách và trang
 
 Bản demo chạy trên Cloudflare Workers và SQLite-backed Durable Object thuộc gói miễn phí, sử dụng tên miền phụ `workers.dev`. Website tiếp tục hoạt động khi tắt máy tính cá nhân. Đăng nhập admin bằng tài khoản có trong database tại lần triển khai đầu tiên.
 
-Đơn hàng, tài khoản, tồn kho, quảng cáo, tin nhắn chăm sóc khách hàng, phiên đăng nhập và ảnh tải lên được lưu trên Cloudflare. Dữ liệu trực tuyến và [database trên máy](backend/shop.sqlite) được quản lý riêng. Lần triển khai đầu tiên nhập dữ liệu từ database của repo. Những lần cập nhật mã nguồn tiếp theo tiếp tục sử dụng dữ liệu trực tuyến đang có.
+Đơn hàng, tài khoản, danh mục, tồn kho, quảng cáo, tin nhắn chăm sóc khách hàng, phiên đăng nhập và ảnh tải lên được lưu trên Cloudflare. Dữ liệu trực tuyến và [database trên máy](backend/shop.sqlite) được quản lý riêng. Lần triển khai đầu tiên nhập dữ liệu từ database của repo. Những lần cập nhật mã nguồn tiếp theo tiếp tục sử dụng dữ liệu trực tuyến đang có.
 
 Bản demo hiện dùng thanh toán khi nhận hàng (COD). Để bật chuyển khoản, cần khai báo ba biến thông tin ngân hàng trong cấu hình Worker. Hướng dẫn SMTP bên dưới áp dụng cho bản Node.js local. Bật email trên Workers cần cấu hình SMTP và bộ xử lý gửi email, gồm hàng đợi thông báo đơn hàng.
 
@@ -73,13 +75,17 @@ npm.cmd start
 
 ## Mua hàng và xem đơn
 
-1. Mở danh mục **Kem đánh răng**, tìm sản phẩm hoặc dùng bộ lọc và sắp xếp.
+1. Chọn danh mục trên trang chủ hoặc trong menu **Khám phá sản phẩm**, tìm sản phẩm hoặc dùng bộ lọc và sắp xếp. Ô tìm kiếm trên header tìm trong toàn bộ sản phẩm của các danh mục đang hiển thị.
 2. Bấm **Xem nhanh** để xem ảnh, mô tả, giá và số lượng có thể thêm. Chọn **Thêm vào giỏ** hoặc **Mua nhanh**.
 3. Mở **Giỏ hàng**, điều chỉnh số lượng và kiểm tra tổng tiền.
 4. Điền thông tin nhận hàng, chọn cách thanh toán và bấm **Xem lại đơn hàng**.
 5. Kiểm tra nội dung rồi bấm **Xác nhận đặt hàng**. Lưu mã đơn sau khi đặt thành công.
 
 Khách có thể đăng ký bằng email, mật khẩu, họ tên, số điện thoại và địa chỉ. Mật khẩu khách hàng dài từ 8 đến 128 ký tự. Khi đã đăng nhập, giỏ hàng sử dụng thông tin nhận hàng đã lưu trong tài khoản.
+
+Sau khi đăng nhập, góc tài khoản hiện **Xin chào** và hai từ đầu, cuối trong họ tên. Ví dụ **Nguyễn Văn An** hiện **Nguyễn An**, avatar tròn có chữ **NA**. Màu nền và chữ được chọn ngẫu nhiên từ các cặp màu có tương phản rõ, giữ ổn định trên cùng trình duyệt. Tên một từ dùng một chữ cái đầu.
+
+**Danh mục nổi bật** và menu **Khám phá sản phẩm** dùng chung danh sách do quản trị quản lý. Có sẵn **Kem đánh răng** và **Bàn chải đánh răng**. Trang bàn chải hiển thị sản phẩm đã được gán đúng danh mục. Khi danh mục chưa có sản phẩm, trang hiển thị thông báo đang cập nhật.
 
 Khách mua bằng thông tin nhận hàng nhập tại giỏ có thể điền thêm email để nhận thông báo. Tồn kho trên máy chủ được trừ khi đơn hàng được tạo thành công.
 
@@ -119,9 +125,16 @@ Chọn **Chăm sóc khách hàng** trong menu quản trị. Danh sách sắp x�
 
 Tin nhắn tự cập nhật mỗi **10 giây** khi đang xem mục này. Bấm **Tải lại tin nhắn** để kiểm tra ngay. Khi kết quả gửi chưa xác nhận, giữ nội dung và bấm **Kiểm tra và gửi lại**. Đăng xuất sẽ đóng quyền xem tin nhắn trong phiên quản trị.
 
+### Danh mục
+
+Mở **Danh mục** trong quản trị để thêm hoặc chỉnh sửa tên, đường dẫn không dấu, mô tả, ảnh, thứ tự và trạng thái hiển thị. Số thứ tự nhỏ xuất hiện trước. Các danh mục đang hiển thị xuất hiện đồng thời ở trang chủ và menu **Khám phá sản phẩm** sau khi tải lại trang cửa hàng.
+
+Dùng **Chọn ảnh từ máy tính** rồi **Tải ảnh lên**, hoặc nhập đường dẫn ảnh có sẵn. Bấm **Thêm danh mục** hoặc **Lưu danh mục** để áp dụng. Danh mục có sản phẩm cần chuyển các sản phẩm sang danh mục khác trước khi xóa. Danh mục mặc định dành cho sản phẩm cũ có thể ẩn. Khi có thông báo phiên bản đã thay đổi, bấm **Tải lại danh mục** trước khi lưu tiếp.
+
 ### Sản phẩm
 
-- Chọn **Thêm sản phẩm** hoặc chọn một sản phẩm hiện có để chỉnh tên, giá, mô tả, ảnh, tồn kho và trạng thái hiển thị.
+- Chọn **Thêm sản phẩm** hoặc chọn một sản phẩm hiện có để chỉnh tên, giá, danh mục, mô tả, ảnh, tồn kho và trạng thái hiển thị.
+- Để thêm bàn chải, chọn **Bàn chải đánh răng** trong ô **Danh mục sản phẩm**, điền thông tin và lưu. Giỏ hàng hỗ trợ sản phẩm từ nhiều danh mục trong cùng đơn.
 - Khi dùng ảnh từ máy tính, chọn ảnh rồi bấm **Tải ảnh lên**. Tiếp tục bấm **Lưu sản phẩm** để áp dụng.
 - Định dạng ảnh hỗ trợ gồm JPEG, PNG và WebP, dung lượng tối đa **5 MiB**.
 
@@ -229,6 +242,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | [backend/src/routes/admin.cjs](backend/src/routes/admin.cjs) | Đăng nhập và API quản trị |
 | [backend/src/routes/account.cjs](backend/src/routes/account.cjs) | Tài khoản, hồ sơ, đơn của khách và khôi phục mật khẩu |
 | [backend/src/routes/support.cjs](backend/src/routes/support.cjs), [backend/src/services/support.cjs](backend/src/services/support.cjs) | API và lưu trữ tin nhắn chăm sóc khách hàng |
+| [backend/src/services/categories.cjs](backend/src/services/categories.cjs) | Danh mục dùng chung cho trang chủ, menu và sản phẩm |
 | [backend/src/db/database.cjs](backend/src/db/database.cjs) | Schema, nâng cấp cấu trúc và dữ liệu mẫu |
 | [backend/src/services/](backend/src/services/) | Xử lý đơn, ảnh, quảng cáo và email |
 | [backend/src/utils/](backend/src/utils/) | Lọc đơn và xuất CSV |
@@ -245,6 +259,9 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Màu sắc, header, menu và banner hai bên | [style.css](backend/public/style.css) |
 | Thẻ tiện ích, xem nhanh và giỏ hàng nổi | [storefront-widgets.css](backend/public/storefront-widgets.css) |
 | Tìm kiếm, menu và hiển thị banner hai bên từ API | [header.js](backend/public/header.js) |
+| Lời chào và avatar tài khoản trên header | [account.js](backend/public/account.js), [account-header.css](backend/public/account-header.css) |
+| Danh mục nổi bật, menu danh mục và trang sản phẩm chung | [catalog-categories.js](backend/public/catalog-categories.js), [catalog-categories.css](backend/public/catalog-categories.css), [san-pham.html](backend/public/san-pham.html) |
+| Quản lý danh mục trong trang admin | [admin-categories.js](backend/public/admin-categories.js), [admin-categories.css](backend/public/admin-categories.css) |
 | Ảnh logo dùng chung | [shop-logo.png](backend/public/assets/shop-logo.png) |
 | Danh mục sản phẩm, giỏ hàng và đặt hàng | [app.js](backend/public/app.js) |
 | Trình chiếu quảng cáo trang chủ | [carousel.js](backend/public/carousel.js) |
@@ -253,6 +270,8 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Giao diện quản trị | [admin.html](backend/public/admin.html), [admin.js](backend/public/admin.js) |
 
 Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải lại. Sau khi sửa mã backend hoặc biến môi trường, dừng và chạy lại máy chủ.
+
+Ảnh [danh mục bàn chải](backend/public/assets/category-toothbrush.png) được tạo bằng công cụ imagegen tích hợp. [Prompt tạo ảnh](backend/public/assets/category-toothbrush.prompt.txt) được lưu cùng ảnh để có thể tạo lại theo cùng phong cách.
 
 Trên điện thoại, header sắp xếp logo và các biểu tượng thao tác ở hàng đầu, ô tìm kiếm ở hàng riêng, tiếp theo là menu một hàng gồm **Trang chủ**, **Sản phẩm** và **Đơn của tôi**. Biểu tượng xe giao hàng mở tra cứu đơn, hình người mở tài khoản, giỏ hàng mở trang giỏ và mặt trăng/mặt trời đổi giao diện sáng/tối.
 

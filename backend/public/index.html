@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="storefront-widgets.css">
     <link rel="stylesheet" href="support-chat.css">
+    <link rel="stylesheet" href="catalog-categories.css">
+    <link rel="stylesheet" href="account-header.css">
+    <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
     <script src="app.js" defer></script>
     <script src="account.js" defer></script>
@@ -24,7 +27,7 @@
           <img src="/assets/shop-logo.png" width="48" height="48" alt="">
           <span class="header-brand-name">Kem đánh răng</span>
         </a>
-        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/kem-danh-rang.html#catalog" method="get">
+        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/san-pham.html#catalog" method="get">
           <label class="visually-hidden" for="header-search-input">Tìm sản phẩm</label>
           <input id="header-search-input" data-header-search-input name="q" type="search" autocomplete="off" placeholder="Tìm tên hoặc mô tả sản phẩm...">
           <button class="header-search-button" type="submit">
@@ -65,6 +68,7 @@
             </button>
             <ul class="catalog-nav-menu" id="products-menu" hidden>
               <li><a href="/kem-danh-rang.html">Kem đánh răng</a></li>
+              <li><a href="/san-pham.html?danh-muc=ban-chai-danh-rang">Bàn chải đánh răng</a></li>
             </ul>
           </div>
           <a class="catalog-nav-link" href="/don-hang.html"><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>
@@ -107,41 +111,33 @@
         <div class="section-heading">
           <h2 id="catalog-title" tabindex="-1">Danh mục nổi bật</h2>
         </div>
-        <div class="featured-category-grid discovery-bento">
-          <a class="featured-category-card" href="/kem-danh-rang.html" aria-labelledby="featured-toothpaste-title">
+        <div class="featured-category-grid" data-featured-categories aria-busy="true">
+          <a class="featured-category-card" href="/kem-danh-rang.html">
             <div class="featured-category-photo">
               <img src="/kem-danh-rang.jpg" width="448" height="640" alt="" loading="lazy" decoding="async">
             </div>
             <div class="featured-category-body">
-              <h3 id="featured-toothpaste-title">Kem đánh răng</h3>
+              <h3>Kem đánh răng</h3>
               <span class="featured-category-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></span>
             </div>
           </a>
-          <article class="shopping-service-card">
-            <span class="service-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18m-13 5h3"/></svg></span>
-            <div class="service-card-copy">
-              <h3>Thanh toán linh hoạt</h3>
-              <p>Chọn trả khi nhận hàng hoặc chuyển khoản ngân hàng tại giỏ hàng.</p>
-              <a class="service-card-link cart-navigation" href="/gio-hang.html">Đi đến giỏ hàng <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m7 17 10-10M7 7h10v10"/></svg></a>
+          <a class="featured-category-card" href="/san-pham.html?danh-muc=ban-chai-danh-rang">
+            <div class="featured-category-photo">
+              <img src="/assets/category-toothbrush.png" width="1254" height="1254" alt="" loading="lazy" decoding="async">
             </div>
-          </article>
-          <article class="shopping-service-card">
-            <span class="service-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 9-4 9 4-9 4-9-4Zm0 0v10l9 4 9-4V7m-9 4v10m-4-12 8-4"/></svg></span>
-            <div class="service-card-copy">
-              <h3>Theo dõi đơn hàng</h3>
-              <p>Xem lại đơn đã đặt và kiểm tra trạng thái xử lý.</p>
-              <div class="service-card-links">
-                <a class="service-card-link" href="/tra-cuu.html">Tra cứu đơn <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m7 17 10-10M7 7h10v10"/></svg></a>
-                <a class="service-card-link" href="/don-hang.html">Đơn của tôi <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m7 17 10-10M7 7h10v10"/></svg></a>
-              </div>
+            <div class="featured-category-body">
+              <h3>Bàn chải đánh răng</h3>
+              <span class="featured-category-arrow" aria-hidden="true">→</span>
             </div>
-          </article>
+          </a>
         </div>
+        <p id="categories-status" role="status" aria-atomic="true"></p>
+        <button id="categories-retry" type="button" class="button-secondary" hidden>Tải lại danh mục</button>
       </section>
       <section id="featured-products" class="featured-products-section" aria-labelledby="featured-products-title">
         <div class="section-heading">
           <h2 id="featured-products-title" tabindex="-1">Sản phẩm nổi bật</h2>
-          <a class="section-view-all" href="/kem-danh-rang.html">Xem tất cả sản phẩm <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a>
+          <a class="section-view-all" href="/san-pham.html">Xem tất cả sản phẩm <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a>
         </div>
         <p id="product-message" role="status" aria-atomic="true"></p>
         <div id="featured-product-list" class="product-grid" aria-busy="true"></div>

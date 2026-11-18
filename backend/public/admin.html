@@ -7,6 +7,8 @@
     <script src="theme.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="admin-support.css">
+    <link rel="stylesheet" href="admin-categories.css">
+    <script src="admin-categories.js" defer></script>
     <script src="admin.js" defer></script>
     <script src="admin-support.js" defer></script>
   </head>
@@ -80,6 +82,7 @@
             <a href="#summary-title">Tổng quan</a>
             <a href="#support-title">Chăm sóc khách hàng</a>
             <a href="#banner-editor-title">Quảng cáo</a>
+            <a href="#category-editor-title">Danh mục</a>
             <a href="#product-editor-title">Sản phẩm</a>
             <a href="#orders-title">Đơn hàng</a>
           </nav>
@@ -215,6 +218,73 @@
             <p id="banner-editor-message" role="status" aria-atomic="true"></p>
           </section>
 
+          <section class="panel admin-categories" aria-labelledby="category-editor-title">
+            <div class="panel-heading">
+              <h2 id="category-editor-title">Danh mục sản phẩm</h2>
+              <button id="new-category" type="button" class="button-secondary" disabled>Thêm danh mục</button>
+            </div>
+            <p class="field-help">Các danh mục được bật sẽ xuất hiện trong Danh mục nổi bật và menu Khám phá sản phẩm.</p>
+            <div class="category-toolbar">
+              <div class="field">
+                <label for="category-picker">Chọn danh mục để chỉnh sửa</label>
+                <select id="category-picker" disabled></select>
+              </div>
+              <button id="reload-categories" type="button" class="button-secondary" disabled>Tải lại danh mục</button>
+            </div>
+            <p id="category-empty" class="field-help" hidden>Chưa có danh mục. Bấm Thêm danh mục để tạo mới.</p>
+            <form id="category-form" class="form-grid" hidden>
+              <div class="field">
+                <label for="edit-category-name">Tên danh mục</label>
+                <input id="edit-category-name" type="text" maxlength="120" required disabled>
+              </div>
+              <div class="field">
+                <label for="edit-category-slug">Tên trong đường dẫn</label>
+                <input id="edit-category-slug" type="text" maxlength="80" pattern="[a-z0-9]+(-[a-z0-9]+)*" aria-describedby="category-slug-help" required disabled>
+                <p id="category-slug-help" class="field-help">Chữ thường không dấu, số và dấu gạch ngang, ví dụ ban-chai-danh-rang.</p>
+              </div>
+              <div class="field field-wide">
+                <label for="edit-category-description">Mô tả</label>
+                <textarea id="edit-category-description" rows="3" maxlength="400" disabled></textarea>
+              </div>
+              <div class="field field-wide">
+                <label for="edit-category-image">Đường dẫn ảnh</label>
+                <input id="edit-category-image" type="text" maxlength="2048" aria-describedby="category-image-help" disabled>
+                <p id="category-image-help" class="field-help">Dùng /kem-danh-rang.jpg, ảnh trong /assets/, /uploads/products/ hoặc liên kết HTTPS. Có thể để trống.</p>
+              </div>
+              <div class="field field-wide image-upload-area">
+                <label for="category-image-file">Chọn ảnh từ máy tính</label>
+                <input id="category-image-file" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="category-file-help category-image-message" disabled>
+                <p id="category-file-help" class="field-help">Ảnh JPEG, PNG hoặc WebP, tối đa 5 MiB. Tải ảnh lên rồi lưu danh mục để áp dụng.</p>
+                <div class="product-image-tools">
+                  <button id="upload-category-image" type="button" class="button-secondary" disabled>Tải ảnh lên</button>
+                </div>
+                <p id="category-image-message" role="status" aria-atomic="true"></p>
+                <img id="category-image-preview" class="category-image-preview" width="240" height="240" alt="Ảnh xem trước danh mục" hidden>
+              </div>
+              <div class="field field-wide">
+                <label for="edit-category-image-alt">Mô tả ảnh cho người đọc màn hình</label>
+                <input id="edit-category-image-alt" type="text" maxlength="200" disabled>
+              </div>
+              <div class="field">
+                <label for="edit-category-sort-order">Thứ tự hiển thị</label>
+                <input id="edit-category-sort-order" type="number" min="0" max="999" step="1" required disabled>
+              </div>
+              <div class="field">
+                <label class="checkbox-label" for="edit-category-enabled">
+                  <input id="edit-category-enabled" type="checkbox" disabled>
+                  Hiển thị trên website
+                </label>
+              </div>
+              <p id="category-delete-help" class="field-help field-wide"></p>
+              <div class="form-actions field-wide">
+                <button id="save-category" type="submit" disabled>Lưu danh mục</button>
+                <button id="cancel-category" type="button" class="button-secondary" hidden disabled>Hủy thêm mới</button>
+                <button id="delete-category" type="button" class="button-danger" aria-describedby="category-delete-help" disabled>Xóa danh mục</button>
+              </div>
+            </form>
+            <p id="category-editor-message" role="status" aria-atomic="true"></p>
+          </section>
+
           <section class="panel admin-product" aria-labelledby="product-editor-title">
             <div class="panel-heading">
               <h2 id="product-editor-title">Quản lý sản phẩm</h2>
@@ -249,6 +319,11 @@
                   required
                   disabled
                 >
+              </div>
+              <div class="field field-wide">
+                <label for="edit-product-category">Danh mục sản phẩm</label>
+                <select id="edit-product-category" aria-describedby="product-category-help" required disabled></select>
+                <p id="product-category-help" class="field-help">Sản phẩm sẽ nằm trong danh mục này. Danh mục đang ẩn được ghi rõ trong danh sách.</p>
               </div>
               <div class="field field-wide">
                 <label for="edit-product-description">Mô tả sản phẩm</label>
@@ -289,7 +364,7 @@
                     aria-describedby="product-stock-help" disabled>
                   Theo dõi tồn kho
                 </label>
-                <label for="edit-product-stock-quantity">Số lượng có thể bán (tuýp)</label>
+                <label for="edit-product-stock-quantity">Số lượng có thể bán (sản phẩm)</label>
                 <input id="edit-product-stock-quantity" type="number" min="0" step="1"
                   max="9007199254740991" value="0" required
                   aria-describedby="product-stock-help" disabled>

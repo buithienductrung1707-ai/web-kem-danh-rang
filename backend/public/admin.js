@@ -39,6 +39,7 @@ const paymentMethodLabels = {
 const productForm = document.getElementById("product-form");
 const productNameField = document.getElementById("edit-product-name");
 const productPriceField = document.getElementById("edit-product-price");
+const productCategoryField = document.getElementById("edit-product-category");
 const productDescriptionField = document.getElementById("edit-product-description");
 const productImageField = document.getElementById("edit-product-image");
 const productImageFileField = document.getElementById("product-image-file");
@@ -52,7 +53,7 @@ const productStockQuantityField = document.getElementById("edit-product-stock-qu
 const productPicker = document.getElementById("product-picker");
 const newProductButton = document.getElementById("new-product");
 const productFields = [productNameField, productPriceField,
-  productDescriptionField, productImageField, productActiveField,
+  productCategoryField, productDescriptionField, productImageField, productActiveField,
   productStockTrackedField, productStockQuantityField];
 const saveProductButton = document.getElementById("save-product");
 const reloadProductButton = document.getElementById("reload-product");
@@ -109,6 +110,7 @@ let ordersExportController = null;
 let ordersDownloadUrl = null;
 let ordersDownloadTimer = null;
 let pageActive = true;
+const categoryEditor = window.ShopAdminCategories;
 
 function setBusy(value) {
   busy = value;
@@ -129,7 +131,7 @@ function setBusy(value) {
   orderSearchForm.setAttribute("aria-busy", String(value));
   updateOrderPagination();
 
-  const productReady = ["edit", "new"].includes(productMode);
+  const productReady = ["edit", "new"].includes(productMode) && categoryEditor.ready;
   for (const field of productFields) field.disabled = value || !productReady;
   productStockQuantityField.disabled = value || !productReady || !productStockTrackedField.checked;
   productPicker.disabled = value || !productReady;
@@ -165,6 +167,7 @@ function setBusy(value) {
   productForm.setAttribute("aria-busy", String(value));
   ordersList.setAttribute("aria-busy", String(value));
   loginForm.setAttribute("aria-busy", String(value));
+  categoryEditor.setBusy(value);
 }
 
 function finishRequest(focusTarget = logoutButton) {
@@ -187,6 +190,7 @@ function finishRequest(focusTarget = logoutButton) {
 }
 
 function showAuth(admin) {
+  categoryEditor.clear();
   clearOrdersExport();
   clearOrdersSummary();
   clearOrderSearch();
@@ -214,6 +218,7 @@ function showAuth(admin) {
 }
 
 function showUnknown(message) {
+  categoryEditor.clear();
   clearOrdersExport();
   clearOrdersSummary();
   clearOrderSearch();
@@ -350,6 +355,7 @@ logoutButton.addEventListener("click", async () => {
   clearOrderSearch();
   clearBannerEditor();
   clearProductEditor();
+  categoryEditor.clear();
   clearOrders();
   messageLabel.textContent = "Đang đăng xuất...";
 
@@ -542,7 +548,7 @@ function renderOrders(orders) {
       "Điện thoại " + order.customer_phone,
       "Địa chỉ " + order.customer_address,
       ...items.map(item => item.productName + " × " + item.quantity +
-        " tuýp · " + money.format(item.unitPrice) + "/tuýp · " + money.format(item.total)),
+        " sản phẩm · " + money.format(item.unitPrice) + "/sản phẩm · " + money.format(item.total)),
       "Tiền sản phẩm " + money.format(order.total),
       Object.hasOwn(paymentMethodLabels, order.payment_method)
         ? paymentMethodLabels[order.payment_method] : "Thanh toán " + order.payment_method,
@@ -1243,6 +1249,7 @@ function validateManagedProduct(product) {
     !Number.isSafeInteger(product.price) || product.price < 0 ||
     typeof product.description !== "string" || typeof product.imageUrl !== "string" ||
     typeof product.active !== "boolean" ||
+    !(product.categoryId === undefined || (Number.isSafeInteger(product.categoryId) && product.categoryId > 0)) ||
     !((product.stockTracked === undefined && product.stockQuantity === undefined) ||
       (typeof product.stockTracked === "boolean" && Number.isSafeInteger(product.stockQuantity) && product.stockQuantity >= 0)) ||
     !Number.isSafeInteger(product.revision) || product.revision < 0
@@ -1266,6 +1273,26 @@ function renderProductPicker() {
   productPicker.value = productSnapshot ? String(productSnapshot.id) : "";
 }
 
+function renderProductCategories(selectedId = productCategoryField.value) {
+  const selected = String(selectedId || productSnapshot?.categoryId || 1);
+  const fragment = document.createDocumentFragment();
+  for (const category of categoryEditor.items) {
+    const option = document.createElement("option");
+    option.value = String(category.id);
+    option.textContent = category.name + (category.enabled ? "" : " (đang ẩn)");
+    fragment.append(option);
+  }
+  if (!categoryEditor.items.some(category => String(category.id) === selected)) {
+    const missing = document.createElement("option");
+    missing.value = selected;
+    missing.textContent = categoryEditor.ready ? "Danh mục #" + selected + " (cần chọn lại)" : "Chưa tải được danh mục";
+    missing.disabled = true;
+    fragment.append(missing);
+  }
+  productCategoryField.replaceChildren(fragment);
+  productCategoryField.value = selected;
+}
+
 function fillProductEditor(product) {
   validateManagedProduct(product);
   clearProductImageUpload();
@@ -1274,6 +1301,7 @@ function fillProductEditor(product) {
   productCreationKey = null;
   productNameField.value = product.name;
   productPriceField.value = String(product.price);
+  renderProductCategories(product.categoryId ?? 1);
   productDescriptionField.value = product.description;
   productImageField.value = product.imageUrl;
   productActiveField.checked = product.active;
@@ -1291,6 +1319,7 @@ function startNewProduct() {
   productCreationKey = crypto.randomUUID();
   productNameField.value = "";
   productPriceField.value = "";
+  renderProductCategories(1);
   productDescriptionField.value = "";
   productImageField.value = "";
   productActiveField.checked = true;
@@ -1307,6 +1336,10 @@ async function loadProductEditor() {
   productEditorMessage.textContent = "Đang tải danh sách sản phẩm...";
 
   try {
+    if (!categoryEditor.ready && !await categoryEditor.load()) {
+      throw new Error("Chưa tải được danh mục sản phẩm");
+    }
+    if (sessionCheckQueued || adminPanel.hidden || !pageActive) return;
     const { response, result } = await callAdmin("/products");
 
     if (sessionCheckQueued) return;
@@ -1378,6 +1411,7 @@ productForm.addEventListener("submit", async (event) => {
   const name = productNameField.value;
   const price = Number(productPriceField.value);
   const stockQuantity = Number(productStockQuantityField.value);
+  const categoryId = Number(productCategoryField.value);
 
   if (name.length > 200 || !Number.isSafeInteger(price) || price < 0) {
     productEditorMessage.textContent =
@@ -1388,11 +1422,17 @@ productForm.addEventListener("submit", async (event) => {
     productEditorMessage.textContent = "Nhập số lượng có thể bán là số nguyên từ 0.";
     return;
   }
+  if (!categoryEditor.ready || !categoryEditor.items.some(category => category.id === categoryId)) {
+    productEditorMessage.textContent = "Hãy tải lại danh mục và chọn danh mục sản phẩm hợp lệ.";
+    productCategoryField.focus();
+    return;
+  }
 
   const creating = productMode === "new";
   const data = {
     name,
     price,
+    categoryId,
     description: productDescriptionField.value.trim(),
     imageUrl: productImageField.value.trim(),
     active: productActiveField.checked,
@@ -1448,6 +1488,7 @@ productForm.addEventListener("submit", async (event) => {
     managedProducts.push(result);
     managedProducts.sort((a, b) => a.id - b.id);
     fillProductEditor(result);
+    await categoryEditor.load();
     productEditorMessage.textContent = creating ? "Đã thêm sản phẩm." : "Đã lưu sản phẩm.";
   } catch {
     productMode = "unknown";
@@ -1983,5 +2024,23 @@ window.addEventListener("pagehide", clearOrdersExport);
 window.addEventListener("pagehide", clearProductEditor);
 window.addEventListener("pagehide", clearBannerEditor);
 window.addEventListener("pagehide", clearOrdersSummary);
+window.addEventListener("pagehide", () => categoryEditor.clear());
+
+categoryEditor.configure({
+  request: callAdmin,
+  isActive: () => !adminPanel.hidden && pageActive && !sessionCheckQueued,
+  setBusy,
+  finish: finishRequest,
+  validImage: value => value === "/kem-danh-rang.jpg" || validBannerImageUrl(value),
+  validateImageFile: validateProductImageFile,
+  onUnauthorized() {
+    showAuth(null);
+    messageLabel.textContent = "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.";
+  },
+  onChange() {
+    renderProductCategories();
+    setBusy(busy);
+  }
+});
 
 checkSession();

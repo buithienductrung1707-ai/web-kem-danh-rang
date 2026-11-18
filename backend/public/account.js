@@ -29,15 +29,93 @@
     phone: document.getElementById("profile-phone"),
     address: document.getElementById("profile-address")
   };
-  const returnTargets = new Set(["/", "/kem-danh-rang.html", "/gio-hang.html", "/tra-cuu.html", "/don-hang.html"]);
+  const returnTargets = new Set(["/", "/kem-danh-rang.html", "/san-pham.html", "/gio-hang.html", "/tra-cuu.html", "/don-hang.html"]);
+  function safeReturnTarget(value) {
+    if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//")) return null;
+    try {
+      const url = new URL(value, window.location.origin);
+      return url.origin === window.location.origin && returnTargets.has(url.pathname)
+        ? url.pathname + url.search + url.hash : null;
+    } catch {
+      return null;
+    }
+  }
   const requestedReturn = new URLSearchParams(window.location.search).get("returnTo");
   const returnTo = form
-    ? (returnTargets.has(requestedReturn) ? requestedReturn : "/")
-    : (returnTargets.has(window.location.pathname) ? window.location.pathname : "/");
+    ? (safeReturnTarget(requestedReturn) || "/")
+    : (safeReturnTarget(window.location.pathname + window.location.search) || "/");
   let activeRequest = null;
   let busy = false;
   let pageActive = true;
   let knownAccount;
+  const avatarColors = [
+    ["#164e63", "#cffafe"],
+    ["#14532d", "#dcfce7"],
+    ["#4c1d95", "#ede9fe"],
+    ["#831843", "#fce7f3"],
+    ["#7c2d12", "#ffedd5"],
+    ["#1e3a8a", "#dbeafe"],
+    ["#713f12", "#fef9c3"],
+    ["#334155", "#f1f5f9"]
+  ];
+  const avatarSeed = readAvatarSeed();
+
+  function readAvatarSeed() {
+    const key = "toothpaste-avatar-color-seed";
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved !== null && /^\d{1,10}$/.test(saved)) {
+        const value = Number(saved);
+        if (Number.isInteger(value) && value >= 0 && value <= 0xffffffff) return value;
+      }
+    } catch {}
+    const value = crypto.getRandomValues(new Uint32Array(1))[0];
+    try {
+      localStorage.setItem(key, String(value));
+    } catch {}
+    return value;
+  }
+
+  function headerIdentity(name) {
+    const words = name.normalize("NFC").trim().split(/\s+/u).filter(Boolean);
+    const chosen = words.length > 1 ? [words[0], words[words.length - 1]] : words;
+    return {
+      name: chosen.join(" ") || "Khách hàng",
+      initials: chosen.map(word => Array.from(word)[0]).join("").toLocaleUpperCase("vi-VN") || "KH"
+    };
+  }
+
+  function renderHeaderAccount(link, account) {
+    const label = link.querySelector("[data-account-label]");
+    const greeting = link.querySelector(".header-link-label");
+    const identity = account ? headerIdentity(account.name) : null;
+    if (label) {
+      label.textContent = identity?.name || "Đăng nhập";
+    } else {
+      link.textContent = identity ? "Xin chào " + identity.name : "Đăng nhập";
+    }
+    if (greeting) greeting.textContent = identity ? "Xin chào" : "Tài khoản";
+    link.classList.toggle("has-account-avatar", account !== null);
+    let avatar = link.querySelector(".account-header-avatar");
+    if (identity) {
+      if (!avatar) {
+        avatar = document.createElement("span");
+        avatar.className = "account-header-avatar";
+        avatar.setAttribute("aria-hidden", "true");
+        link.prepend(avatar);
+      }
+      const colors = avatarColors[(avatarSeed % avatarColors.length + account.id % avatarColors.length) % avatarColors.length];
+      avatar.textContent = identity.initials;
+      avatar.style.setProperty("--account-avatar-background", colors[0]);
+      avatar.style.setProperty("--account-avatar-text", colors[1]);
+    } else {
+      avatar?.remove();
+    }
+    const accessibleLabel = identity ? "Xin chào " + identity.name + ", mở tài khoản" : "Tài khoản, Đăng nhập";
+    link.setAttribute("aria-label", accessibleLabel);
+    link.title = accessibleLabel;
+    link.href = authUrl("/dang-nhap.html");
+  }
 
   function authUrl(path) {
     return path + (returnTo === "/" ? "" : "?returnTo=" + encodeURIComponent(returnTo));
@@ -67,7 +145,7 @@
     const phone = account?.phone === undefined ? "" : account.phone;
     const address = account?.address === undefined ? "" : account.address;
     if (!account || !Number.isSafeInteger(account.id) || account.id < 1 ||
-      typeof account.name !== "string" || account.name.trim() === "" || account.name.length > 120 ||
+      typeof account.name !== "string" || account.name.length > 120 ||
       typeof account.email !== "string" || account.email.trim() === "" || account.email.length > 254 ||
       typeof phone !== "string" || phone.length > 32 ||
       typeof address !== "string" || address.length > 500) {
@@ -79,14 +157,7 @@
   function renderAccount(account, preserveProfile = false) {
     if (account !== null) account = validateAccount(account);
     for (const link of document.querySelectorAll("[data-account-link]")) {
-      const label = link.querySelector("[data-account-label]");
-      if (label) {
-        label.textContent = account ? "Xem hồ sơ" : "Đăng nhập";
-      } else {
-        link.textContent = account ? "Tài khoản" : "Đăng nhập";
-      }
-      link.setAttribute("aria-label", account ? "Tài khoản, Xem hồ sơ" : "Tài khoản, Đăng nhập");
-      link.href = authUrl("/dang-nhap.html");
+      renderHeaderAccount(link, account);
     }
     if (formPanel) formPanel.hidden = account !== null;
     if (pageTitle) {

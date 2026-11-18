@@ -7,6 +7,7 @@ const accountRouter = require("./routes/account.cjs");
 const { customerSupportRouter } = require("./routes/support.cjs");
 const { createOrder, getOrderItems, getOrderHistory } = require("./services/orders.cjs");
 const { getPublicBanners } = require("./services/banners.cjs");
+const { getPublicCategories } = require("./services/categories.cjs");
 const { getRuntime } = require("./runtime.cjs");
 
 const app = express();
@@ -25,11 +26,12 @@ app.use(express.json({
 app.use("/api/admin", adminRouter);
 
 const productsQuery = db.prepare(`
-  SELECT id, name, price, description, image_url AS imageUrl,
-    stock_tracked AS stockTracked, stock_quantity AS stockQuantity
-  FROM products
-  WHERE active = 1
-  ORDER BY id
+  SELECT p.id, p.name, p.price, p.description, p.image_url AS imageUrl,
+    p.stock_tracked AS stockTracked, p.stock_quantity AS stockQuantity,
+    p.category_id AS categoryId, c.slug AS categorySlug, c.name AS categoryName
+  FROM products p LEFT JOIN product_categories c ON c.id = p.category_id
+  WHERE p.active = 1
+  ORDER BY p.id
 `);
 
 const trackedOrderQuery = db.prepare(`
@@ -44,6 +46,11 @@ app.get("/api/products", (req, res) => {
     ...product,
     stockTracked: product.stockTracked === 1
   })));
+});
+
+app.get("/api/categories", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json(getPublicCategories());
 });
 
 app.get("/api/banners", (req, res) => {

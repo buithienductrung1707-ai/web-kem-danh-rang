@@ -1,0 +1,93 @@
+.commerce-header [data-account-link].has-account-avatar > .header-icon {
+  display: none;
+}
+
+.commerce-header [data-account-link].has-account-avatar > .account-header-avatar {
+  display: inline-flex;
+  flex: 0 0 36px;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: var(--account-avatar-background);
+  color: var(--account-avatar-text);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.commerce-header [data-account-link].has-account-avatar .header-link-copy {
+  max-width: 140px;
+}
+
+@media screen and (max-width: 650px) {
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-header-inner:has(.has-account-avatar) {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .commerce-header .site-header-inner:has(.has-account-avatar) .header-brand-name {
+    display: none;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-header-inner:has(.has-account-avatar) .header-actions {
+    justify-content: flex-end;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-nav a[data-account-link].has-account-avatar {
+    flex-basis: 100px;
+    justify-content: flex-start;
+    gap: 5px;
+    width: 100px;
+    min-width: 0;
+    padding: 4px 0;
+    border-radius: 10px;
+  }
+
+  .commerce-header [data-account-link].has-account-avatar > .account-header-avatar {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .commerce-header [data-account-link].has-account-avatar .header-link-copy {
+    position: static;
+    width: auto;
+    height: auto;
+    max-width: 67px;
+    margin: 0;
+    overflow: hidden;
+    clip-path: none;
+    white-space: normal;
+    gap: 2px;
+  }
+
+  .commerce-header [data-account-link].has-account-avatar .header-link-label {
+    font-size: 10px;
+  }
+
+  .commerce-header [data-account-link].has-account-avatar .header-link-copy strong {
+    font-size: 11px;
+  }
+}
+
+@media screen and (max-width: 359px) {
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-header-inner:has(.has-account-avatar) {
+    column-gap: 4px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-header-inner:has(.has-account-avatar) :is(.header-actions, .site-nav) {
+    gap: 2px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-nav a[data-account-link].has-account-avatar {
+    flex-basis: 96px;
+    width: 96px;
+    gap: 4px;
+  }
+}

@@ -1,0 +1,46 @@
+.category-toolbar {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.category-toolbar .field {
+  flex: 1;
+}
+
+.category-toolbar button {
+  flex-shrink: 0;
+}
+
+.category-image-preview {
+  display: block;
+  width: 240px;
+  max-width: 100%;
+  height: 240px;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  object-fit: contain;
+}
+
+.admin-categories [data-error="true"] {
+  color: var(--danger);
+}
+
+.admin-categories .field-help {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .category-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .category-toolbar button {
+    justify-self: start;
+  }
+}

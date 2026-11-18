@@ -9,6 +9,9 @@ const { createProductImageUpload } = require("../services/product-images.cjs");
 const { parseOrderFilters, orderFilterSql, orderFilterParameters } = require("../utils/order-filters.cjs");
 const { ordersToCsv } = require("../utils/order-export.cjs");
 const { getAdminBanners, createBanner, updateBanner, deleteBanner } = require("../services/banners.cjs");
+const {
+  DEFAULT_CATEGORY_ID, getAdminCategories, createCategory, updateCategory, deleteCategory, categoryExists
+} = require("../services/categories.cjs");
 const { outboxSummary, retryFailedEmails } = require("../services/email-outbox.cjs");
 const { getSessionOptions } = require("../services/session-options.cjs");
 const {
@@ -194,6 +197,25 @@ router.patch("/banners/:id", requireAdmin, (req, res) => {
 
 router.delete("/banners/:id", requireAdmin, (req, res) => {
   const result = deleteBanner(Number(req.params.id), req.body || {});
+  res.status(result.status).json(result.body);
+});
+
+router.get("/categories", requireAdmin, (req, res) => {
+  res.json(getAdminCategories());
+});
+
+router.post("/categories", requireAdmin, (req, res) => {
+  const result = createCategory(req.body || {});
+  res.status(result.status).json(result.body);
+});
+
+router.patch("/categories/:id", requireAdmin, (req, res) => {
+  const result = updateCategory(Number(req.params.id), req.body || {});
+  res.status(result.status).json(result.body);
+});
+
+router.delete("/categories/:id", requireAdmin, (req, res) => {
+  const result = deleteCategory(Number(req.params.id), req.body || {});
   res.status(result.status).json(result.body);
 });
 
@@ -443,20 +465,22 @@ router.patch("/product", requireAdmin, (req, res) => {
 });
 
 const productFields = `id, name, price, description, image_url AS imageUrl, active, revision,
-  stock_tracked AS stockTracked, stock_quantity AS stockQuantity`;
+  stock_tracked AS stockTracked, stock_quantity AS stockQuantity, category_id AS categoryId,
+  (SELECT slug FROM product_categories WHERE id = products.category_id) AS categorySlug,
+  (SELECT name FROM product_categories WHERE id = products.category_id) AS categoryName`;
 const allProductsQuery = db.prepare(`SELECT ${productFields} FROM products ORDER BY id`);
 const productByIdQuery = db.prepare(`SELECT ${productFields} FROM products WHERE id = ?`);
 const productByCreationQuery = db.prepare(`SELECT ${productFields} FROM products WHERE creation_key = ?`);
 const createProductQuery = db.prepare(`
   INSERT INTO products (
-    name, price, description, image_url, active, creation_key, stock_tracked, stock_quantity
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING
+    name, price, description, image_url, active, creation_key, stock_tracked, stock_quantity, category_id
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING
   RETURNING ${productFields}
 `);
 const editProductQuery = db.prepare(`
   UPDATE products SET name = ?, price = ?, description = ?, image_url = ?,
     active = ?, stock_tracked = COALESCE(?, stock_tracked),
-    stock_quantity = COALESCE(?, stock_quantity), revision = revision + 1
+    stock_quantity = COALESCE(?, stock_quantity), category_id = COALESCE(?, category_id), revision = revision + 1
   WHERE id = ? AND revision = ? AND revision < 9007199254740991
   RETURNING ${productFields}
 `);
@@ -469,7 +493,8 @@ function productData(body) {
     typeof body.active !== "boolean" ||
     (body.stockTracked !== undefined && typeof body.stockTracked !== "boolean") ||
     (body.stockQuantity !== undefined &&
-      (!Number.isSafeInteger(body.stockQuantity) || body.stockQuantity < 0))) return null;
+      (!Number.isSafeInteger(body.stockQuantity) || body.stockQuantity < 0)) ||
+    (body.categoryId !== undefined && !categoryExists(body.categoryId))) return null;
 
   const imageUrl = body.imageUrl.trim();
   if (imageUrl !== "") {
@@ -487,7 +512,7 @@ function productData(body) {
   return {
     name: body.name.trim(), price: body.price,
     description: body.description.trim(), imageUrl, active: body.active,
-    stockTracked: body.stockTracked, stockQuantity: body.stockQuantity
+    stockTracked: body.stockTracked, stockQuantity: body.stockQuantity, categoryId: body.categoryId
   };
 }
 
@@ -496,7 +521,8 @@ function productMatches(product, data) {
     product.description === data.description && product.imageUrl === data.imageUrl &&
     Boolean(product.active) === data.active &&
     (data.stockTracked === undefined || Boolean(product.stockTracked) === data.stockTracked) &&
-    (data.stockQuantity === undefined || product.stockQuantity === data.stockQuantity);
+    (data.stockQuantity === undefined || product.stockQuantity === data.stockQuantity) &&
+    (data.categoryId === undefined || product.categoryId === data.categoryId);
 }
 
 function productResponse(product) {
@@ -512,15 +538,16 @@ router.post("/products", requireAdmin, (req, res) => {
   const data = productData(body);
   if (!data || typeof body.requestId !== "string" || body.requestId.trim() === "") {
     return res.status(400).json({
-      error: "Kiểm tra tên, giá, mô tả và đường dẫn ảnh. Ảnh có thể để trống hoặc dùng đường dẫn / hay http(s)."
+      error: "Kiểm tra tên, giá, mô tả, danh mục và đường dẫn ảnh. Ảnh có thể để trống hoặc dùng đường dẫn / hay http(s)."
     });
   }
 
   const key = body.requestId.trim();
   data.stockTracked ??= false;
   data.stockQuantity ??= 0;
+  data.categoryId ??= DEFAULT_CATEGORY_ID;
   const created = createProductQuery.get(data.name, data.price, data.description,
-    data.imageUrl, Number(data.active), key, Number(data.stockTracked), data.stockQuantity);
+    data.imageUrl, Number(data.active), key, Number(data.stockTracked), data.stockQuantity, data.categoryId);
   if (created) return res.status(201).json(productResponse(created));
 
   const existing = productByCreationQuery.get(key);
@@ -543,7 +570,7 @@ router.patch("/products/:id", requireAdmin, (req, res) => {
   const updated = editProductQuery.get(data.name, data.price, data.description,
     data.imageUrl, Number(data.active),
     data.stockTracked === undefined ? null : Number(data.stockTracked),
-    data.stockQuantity ?? null, id, body.expectedRevision);
+    data.stockQuantity ?? null, data.categoryId ?? null, id, body.expectedRevision);
   if (updated) return res.json(productResponse(updated));
 
   const current = productByIdQuery.get(id);

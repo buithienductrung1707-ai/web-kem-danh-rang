@@ -2,7 +2,8 @@ const productList = document.getElementById("product-list");
 const featuredProductList = document.getElementById("featured-product-list");
 const productMessage = document.getElementById("product-message");
 const reloadCatalogButton = document.getElementById("reload-catalog") ?? document.getElementById("featured-products-retry");
-const productSearchField = document.getElementById("product-search");
+const productSearchField = document.getElementById("product-search")
+  ?? (productList ? document.querySelector("[data-header-search-input]") : null);
 const productSortField = document.getElementById("product-sort");
 const catalogResults = document.getElementById("catalog-results");
 const favoritesOnlyFilter = document.getElementById("favorites-only");
@@ -17,6 +18,7 @@ const productPreviewNoImage = document.getElementById("product-preview-no-image"
 const productPreviewPrice = document.getElementById("product-preview-price");
 const productPreviewStock = document.getElementById("product-preview-stock");
 const productPreviewDescription = document.getElementById("product-preview-description");
+const productPreviewCategory = document.querySelector(".preview-category");
 const productPreviewAdd = document.getElementById("product-preview-add");
 const productPreviewMessage = document.getElementById("product-preview-message");
 const shoppingCartWidget = document.getElementById("shopping-cart-widget");
@@ -78,6 +80,7 @@ const favoritesStorageKey = "toothpaste-favorite-products";
 const money = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" });
 
 let products = new Map();
+let catalogCategories = null;
 let cart = new Map();
 let lastStoredCart = new Map();
 let removingCartProductId = null;
@@ -116,6 +119,10 @@ let shoppingCartDismissed = false;
 
 function paymentLabel(method) {
   return method === "BANK_TRANSFER" ? "Chuyển khoản ngân hàng" : "Thanh toán khi nhận hàng (COD)";
+}
+
+function productUnit(product) {
+  return product?.categoryId === 1 ? "tuýp" : "sản phẩm";
 }
 
 function renderPaymentDetails() {
@@ -772,7 +779,7 @@ function stockIssue(items = [...cart].map(([productId, quantity]) => ({ productI
     if (product?.stockTracked && item.quantity > product.stockQuantity) {
       return product.name + (product.stockQuantity === 0
         ? " đã hết hàng. Hãy xóa sản phẩm này khỏi giỏ để tiếp tục."
-        : " chỉ còn " + product.stockQuantity + " tuýp. Hãy giảm số lượng hoặc xóa sản phẩm để tiếp tục.");
+        : " chỉ còn " + product.stockQuantity + " " + productUnit(product) + ". Hãy giảm số lượng hoặc xóa sản phẩm để tiếp tục.");
     }
   }
   return "";
@@ -797,10 +804,11 @@ function renderProductPreview(locked) {
   productPreviewTitle.textContent = product.name;
   productPreviewPrice.textContent = money.format(product.price);
   productPreviewDescription.textContent = product.description || "Cửa hàng đang cập nhật mô tả sản phẩm.";
+  if (productPreviewCategory) productPreviewCategory.textContent = product.categoryName || "Sản phẩm";
   productPreviewStock.textContent = product.stockTracked
-    ? product.stockQuantity === 0 ? "Hết hàng" : "Có thể thêm " + Math.max(0, product.stockQuantity - quantity) + " tuýp"
+    ? product.stockQuantity === 0 ? "Hết hàng" : "Có thể thêm " + Math.max(0, product.stockQuantity - quantity) + " " + productUnit(product)
     : "Sẵn sàng đặt hàng";
-  if (quantity > 0) productPreviewStock.textContent += " · Trong giỏ " + quantity + " tuýp";
+  if (quantity > 0) productPreviewStock.textContent += " · Trong giỏ " + quantity + " " + productUnit(product);
 }
 
 function openProductPreview(product, opener) {
@@ -1095,11 +1103,11 @@ function renderCart() {
     const detail = document.createElement("p");
     detail.className = "cart-item-detail";
     detail.textContent = product
-      ? money.format(product.price) + "/tuýp · " + quantity + " tuýp"
-      : quantity + " tuýp · " + (catalogReady ? "Sản phẩm đã ẩn hoặc ngừng bán. Hãy xóa để tiếp tục." : "Đang chờ thông tin sản phẩm.");
+      ? money.format(product.price) + "/" + productUnit(product) + " · " + quantity + " " + productUnit(product)
+      : quantity + " sản phẩm · " + (catalogReady ? "Sản phẩm đã ẩn hoặc ngừng bán. Hãy xóa để tiếp tục." : "Đang chờ thông tin sản phẩm.");
     if (product?.stockTracked) {
       const remaining = Math.max(0, product.stockQuantity - quantity);
-      detail.textContent += product.stockQuantity === 0 ? " · Hết hàng" : " · Còn " + remaining + " tuýp có thể thêm";
+      detail.textContent += product.stockQuantity === 0 ? " · Hết hàng" : " · Còn " + remaining + " " + productUnit(product) + " có thể thêm";
     }
     const actions = document.createElement("div");
     actions.className = "cart-quantity-control";
@@ -1130,7 +1138,13 @@ function renderCatalog() {
   if (!target) return;
   const fragment = document.createDocumentFragment();
   const query = normalizeSearch(productSearchField?.value.trim() ?? "");
-  const visibleProducts = [...products.values()].filter(product =>
+  const selectedCategory = catalogCategories && window.ShopCategories?.isCategoryPage
+    ? window.ShopCategories.currentCategory(catalogCategories) : null;
+  const visibleCategoryIds = catalogCategories ? new Set(catalogCategories.map(category => category.id)) : null;
+  const categoryProducts = [...products.values()].filter(product =>
+    (!visibleCategoryIds || visibleCategoryIds.has(product.categoryId)) &&
+    (!window.ShopCategories?.isCategoryPage || product.categoryId === selectedCategory?.id));
+  const visibleProducts = categoryProducts.filter(product =>
     normalizeSearch(product.name + " " + product.description).includes(query) &&
     (!favoritesOnlyFilter?.checked || favoriteProducts.has(product.id)) &&
     (!availableOnlyFilter?.checked || !product.stockTracked || product.stockQuantity > 0));
@@ -1195,7 +1209,7 @@ function renderCatalog() {
     if (product.stockTracked) {
       const stock = document.createElement("p");
       stock.className = "stock-status";
-      stock.textContent = product.stockQuantity === 0 ? "Hết hàng" : "Còn " + product.stockQuantity + " tuýp";
+      stock.textContent = product.stockQuantity === 0 ? "Hết hàng" : "Còn " + product.stockQuantity + " " + productUnit(product);
       card.append(stock);
     }
     if (product.description) {
@@ -1246,11 +1260,13 @@ function renderCatalog() {
   }
   target.replaceChildren(fragment);
   if (catalogResults) {
-    if (products.size === 0) catalogResults.textContent = "";
+    if (categoryProducts.length === 0) catalogResults.textContent = window.ShopCategories?.isCategoryPage && !selectedCategory
+      ? "Danh mục này hiện chưa được hiển thị. Hãy chọn danh mục khác trong Khám phá sản phẩm."
+      : "Cửa hàng đang cập nhật sản phẩm cho danh mục này.";
     else if (visibleProducts.length === 0) catalogResults.textContent = favoritesOnlyFilter?.checked && favoriteProducts.size === 0
       ? "Bạn chưa lưu sản phẩm yêu thích. Hãy tắt bộ lọc yêu thích để chọn sản phẩm."
       : "Chưa tìm thấy sản phẩm phù hợp. Hãy thử từ khóa khác hoặc xóa bộ lọc.";
-    else catalogResults.textContent = "Hiển thị " + visibleProducts.length + "/" + products.size + " sản phẩm.";
+    else catalogResults.textContent = "Hiển thị " + visibleProducts.length + "/" + categoryProducts.length + " sản phẩm.";
   }
   renderActiveFilters();
   updateControls();
@@ -1396,7 +1412,10 @@ async function loadCatalog() {
   renderCatalogSkeleton();
   updateControls();
   try {
-    const response = await fetch("/api/products", { cache: "no-store", signal: AbortSignal.timeout(15000) });
+    const [response, categories] = await Promise.all([
+      fetch("/api/products", { cache: "no-store", signal: AbortSignal.timeout(15000) }),
+      (productList || featuredProductList) && window.ShopCategories ? window.ShopCategories.load() : null
+    ]);
     const result = await response.json();
     if (!storefrontActive || orderPending || isSubmitting) return;
     if (!response.ok || !Array.isArray(result) ||
@@ -1404,12 +1423,17 @@ async function loadCatalog() {
         typeof item.name === "string" && item.name.trim() !== "" &&
         Number.isSafeInteger(item.price) && item.price >= 0 &&
         typeof item.description === "string" && validImageUrl(item.imageUrl) &&
+        (item.categoryId === undefined || Number.isSafeInteger(item.categoryId) && item.categoryId > 0) &&
+        (item.categoryName === undefined || typeof item.categoryName === "string") &&
         ((item.stockTracked === undefined && item.stockQuantity === undefined) ||
           (typeof item.stockTracked === "boolean" && Number.isSafeInteger(item.stockQuantity) && item.stockQuantity >= 0))) ||
       new Set(result.map(item => item.id)).size !== result.length) {
       throw new Error("Dữ liệu sản phẩm chưa hợp lệ");
     }
-    products = new Map(result.map(item => [item.id, { stockTracked: false, stockQuantity: 0, ...item }]));
+    products = new Map(result.map(item => [item.id, {
+      stockTracked: false, stockQuantity: 0, categoryId: 1, categoryName: "Kem đánh răng", ...item
+    }]));
+    catalogCategories = categories;
     catalogReady = true;
     cartMessage.textContent = "";
     importReorder();
@@ -1423,7 +1447,7 @@ async function loadCatalog() {
     else {
       const queuedReorder = window.ShopMemory?.readReorder?.();
       productMessage.textContent = cart.size > 0 || queuedReorder?.reorder || queuedReorder?.error
-        ? "Chưa tải được sản phẩm để cập nhật giỏ hàng. Mở giỏ hàng hoặc danh mục Kem đánh răng để thử lại." : "";
+        ? "Chưa tải được sản phẩm để cập nhật giỏ hàng. Mở giỏ hàng hoặc trang sản phẩm để thử lại." : "";
     }
   } finally {
     catalogLoading = false;
@@ -1519,7 +1543,7 @@ function renderOrderReview() {
       "Địa chỉ " + reviewedOrder.customerAddress
     ] : [orderPending ? "Giữ thông tin nhận hàng của lần gửi đang chờ." : "Nhận hàng theo thông tin đã lưu trong tài khoản."]),
     ...items.map(item => item.expectedProductName + " × " + item.quantity +
-      " tuýp · " + money.format(item.expectedUnitPrice * item.quantity)),
+      " " + productUnit(products.get(item.productId)) + " · " + money.format(item.expectedUnitPrice * item.quantity)),
     "Tiền sản phẩm " + money.format(total),
     paymentLabel(reviewedOrder.paymentMethod) + "."
   ].join("\n");
