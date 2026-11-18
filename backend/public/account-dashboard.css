@@ -1,0 +1,648 @@
+.account-shell.has-account-dashboard {
+  --main-max-width: 1240px;
+  padding-top: 36px;
+}
+
+.has-account-dashboard > .account-heading {
+  display: none;
+}
+
+.account-dashboard {
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr);
+  align-items: start;
+  gap: 28px;
+}
+
+.account-dashboard :is(.account-dashboard-content, .account-dashboard-sidebar, .field) {
+  min-width: 0;
+}
+
+.account-dashboard-sidebar {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.account-dashboard-summary {
+  padding: 24px 20px 20px;
+  background: linear-gradient(135deg, var(--soft), color-mix(in srgb, var(--primary) 17%, var(--surface)));
+  border-bottom: 1px solid var(--line);
+}
+
+.account-dashboard-summary-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-dashboard-identity {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  overflow-wrap: anywhere;
+}
+
+.account-dashboard-identity strong {
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.account-dashboard-identity > span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.account-dashboard-greeting {
+  text-transform: uppercase;
+  font-weight: 750;
+  letter-spacing: .06em;
+}
+
+.account-dashboard-customer-code {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0 0;
+  font-size: 13px;
+}
+
+.account-dashboard-customer-code dt {
+  color: var(--muted);
+}
+
+.account-dashboard-customer-code dd {
+  margin: 0;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--account-avatar-text, var(--accent)) 35%, transparent);
+  border-radius: 50%;
+  background: var(--account-avatar-background, var(--primary-dark));
+  color: var(--account-avatar-text, var(--button-text));
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.dashboard-avatar-small {
+  width: 52px;
+  height: 52px;
+  font-size: 19px;
+}
+
+.dashboard-avatar-large {
+  width: 80px;
+  height: 80px;
+  font-size: 28px;
+}
+
+.dashboard-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.account-dashboard-nav {
+  display: grid;
+  gap: 6px;
+  padding: 12px 10px;
+}
+
+.account-dashboard-nav :is(a, #account-logout) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+  text-align: left;
+  text-decoration: none;
+}
+
+.account-dashboard-nav :is(a, #account-logout):hover,
+.account-dashboard-nav :is(a, #account-logout)[aria-current="page"] {
+  background: var(--soft);
+  color: var(--primary-dark);
+}
+
+.account-dashboard-nav svg,
+.dashboard-icon-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.account-dashboard-nav #account-logout {
+  margin-top: 6px;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 14px 14px;
+  color: var(--muted);
+}
+
+.dashboard-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: 44px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.dashboard-breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 22px;
+  background: var(--soft);
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.dashboard-breadcrumb > span[aria-hidden] {
+  color: var(--muted);
+  font-size: 21px;
+}
+
+.dashboard-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 22px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--surface) 65%, var(--background));
+}
+
+.dashboard-tabs button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.dashboard-tabs button[aria-selected="true"] {
+  background: var(--soft);
+  color: var(--text);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--text) 5%, transparent);
+}
+
+.dashboard-tabs button:hover {
+  color: var(--primary-dark);
+}
+
+.dashboard-card {
+  min-width: 0;
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.dashboard-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 66px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dashboard-card-heading h2,
+.dashboard-dialog-heading h2 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.4;
+  letter-spacing: -.02em;
+}
+
+.dashboard-card-body {
+  padding: 24px;
+}
+
+.dashboard-avatar-editor {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dashboard-avatar-controls {
+  min-width: 0;
+}
+
+.dashboard-avatar-controls > strong {
+  display: block;
+  font-size: 14px;
+}
+
+.dashboard-avatar-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.dashboard-avatar-controls p,
+.dashboard-address-help {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.dashboard-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 20px;
+}
+
+#dashboard-profile-form {
+  padding-top: 24px;
+}
+
+.account-dashboard .field {
+  margin-bottom: 16px;
+}
+
+.account-dashboard .field label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.account-dashboard :is(input:not([type="checkbox"]), textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 11px 14px;
+  border: 1px solid var(--control-border);
+  border-radius: 14px;
+  background: var(--background);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.account-dashboard input[readonly] {
+  color: var(--muted);
+}
+
+.account-dashboard :is(input, textarea):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent);
+  outline-offset: 2px;
+  border-color: var(--primary);
+}
+
+.account-dashboard :is(.field-help, .field-error) {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+.account-dashboard .field-help {
+  color: var(--muted);
+}
+
+.account-dashboard .field-error,
+.dashboard-message.is-error {
+  color: var(--danger);
+}
+
+.account-dashboard [aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.account-dashboard :is(.field-error, .dashboard-message):empty {
+  display: none;
+}
+
+.dashboard-message {
+  margin: 14px 0 0;
+  color: var(--primary-dark);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.account-dashboard button {
+  border-radius: 24px;
+  font-size: 14px;
+  transition: background-color .18s, color .18s, opacity .18s;
+}
+
+.account-dashboard button.dashboard-secondary {
+  border-color: var(--control-border);
+  background: transparent;
+  color: var(--text);
+}
+
+.account-dashboard button.dashboard-secondary:hover {
+  background: var(--soft);
+  color: var(--primary-dark);
+}
+
+.account-dashboard .dashboard-text-button {
+  min-height: 44px;
+  padding: 8px 10px;
+  background: transparent;
+  color: var(--primary-dark);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.account-dashboard .dashboard-compact {
+  min-height: 44px;
+  padding: 6px 16px;
+}
+
+.dashboard-card-heading .dashboard-add-address {
+  min-height: 44px;
+  padding: 10px 16px;
+  white-space: nowrap;
+}
+
+.dashboard-address-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.dashboard-address-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px 20px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--background);
+}
+
+.dashboard-address-item.is-default {
+  border-color: var(--primary);
+}
+
+.dashboard-address-item h3 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-address-item p {
+  margin: 4px 0;
+  color: var(--muted);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-address-default-badge {
+  padding: 3px 8px;
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  color: var(--primary-dark);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.dashboard-address-actions {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.dashboard-address-actions button {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--primary-dark);
+  font-size: 13px;
+}
+
+.dashboard-address-actions button[data-action="delete"] {
+  color: var(--danger);
+}
+
+.dashboard-address-actions button[data-action="default"] {
+  grid-column: 1 / -1;
+}
+
+.dashboard-empty {
+  margin: 0;
+  padding: 20px;
+  border: 1px dashed var(--control-border);
+  border-radius: 16px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.dashboard-dialog {
+  width: min(520px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 24px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.dashboard-dialog::backdrop {
+  background: color-mix(in srgb, var(--text) 45%, transparent);
+  backdrop-filter: blur(5px);
+}
+
+.dashboard-dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.dashboard-dialog .dashboard-icon-button {
+  width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  background: var(--soft);
+  color: var(--text);
+}
+
+.dashboard-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+.dashboard-checkbox input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+
+@media screen and (max-width: 960px) {
+  .account-dashboard {
+    grid-template-columns: 224px minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .dashboard-address-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-address-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (max-width: 760px) {
+  .account-shell.has-account-dashboard {
+    padding: 24px 16px 32px;
+  }
+
+  .account-dashboard {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .account-dashboard-summary {
+    padding: 18px;
+  }
+
+  .account-dashboard-customer-code {
+    margin-top: 12px;
+  }
+
+  .account-dashboard-nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .account-dashboard-nav :is(a, #account-logout) {
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-height: 62px;
+    margin: 0;
+    padding: 8px 3px;
+    border: 0;
+    border-radius: 12px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .dashboard-breadcrumb {
+    margin-bottom: 10px;
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .dashboard-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-card {
+    border-radius: 22px;
+  }
+
+  .dashboard-card-heading,
+  .dashboard-card-body {
+    padding: 18px;
+  }
+
+  .dashboard-card-heading {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-card-heading h2,
+  .dashboard-dialog-heading h2 {
+    font-size: 18px;
+  }
+
+  .dashboard-tabs button {
+    padding: 8px 5px;
+    font-size: 12px;
+  }
+
+  .dashboard-avatar-editor {
+    gap: 16px;
+  }
+
+  .dashboard-avatar-large {
+    width: 64px;
+    height: 64px;
+    font-size: 24px;
+  }
+
+  .dashboard-avatar-controls p {
+    font-size: 12px;
+  }
+
+  .dashboard-address-item {
+    padding: 14px;
+  }
+
+  .dashboard-dialog {
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-dashboard button {
+    transition: none;
+  }
+}

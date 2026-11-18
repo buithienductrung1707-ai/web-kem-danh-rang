@@ -14,6 +14,7 @@
   const continueLink = document.getElementById("account-continue");
   const showPassword = document.getElementById("account-show-password");
   const profileForm = document.getElementById("account-profile-form");
+  const dashboard = window.ShopAccountDashboard;
   const saveProfileButton = document.getElementById("account-save-profile");
   const profileMessage = document.getElementById("account-profile-message");
   const fields = {
@@ -87,10 +88,15 @@
     };
   }
 
+  function identityFor(account) {
+    const colors = avatarColors[(avatarSeed % avatarColors.length + account.id % avatarColors.length) % avatarColors.length];
+    return { ...headerIdentity(account.name), background: colors[0], color: colors[1] };
+  }
+
   function renderHeaderAccount(link, account) {
     const label = link.querySelector("[data-account-label]");
     const greeting = link.querySelector(".header-link-label");
-    const identity = account ? headerIdentity(account.name) : null;
+    const identity = account ? identityFor(account) : null;
     if (label) {
       label.textContent = identity?.name || "Đăng nhập";
     } else {
@@ -106,10 +112,20 @@
         avatar.setAttribute("aria-hidden", "true");
         link.prepend(avatar);
       }
-      const colors = avatarColors[(avatarSeed % avatarColors.length + account.id % avatarColors.length) % avatarColors.length];
       avatar.textContent = identity.initials;
-      avatar.style.setProperty("--account-avatar-background", colors[0]);
-      avatar.style.setProperty("--account-avatar-text", colors[1]);
+      avatar.style.setProperty("--account-avatar-background", identity.background);
+      avatar.style.setProperty("--account-avatar-text", identity.color);
+      if (account.avatarUrl) {
+        const photo = document.createElement("img");
+        photo.src = account.avatarUrl;
+        photo.alt = "";
+        photo.width = 36;
+        photo.height = 36;
+        photo.addEventListener("error", () => {
+          if (photo.parentElement === avatar) avatar.textContent = identity.initials;
+        }, { once: true });
+        avatar.replaceChildren(photo);
+      }
     } else {
       avatar?.remove();
     }
@@ -138,22 +154,35 @@
     profileForm?.setAttribute("aria-busy", String(value));
     if (!value) {
       if (submitButton) submitButton.textContent = registerForm ? "Tạo tài khoản" : "Đăng nhập";
-      if (logoutButton) logoutButton.textContent = "Đăng xuất";
+      if (logoutButton) (logoutButton.querySelector("span") ?? logoutButton).textContent = "Đăng xuất";
       if (saveProfileButton) saveProfileButton.textContent = "Lưu thông tin";
     }
+    dashboard?.setBusy(value);
   }
 
   function validateAccount(account) {
     const phone = account?.phone === undefined ? "" : account.phone;
     const address = account?.address === undefined ? "" : account.address;
+    const avatarUrl = account?.avatarUrl ?? "";
+    const shippingAddress = account?.shippingAddress;
     if (!account || !Number.isSafeInteger(account.id) || account.id < 1 ||
       typeof account.name !== "string" || account.name.length > 120 ||
       typeof account.email !== "string" || account.email.trim() === "" || account.email.length > 254 ||
       typeof phone !== "string" || phone.length > 32 ||
-      typeof address !== "string" || address.length > 500) {
+      typeof address !== "string" || address.length > 500 ||
+      typeof avatarUrl !== "string" ||
+      (avatarUrl !== "" && !/^\/uploads\/products\/[a-f0-9]{64}\.(jpg|png|webp)$/.test(avatarUrl)) ||
+      (shippingAddress !== undefined && shippingAddress !== null &&
+        (typeof shippingAddress !== "object" || Array.isArray(shippingAddress) ||
+          typeof shippingAddress.recipientName !== "string" || shippingAddress.recipientName.length > 120 ||
+          typeof shippingAddress.phone !== "string" || shippingAddress.phone.length > 32 ||
+          typeof shippingAddress.address !== "string" || shippingAddress.address.length > 500))) {
       throw new Error("Thông tin tài khoản chưa hợp lệ");
     }
-    return { id: account.id, name: account.name, email: account.email, phone, address };
+    return { id: account.id, name: account.name, email: account.email, phone, address, avatarUrl,
+      ...(shippingAddress === undefined ? {} : {
+        shippingAddress: shippingAddress === null ? null : { ...shippingAddress }
+      }) };
   }
 
   function renderAccount(account, preserveProfile = false) {
@@ -168,8 +197,9 @@
       document.title = title + " — Cửa hàng kem đánh răng";
     }
     if (signedInPanel) signedInPanel.hidden = account === null;
+    dashboard?.render(account);
     if (accountName) accountName.textContent = account?.name || "";
-    if (accountEmail) accountEmail.textContent = account?.email || "";
+    if (accountEmail && !dashboard) accountEmail.textContent = account?.email || "";
     if (!preserveProfile || account === null) {
       for (const [key, field] of Object.entries(profileFields)) {
         if (field) field.value = account?.[key] || "";
@@ -281,6 +311,10 @@
       const account = await readSession(controller);
       if (!isCurrent(controller)) return;
       acceptAccount(account);
+      if (account && registerForm) {
+        window.location.replace(authUrl("/dang-nhap.html"));
+        return;
+      }
       setStatus("");
       if (focusAfter) focusTarget = account ? logoutButton : fields.email;
     } catch {
@@ -489,7 +523,7 @@
   logoutButton?.addEventListener("click", async () => {
     if (busy || !pageActive) return;
     const controller = startRequest("Đang đăng xuất...");
-    logoutButton.textContent = "Đang đăng xuất...";
+    (logoutButton.querySelector("span") ?? logoutButton).textContent = "Đang đăng xuất...";
     let focusTarget = logoutButton;
     try {
       const { response, result } = await request("/logout", {
@@ -571,6 +605,20 @@
   window.addEventListener("pageshow", (event) => {
     pageActive = true;
     if (event.persisted) void checkSession();
+  });
+  dashboard?.configure({
+    acceptAccount,
+    identityFor,
+    onUnauthorized(reason) {
+      activeRequest?.abort();
+      activeRequest = null;
+      setBusy(false);
+      acceptAccount(null);
+      clearPasswords();
+      setStatus(typeof reason === "string" && reason.trim() !== ""
+        ? reason : "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.");
+      fields.email?.focus();
+    }
   });
   renderAccount(null);
   void checkSession();

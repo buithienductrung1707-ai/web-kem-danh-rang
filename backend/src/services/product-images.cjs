@@ -167,7 +167,8 @@ async function saveImageToFilesystem(uploadDirectory, filename, data) {
 }
 
 function createProductImageUpload({
-  uploadDirectory = path.join(publicDirectory, "uploads", "products")
+  uploadDirectory = path.join(publicDirectory, "uploads", "products"),
+  onSaved
 } = {}) {
   const readRawImage = express.raw({
     type: () => true,
@@ -212,7 +213,9 @@ function createProductImageUpload({
       ? await runtime.saveImage(filename, data, contentType)
       : await saveImageToFilesystem(uploadDirectory, filename, data);
 
-    res.status(created ? 201 : 200).json({ imageUrl: `/uploads/products/${filename}` });
+    const result = { imageUrl: `/uploads/products/${filename}`, created };
+    if (onSaved) return onSaved(req, res, result);
+    res.status(created ? 201 : 200).json({ imageUrl: result.imageUrl });
   }
 
   return [readImage, saveImage];

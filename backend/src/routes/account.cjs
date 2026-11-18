@@ -8,6 +8,8 @@ const { runTransaction } = require("../db/transaction.cjs");
 const { getOrderItems } = require("../services/orders.cjs");
 const mailer = require("../services/mailer.cjs");
 const { getSessionOptions } = require("../services/session-options.cjs");
+const { createProductImageUpload } = require("../services/product-images.cjs");
+const addresses = require("../services/customer-addresses.cjs");
 
 const router = express.Router();
 const deriveKey = promisify(scrypt);
@@ -96,23 +98,41 @@ const resetPasswordLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "Bạn đã thử nhiều lần. Hãy chờ 15 phút rồi thử lại." }
 });
+const passwordChangeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Bạn đã thử đổi mật khẩu nhiều lần. Hãy chờ 15 phút rồi thử lại." }
+});
+const addressLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 30,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Bạn đã cập nhật địa chỉ nhiều lần. Hãy chờ một phút rồi thử lại." }
+});
+const avatarLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Bạn đã cập nhật ảnh nhiều lần. Hãy chờ một phút rồi thử lại." }
+});
 
 const findCustomerByEmail = db.prepare(`
-  SELECT id, name, email, phone, address, password_salt, password_hash
+  SELECT id, name, email, phone, address, avatar_url, addresses_initialized, password_salt, password_hash
   FROM customers WHERE email = ?
 `);
 const findCustomerById = db.prepare(`
-  SELECT id, name, email, phone, address, password_salt FROM customers WHERE id = ?
+  SELECT id, name, email, phone, address, avatar_url, addresses_initialized, password_salt
+  FROM customers WHERE id = ?
 `);
 const createCustomer = db.prepare(`
   INSERT INTO customers (name, email, phone, address, password_salt, password_hash)
   VALUES (?, ?, ?, ?, ?, ?)
   ON CONFLICT(email) DO NOTHING
-  RETURNING id, name, email, phone, address
-`);
-const updateCustomerProfile = db.prepare(`
-  UPDATE customers SET name = ?, phone = ?, address = ? WHERE id = ? AND password_salt = ?
-  RETURNING id, name, email, phone, address
+  RETURNING id, name, email, phone, address, avatar_url, addresses_initialized
 `);
 const countCustomerOrders = db.prepare(`
   SELECT COUNT(*) AS total FROM orders WHERE customer_id = ? AND (? = 'all' OR status = ?)
@@ -176,8 +196,7 @@ function validateProfile(body) {
 }
 
 function customerResponse(customer) {
-  const { id, name, email, phone, address } = customer;
-  return { id, name, email, phone, address };
+  return addresses.customerResponse(customer);
 }
 
 function validateCredentials(body) {
@@ -238,19 +257,103 @@ router.get("/me", requireCustomer, (req, res) => {
 });
 
 router.patch("/profile", requireCustomer, requireCustomerContext, profileLimiter, (req, res) => {
-  const body = req.body || {};
-  const validation = validateProfile(body);
-  if (validation) return res.status(400).json(validation);
+  const result = addresses.updateProfile(res.locals.customer.id, req.session.customerSalt, req.body);
+  res.status(result.status).json(result.body);
+});
 
-  const customer = updateCustomerProfile.get(
-    body.name.trim(), body.phone.trim(), body.address.trim(),
-    res.locals.customer.id, req.session.customerSalt
-  );
-  if (!customer) {
-    return res.status(401).json({ error: "Hãy đăng nhập tài khoản của bạn." });
+router.get("/addresses", requireCustomer, requireCustomerContext, (req, res) => {
+  const result = addresses.getAddresses(res.locals.customer.id, req.session.customerSalt);
+  res.status(result.status).json(result.body);
+});
+
+router.post("/addresses", requireCustomer, requireCustomerContext, addressLimiter, (req, res) => {
+  const result = addresses.createAddress(res.locals.customer.id, req.session.customerSalt, req.body || {});
+  res.status(result.status).json(result.body);
+});
+
+function addressId(value) {
+  return typeof value === "string" && /^[1-9]\d*$/.test(value) && Number.isSafeInteger(Number(value))
+    ? Number(value)
+    : null;
+}
+
+router.patch("/addresses/:id", requireCustomer, requireCustomerContext, addressLimiter, (req, res) => {
+  const id = addressId(req.params.id);
+  if (id === null) return res.status(400).json({ error: "Mã địa chỉ chưa hợp lệ." });
+  const result = addresses.updateAddress(res.locals.customer.id, req.session.customerSalt, id, req.body || {});
+  res.status(result.status).json(result.body);
+});
+
+router.delete("/addresses/:id", requireCustomer, requireCustomerContext, addressLimiter, (req, res) => {
+  const id = addressId(req.params.id);
+  const revision = req.query.revision;
+  if (id === null || typeof revision !== "string" || !/^\d+$/.test(revision) ||
+    !Number.isSafeInteger(Number(revision))) {
+    return res.status(400).json({ error: "Mã hoặc phiên bản địa chỉ chưa hợp lệ." });
   }
+  const result = addresses.deleteAddress(res.locals.customer.id, req.session.customerSalt, id, Number(revision));
+  res.status(result.status).json(result.body);
+});
 
-  res.json(customer);
+router.post("/avatar", requireCustomer, requireCustomerContext, avatarLimiter,
+  ...createProductImageUpload({
+    onSaved(req, res, { imageUrl }) {
+      const updated = db.prepare(`
+        UPDATE customers SET avatar_url = ? WHERE id = ? AND password_salt = ? RETURNING id
+      `).get(imageUrl, res.locals.customer.id, req.session.customerSalt);
+      if (!updated) return res.status(401).json({ error: "Phiên tài khoản đã thay đổi. Hãy đăng nhập lại." });
+      res.json(customerResponse(findCustomerById.get(updated.id)));
+    }
+  })
+);
+
+router.delete("/avatar", requireCustomer, requireCustomerContext, avatarLimiter, (req, res) => {
+  const updated = db.prepare(`
+    UPDATE customers SET avatar_url = '' WHERE id = ? AND password_salt = ? RETURNING id
+  `).get(res.locals.customer.id, req.session.customerSalt);
+  if (!updated) return res.status(401).json({ error: "Phiên tài khoản đã thay đổi. Hãy đăng nhập lại." });
+  res.json(customerResponse(findCustomerById.get(updated.id)));
+});
+
+router.post("/password", requireCustomer, requireCustomerContext, passwordChangeLimiter, async (req, res) => {
+  const { currentPassword, newPassword } = req.body || {};
+  if (typeof currentPassword !== "string" || currentPassword.length < 1 || currentPassword.length > 128) {
+    return res.status(400).json({ error: "Hãy nhập mật khẩu hiện tại.", field: "currentPassword" });
+  }
+  if (typeof newPassword !== "string" || newPassword.length < 8 || newPassword.length > 128) {
+    return res.status(400).json({ error: "Mật khẩu mới cần có từ 8 đến 128 ký tự.", field: "newPassword" });
+  }
+  const customer = findCustomerByEmail.get(res.locals.customer.email);
+  const oldSalt = req.session.customerSalt;
+  const currentHash = await deriveKey(currentPassword, customer?.password_salt ?? dummySalt, 64, passwordOptions);
+  const expectedHash = customer ? Buffer.from(customer.password_hash, "hex") : Buffer.alloc(64);
+  if (!customer || customer.password_salt !== oldSalt || expectedHash.length !== currentHash.length ||
+    !timingSafeEqual(expectedHash, currentHash)) {
+    return res.status(400).json({ error: "Mật khẩu hiện tại chưa đúng.", field: "currentPassword" });
+  }
+  const salt = randomBytes(16).toString("hex");
+  const hash = await deriveKey(newPassword, salt, 64, passwordOptions);
+  const changed = runTransaction(db, () => {
+    if (!resetCustomerPassword.get(salt, hash.toString("hex"), customer.id, oldSalt)) return false;
+    db.prepare("DELETE FROM password_resets WHERE customer_id = ?").run(customer.id);
+    return true;
+  }, { rollbackIf: result => !result });
+  if (!changed) return res.status(401).json({ error: "Phiên tài khoản đã thay đổi. Hãy đăng nhập lại." });
+  try {
+    await startCustomerSession(req, res, customer.id, salt);
+  } catch {
+    return res.status(503).json({
+      error: "Mật khẩu đã được đổi. Hãy đăng nhập lại bằng mật khẩu mới để tiếp tục.",
+      passwordChanged: true
+    });
+  }
+  const currentCustomer = findCustomerById.get(customer.id);
+  if (!currentCustomer || currentCustomer.password_salt !== salt) {
+    await promisify(req.session.destroy).call(req.session);
+    res.clearCookie(cookieName, cookieOptions);
+    return res.status(401).json({ error: "Mật khẩu đã được cập nhật tiếp. Hãy đăng nhập lại." });
+  }
+  res.json({ message: "Đã đổi mật khẩu thành công.", customer: customerResponse(currentCustomer) });
 });
 
 router.get("/orders", requireCustomer, requireCustomerContext, (req, res) => {
@@ -360,7 +463,7 @@ router.post("/register", registerLimiter, async (req, res) => {
     });
   }
 
-  res.status(201).json(customer);
+  res.status(201).json(customerResponse(customer));
 });
 
 router.post("/login", loginLimiter, async (req, res) => {

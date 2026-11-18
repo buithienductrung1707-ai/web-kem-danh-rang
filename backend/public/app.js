@@ -692,6 +692,16 @@ function renderCheckoutAccount() {
 }
 
 function applyCheckoutAccount(account) {
+  if (account) {
+    const recipient = account.shippingAddress === undefined
+      ? { recipientName: account.name, phone: account.phone, address: account.address }
+      : account.shippingAddress;
+    if (recipient !== null && (!recipient ||
+      typeof recipient.recipientName !== "string" || typeof recipient.phone !== "string" ||
+      typeof recipient.address !== "string")) throw new Error("Thông tin nhận hàng chưa hợp lệ");
+    account = { id: account.id, email: account.email,
+      name: recipient?.recipientName ?? "", phone: recipient?.phone ?? "", address: recipient?.address ?? "" };
+  }
   const previous = checkoutAccount;
   const changed = JSON.stringify(previous) !== JSON.stringify(account);
   if (previous !== null || account !== null) {

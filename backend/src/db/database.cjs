@@ -72,6 +72,8 @@ function initializeSchema() {
       email TEXT NOT NULL UNIQUE,
       phone TEXT NOT NULL DEFAULT '',
       address TEXT NOT NULL DEFAULT '',
+      avatar_url TEXT NOT NULL DEFAULT '',
+      addresses_initialized INTEGER NOT NULL DEFAULT 0 CHECK (addresses_initialized IN (0, 1)),
       password_salt TEXT NOT NULL,
       password_hash TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -86,6 +88,28 @@ function initializeSchema() {
     ) STRICT;
 
     CREATE INDEX IF NOT EXISTS password_resets_customer ON password_resets(customer_id);
+
+    CREATE TABLE IF NOT EXISTS customer_addresses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT CHECK (id BETWEEN 1 AND 9007199254740991),
+      customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+      recipient_name TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      address TEXT NOT NULL,
+      is_default INTEGER NOT NULL DEFAULT 0 CHECK (is_default IN (0, 1)),
+      revision INTEGER NOT NULL DEFAULT 0 CHECK (revision BETWEEN 0 AND 9007199254740991),
+      request_id TEXT,
+      creation_payload TEXT,
+      UNIQUE (customer_id, request_id)
+    ) STRICT;
+
+    CREATE UNIQUE INDEX IF NOT EXISTS customer_addresses_default
+      ON customer_addresses(customer_id) WHERE is_default = 1;
+
+    CREATE TABLE IF NOT EXISTS deleted_customer_address_requests (
+      customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+      request_id TEXT NOT NULL,
+      PRIMARY KEY (customer_id, request_id)
+    ) STRICT;
 
     CREATE TABLE IF NOT EXISTS email_outbox (
       id INTEGER PRIMARY KEY,
@@ -241,6 +265,13 @@ function initializeSchema() {
     if (!customerColumns.has(name)) {
       db.exec(`ALTER TABLE customers ADD COLUMN ${name} TEXT NOT NULL DEFAULT ''`);
     }
+  }
+  if (!customerColumns.has("avatar_url")) {
+    db.exec("ALTER TABLE customers ADD COLUMN avatar_url TEXT NOT NULL DEFAULT ''");
+  }
+  if (!customerColumns.has("addresses_initialized")) {
+    db.exec(`ALTER TABLE customers ADD COLUMN addresses_initialized
+      INTEGER NOT NULL DEFAULT 0 CHECK (addresses_initialized IN (0, 1))`);
   }
 
   const orderColumns = new Set(

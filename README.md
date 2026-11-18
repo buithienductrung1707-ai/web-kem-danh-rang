@@ -83,9 +83,20 @@ npm.cmd start
 
 Khi thêm sản phẩm thành công, ảnh sản phẩm bay tới biểu tượng giỏ hàng trên header và số lượng trên giỏ nhấn sáng nhẹ. Nếu thiết bị bật chế độ giảm chuyển động, phản hồi được rút gọn để hạn chế hiệu ứng.
 
-Khách có thể đăng ký bằng email, mật khẩu, họ tên, số điện thoại và địa chỉ. Mật khẩu khách hàng dài từ 8 đến 128 ký tự. Khi đã đăng nhập, giỏ hàng sử dụng thông tin nhận hàng đã lưu trong tài khoản.
+Khách có thể đăng ký bằng email, mật khẩu, họ tên, số điện thoại và địa chỉ. Mật khẩu khách hàng dài từ 8 đến 128 ký tự. Khi đã đăng nhập, đơn hàng sử dụng địa chỉ nhận hàng mặc định trong tài khoản.
 
-Sau khi đăng nhập, góc tài khoản hiện **Xin chào** và hai từ đầu, cuối trong họ tên. Ví dụ **Nguyễn Văn An** hiện **Nguyễn An**, avatar tròn có chữ **NA**. Màu nền và chữ được chọn ngẫu nhiên từ các cặp màu có tương phản rõ, giữ ổn định trên cùng trình duyệt. Tên một từ dùng hai chữ cái đầu, ví dụ **Trung** có avatar **TR**.
+Sau khi đăng nhập, góc tài khoản hiện **Xin chào** và hai từ đầu, cuối trong họ tên. Ví dụ **Nguyễn Văn An** hiện **Nguyễn An**. Avatar mặc định có chữ **NA**, màu nền và chữ được chọn ngẫu nhiên từ các cặp màu có tương phản rõ, giữ ổn định trên cùng trình duyệt. Tên một từ dùng hai chữ cái đầu, ví dụ **Trung** có avatar **TR**. Ảnh đại diện đã tải lên được hiển thị trên header và trang tài khoản.
+
+### Quản lý tài khoản cá nhân
+
+Bấm khu vực tài khoản trên header để mở trang **Thông tin tài khoản**. Thanh bên hiển thị họ tên, số điện thoại và mã khách hàng được ghép từ `KH` cùng ID tài khoản.
+
+- Trong tab **Thông tin tài khoản**, chỉnh **Họ**, **Tên**, **Số điện thoại** rồi bấm **Cập nhật**. Bấm **Hoàn tác** để đưa các ô nhập về thông tin đã lưu. Email dùng để đăng nhập được hiển thị ở chế độ chỉ xem.
+- Bấm **Thay đổi** ở ảnh đại diện để chọn JPG, PNG hoặc WebP. Ảnh đầu vào tối đa **20 MiB**, được cắt vuông ở giữa, thu về **512 × 512px** và nén trước khi tải lên. Bấm **Xoá ảnh** để dùng lại avatar chữ cái.
+- Tab **Thay đổi mật khẩu** yêu cầu mật khẩu hiện tại, mật khẩu mới và nhập lại mật khẩu mới. Đổi thành công sẽ tiếp tục phiên hiện tại và yêu cầu các phiên khác đăng nhập lại. Nếu máy chủ thông báo mật khẩu đã đổi nhưng phiên chưa lưu được, đăng nhập bằng mật khẩu mới.
+- **Sổ địa chỉ giao nhận** hỗ trợ tối đa **5 địa chỉ**, gồm người nhận, số điện thoại và địa chỉ. Dùng **Thêm địa chỉ**, **Chỉnh sửa**, **Xoá** hoặc **Đặt mặc định**. Thông tin người nhận được quản lý riêng với họ tên và số điện thoại cá nhân.
+
+Thông tin nhận hàng cũ được chuyển thành địa chỉ đầu tiên khi mở sổ địa chỉ. Xoá địa chỉ mặc định sẽ chọn địa chỉ còn lại đầu tiên làm mặc định. Khi sổ trống, thêm địa chỉ nhận hàng để tiếp tục đặt hàng. Khi có lỗi phiên bản, đóng cửa sổ chỉnh sửa, bấm **Tải lại địa chỉ** rồi kiểm tra thông tin hiện tại.
 
 **Danh mục nổi bật** và menu **Khám phá sản phẩm** dùng chung danh sách do quản trị quản lý. Có sẵn **Kem đánh răng** và **Bàn chải đánh răng**. Trang bàn chải hiển thị sản phẩm đã được gán đúng danh mục. Khi danh mục chưa có sản phẩm, trang hiển thị thông báo đang cập nhật.
 
@@ -214,7 +225,7 @@ SMTP phục vụ email đặt lại mật khẩu và thông báo đơn hàng. Li
 | Thành phần | Vị trí |
 | --- | --- |
 | Database SQLite | [backend/shop.sqlite](backend/shop.sqlite) |
-| Ảnh sản phẩm và ảnh quảng cáo tải lên | [backend/public/uploads/products/](backend/public/uploads/products/) |
+| Ảnh sản phẩm, quảng cáo và ảnh đại diện tải lên | [backend/public/uploads/products/](backend/public/uploads/products/) |
 | Ảnh giao diện có sẵn | [backend/public/assets/](backend/public/assets/) |
 | Cấu hình cục bộ do bạn tạo | `backend/smtp.env` |
 
@@ -243,6 +254,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | [backend/src/app.cjs](backend/src/app.cjs) | Ứng dụng Express, API công khai và phục vụ frontend |
 | [backend/src/routes/admin.cjs](backend/src/routes/admin.cjs) | Đăng nhập và API quản trị |
 | [backend/src/routes/account.cjs](backend/src/routes/account.cjs) | Tài khoản, hồ sơ, đơn của khách và khôi phục mật khẩu |
+| [backend/src/services/customer-addresses.cjs](backend/src/services/customer-addresses.cjs) | Sổ địa chỉ cá nhân, địa chỉ mặc định và dữ liệu hồ sơ |
 | [backend/src/routes/support.cjs](backend/src/routes/support.cjs), [backend/src/services/support.cjs](backend/src/services/support.cjs) | API và lưu trữ tin nhắn chăm sóc khách hàng |
 | [backend/src/services/categories.cjs](backend/src/services/categories.cjs) | Danh mục dùng chung cho trang chủ, menu và sản phẩm |
 | [backend/src/db/database.cjs](backend/src/db/database.cjs) | Schema, nâng cấp cấu trúc và dữ liệu mẫu |
@@ -263,6 +275,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Hiệu ứng thêm sản phẩm vào giỏ hàng | [cart-feedback.js](backend/public/cart-feedback.js), [cart-feedback.css](backend/public/cart-feedback.css) |
 | Tìm kiếm, menu và hiển thị banner hai bên từ API | [header.js](backend/public/header.js) |
 | Lời chào và avatar tài khoản trên header | [account.js](backend/public/account.js), [account-header.css](backend/public/account-header.css) |
+| Giao diện và thao tác cài đặt tài khoản cá nhân | [account-dashboard.js](backend/public/account-dashboard.js), [account-dashboard.css](backend/public/account-dashboard.css), [dang-nhap.html](backend/public/dang-nhap.html) |
 | Danh mục nổi bật, menu danh mục và trang sản phẩm chung | [catalog-categories.js](backend/public/catalog-categories.js), [catalog-categories.css](backend/public/catalog-categories.css), [san-pham.html](backend/public/san-pham.html) |
 | Quản lý danh mục trong trang admin | [admin-categories.js](backend/public/admin-categories.js), [admin-categories.css](backend/public/admin-categories.css) |
 | Ảnh logo dùng chung | [shop-logo.png](backend/public/assets/shop-logo.png) |
