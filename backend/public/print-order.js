@@ -66,7 +66,7 @@ function renderOrder(order) {
   const fragment = document.createDocumentFragment();
   for (const item of items) {
     const row = document.createElement("tr");
-    for (const value of [item.productName, item.quantity + " tuýp",
+    for (const value of [item.productName, item.quantity + " sp",
       money.format(item.unitPrice), money.format(item.total)]) {
       const cell = document.createElement("td");
       cell.textContent = value;

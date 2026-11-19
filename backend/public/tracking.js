@@ -260,7 +260,7 @@ async function lookupOrder() {
       "Mã đơn " + orderCode(result),
       "Trạng thái " + status,
       ...items.map(item => item.productName + " × " + item.quantity +
-        " tuýp · " + trackingMoney.format(item.unitPrice) + "/tuýp · " + trackingMoney.format(item.total)),
+        " sp · " + trackingMoney.format(item.unitPrice) + "/sp · " + trackingMoney.format(item.total)),
       "Tiền sản phẩm " + trackingMoney.format(result.total),
       Object.hasOwn(trackingPaymentLabels, result.paymentMethod)
         ? trackingPaymentLabels[result.paymentMethod] : "Thanh toán " + result.paymentMethod,

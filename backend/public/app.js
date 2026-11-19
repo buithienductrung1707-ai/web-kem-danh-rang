@@ -167,7 +167,7 @@ function paymentLabel(method) {
 }
 
 function productUnit(product) {
-  return product?.categoryId === 1 ? "tuýp" : "sản phẩm";
+  return product?.categoryId === 1 ? "sp" : "sản phẩm";
 }
 
 function renderPaymentDetails() {
