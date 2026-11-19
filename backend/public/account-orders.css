@@ -22,29 +22,78 @@
   font-size: 14px;
 }
 
-.workspace-orders-heading > .button-link {
-  flex-shrink: 0;
-  border-radius: 24px;
-}
-
 .account-orders #orders-message:empty {
   display: none;
 }
 
-.workspace-orders-filters {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px 12px;
-  padding: 22px;
+.workspace-orders-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 76px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--line);
 }
 
+.account-orders .workspace-orders-create {
+  min-height: 44px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  background: linear-gradient(110deg, var(--primary-dark), var(--primary));
+  color: var(--button-text);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--primary) 16%, transparent);
+  font-size: 14px;
+  font-weight: 750;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.account-orders .workspace-orders-create:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--primary) 24%, transparent);
+}
+
+.workspace-orders-filters {
+  display: grid;
+  gap: 20px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.workspace-orders-primary-filters {
+  display: grid;
+  grid-template-columns: minmax(132px, .85fr) minmax(132px, .85fr) minmax(220px, 2.2fr) minmax(136px, 1fr);
+  align-items: end;
+  gap: 12px;
+  min-width: 0;
+}
+
 .account-orders .workspace-orders-filters .field {
+  min-width: 0;
   margin: 0;
 }
 
-.workspace-orders-search {
-  grid-column: span 2;
+.workspace-orders-filters label:not(.visually-hidden) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.workspace-orders-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.workspace-orders-date label .workspace-orders-icon {
+  color: var(--primary-dark);
 }
 
 .account-orders select {
@@ -60,12 +109,77 @@
   font-size: 16px;
 }
 
+.account-orders .workspace-orders-primary-filters :is(input, select),
+.account-orders .workspace-orders-status select {
+  min-height: 44px;
+  height: 44px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--background);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.workspace-orders-search-control,
+.workspace-orders-sort-control {
+  position: relative;
+  min-width: 0;
+}
+
+.workspace-orders-search-control > .workspace-orders-icon,
+.workspace-orders-sort-control > .workspace-orders-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.workspace-orders-search-control > .workspace-orders-icon {
+  left: 14px;
+}
+
+.account-orders .workspace-orders-search-control input {
+  padding-left: 40px;
+  border-radius: 999px;
+}
+
+.workspace-orders-sort-control > .workspace-orders-icon {
+  right: 12px;
+}
+
+.account-orders .workspace-orders-sort-control select {
+  appearance: none;
+  padding-right: 36px;
+  font-weight: 650;
+}
+
+.workspace-orders-secondary-filters {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  min-width: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.workspace-orders-status {
+  flex: 0 1 220px;
+}
+
 .workspace-orders-filter-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: end;
   gap: 8px;
-  grid-column: span 3;
+}
+
+.workspace-orders-filter-actions button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
 }
 
 .account-orders :is(button, .button-link) {
@@ -372,11 +486,18 @@
 }
 
 @media (max-width: 1120px) {
-  .workspace-orders-filters {
+  .workspace-orders-primary-filters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .workspace-orders-filter-actions {
+  .workspace-orders-search {
     grid-column: span 2;
+  }
+  .workspace-orders-sort {
+    grid-column: span 2;
+  }
+  .account-orders .workspace-orders-primary-filters :is(input, select),
+  .account-orders .workspace-orders-status select {
+    font-size: 16px;
   }
 }
 
@@ -384,13 +505,25 @@
   .workspace-orders-heading {
     gap: 12px;
   }
-  .workspace-orders-heading > .button-link {
-    width: 100%;
-    text-align: center;
+  .workspace-orders-toolbar {
+    min-height: 72px;
+    padding: 14px 16px;
   }
   .workspace-orders-filters {
     padding: 16px;
-    gap: 14px 10px;
+    gap: 16px;
+  }
+  .workspace-orders-primary-filters {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .workspace-orders-search,
+  .workspace-orders-sort {
+    grid-column: auto;
+  }
+  .workspace-orders-status,
+  .workspace-orders-filter-actions {
+    flex: 1 1 100%;
   }
   .workspace-orders-results {
     padding: 0 12px 16px;
@@ -444,5 +577,14 @@
   .account-orders .orders-pagination button {
     padding-inline: 12px;
     font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-orders .workspace-orders-create {
+    transition: none;
+  }
+  .account-orders .workspace-orders-create:hover {
+    transform: none;
   }
 }
