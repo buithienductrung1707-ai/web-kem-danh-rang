@@ -9,6 +9,7 @@ const { createOrder, getOrderItems, getOrderHistory } = require("./services/orde
 const { getPublicBanners } = require("./services/banners.cjs");
 const { getPublicCategories } = require("./services/categories.cjs");
 const { productDetailsResponse, productBrand } = require("./services/product-details.cjs");
+const { productId, getProductReviewStats, getPublicReviews } = require("./services/product-reviews.cjs");
 const { getRuntime } = require("./runtime.cjs");
 
 const app = express();
@@ -62,7 +63,14 @@ app.get("/api/products/:id", (req, res) => {
   const id = /^[1-9]\d*$/.test(req.params.id) ? Number(req.params.id) : NaN;
   const product = Number.isSafeInteger(id) ? productDetailsQuery.get(id) : null;
   if (!product) return res.status(404).json({ error: "Không tìm thấy sản phẩm." });
-  res.json(productDetailsResponse({ ...product, stockTracked: product.stockTracked === 1 }));
+  res.json({ ...productDetailsResponse({ ...product, stockTracked: product.stockTracked === 1 }),
+    ...getProductReviewStats(id) });
+});
+
+app.get("/api/products/:id/reviews", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  const result = getPublicReviews(productId(req.params.id), req.query);
+  res.status(result.status).json(result.body);
 });
 
 app.get("/api/categories", (req, res) => {

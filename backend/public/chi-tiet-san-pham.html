@@ -11,11 +11,14 @@
     <link rel="stylesheet" href="account-header.css">
     <link rel="stylesheet" href="cart-feedback.css">
     <link rel="stylesheet" href="product-detail.css">
+    <link rel="stylesheet" href="product-reviews.css">
+    <link rel="stylesheet" href="favorite-buttons.css">
     <meta name="description" content="Xem thông tin sản phẩm chăm sóc răng miệng, giá bán và số lượng hiện có tại cửa hàng.">
     <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
     <script src="cart-feedback.js" defer></script>
     <script src="app.js" defer></script>
+    <script src="product-reviews.js" defer></script>
     <script src="product-detail.js" defer></script>
     <script src="account-menu.js" defer></script>
     <script src="account.js" defer></script>
@@ -115,13 +118,18 @@
 
       <article id="product-detail" aria-labelledby="product-detail-title" hidden>
         <div class="detail-product-grid">
+          <div class="detail-media-column">
           <section id="detail-gallery" class="detail-gallery" aria-label="Ảnh sản phẩm">
+            <div id="detail-thumbnails" class="detail-thumbnails" role="group" aria-label="Chọn ảnh sản phẩm" hidden></div>
             <div id="detail-main-media" class="detail-main-media" tabindex="0" role="group" aria-label="Thư viện ảnh sản phẩm. Dùng phím mũi tên để chuyển ảnh.">
               <img id="detail-main-image" width="900" height="900" alt="" fetchpriority="high" decoding="async" hidden>
               <div id="detail-image-fallback" class="detail-image-fallback" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
                 <span>Ảnh sản phẩm đang được cập nhật</span>
               </div>
+              <button id="detail-image-zoom" class="detail-image-zoom button-secondary" type="button" aria-pressed="false" aria-label="Phóng to ảnh sản phẩm" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5M10.5 7v7m-3.5-3.5h7"/></svg>
+              </button>
               <div id="detail-gallery-controls" class="detail-gallery-controls" hidden>
                 <button id="detail-image-previous" class="button-secondary" type="button" aria-label="Ảnh trước">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
@@ -132,12 +140,36 @@
                 </button>
               </div>
             </div>
-            <div id="detail-thumbnails" class="detail-thumbnails" role="group" aria-label="Chọn ảnh sản phẩm" hidden></div>
           </section>
+          <p id="detail-gallery-help" class="detail-gallery-help">Rê chuột hoặc bấm biểu tượng phóng to để xem chi tiết ảnh.</p>
+          <section id="detail-specifications-card" class="detail-information-card detail-specifications-card" aria-labelledby="detail-specifications-title" hidden>
+            <h2 id="detail-specifications-title">Thông tin sản phẩm</h2>
+            <dl id="detail-specifications" class="detail-specifications"></dl>
+          </section>
+          </div>
 
           <section class="detail-purchase" aria-label="Thông tin mua sản phẩm">
-            <p id="detail-product-code" class="detail-product-code"></p>
             <h1 id="product-detail-title"></h1>
+            <div class="detail-product-meta">
+              <p id="detail-product-code" class="detail-product-code"></p>
+              <span id="detail-stock-badge" class="detail-stock-badge"></span>
+            </div>
+            <div class="detail-rating-row">
+              <a id="detail-review-link" class="detail-review-link" href="#reviews">
+                <span id="detail-rating-stars" class="review-stars" aria-hidden="true"></span>
+                <strong id="detail-rating-value">—</strong>
+                <span id="detail-review-count">Xem đánh giá</span>
+              </a>
+              <span id="detail-sold-count" class="detail-sold-count" hidden></span>
+              <button id="detail-favorite" class="favorite-button" type="button" aria-label="Yêu thích sản phẩm" aria-pressed="false" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.9-8.6a5.5 5.5 0 0 0-.1-7.8Z"/></svg>
+              </button>
+            </div>
+            <p id="detail-favorite-message" role="status" aria-atomic="true"></p>
+            <aside id="detail-low-stock" class="detail-low-stock" aria-label="Tình trạng tồn kho" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m13 2-3 8H5l6 12 3-8h5L13 2Z"/></svg>
+              <strong id="detail-low-stock-text"></strong>
+            </aside>
             <p id="detail-summary" class="detail-summary" hidden></p>
             <div class="detail-price-card">
               <span>Giá sản phẩm</span>
@@ -183,11 +215,42 @@
             <h2 id="detail-description-title">Mô tả sản phẩm</h2>
             <div id="detail-description" class="detail-description"></div>
           </section>
-          <section id="detail-specifications-card" class="detail-information-card" aria-labelledby="detail-specifications-title" hidden>
-            <h2 id="detail-specifications-title">Thông tin sản phẩm</h2>
-            <dl id="detail-specifications" class="detail-specifications"></dl>
-          </section>
         </div>
+        <section id="reviews" class="product-reviews" aria-labelledby="reviews-title">
+          <h2 id="reviews-title" tabindex="-1"><svg class="review-heading-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg><span id="reviews-product-title">Đánh giá sản phẩm</span></h2>
+          <div class="reviews-overview">
+            <div class="reviews-score">
+              <strong id="reviews-average">—</strong>
+              <div id="reviews-stars" class="review-stars" aria-hidden="true"></div>
+              <p id="reviews-count">Đang tải đánh giá...</p>
+            </div>
+            <div id="reviews-distribution" class="reviews-distribution" aria-label="Phân bố số sao"></div>
+          </div>
+          <div id="reviews-filters" class="reviews-filters" role="group" aria-label="Lọc đánh giá">
+            <label class="reviews-comment-filter" for="reviews-comments-only"><input id="reviews-comments-only" type="checkbox">Có bình luận <span id="reviews-comment-count"></span></label>
+          </div>
+          <div class="reviews-toolbar">
+            <button id="reviews-write" class="reviews-write" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a3 3 0 0 1-3 3H8l-5 3V6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v9Z"/></svg>Viết đánh giá</button>
+          </div>
+          <section id="review-form-panel" class="review-form-panel" aria-labelledby="review-form-title" hidden>
+            <div class="review-form-heading"><h3 id="review-form-title">Đánh giá của bạn</h3><button id="review-cancel" class="button-secondary" type="button">Đóng</button></div>
+            <p id="review-eligibility-message" role="status" aria-atomic="true"></p>
+            <a id="review-login" class="button-link" href="/dang-nhap.html" hidden>Đăng nhập để đánh giá</a>
+            <button id="review-eligibility-retry" class="button-secondary" type="button" hidden>Kiểm tra lại</button>
+            <form id="review-form" hidden>
+              <fieldset id="review-rating" class="review-rating"><legend>Bạn đánh giá sản phẩm bao nhiêu sao?</legend></fieldset>
+              <div class="field"><label for="review-comment">Nội dung đánh giá <span class="review-optional">(không bắt buộc)</span></label><textarea id="review-comment" maxlength="2000" rows="4" placeholder="Chia sẻ trải nghiệm sử dụng sản phẩm của bạn." aria-describedby="review-comment-count"></textarea><p id="review-comment-count" class="review-field-help">0 / 2000 ký tự</p></div>
+              <p id="review-form-message" role="status" aria-atomic="true"></p>
+              <button id="review-refresh-own" class="button-secondary" type="button" hidden>Tải bản đánh giá mới</button>
+              <button id="review-submit" type="submit">Gửi đánh giá</button>
+            </form>
+          </section>
+          <div class="reviews-list-heading"><h3 id="reviews-customer-title">Đánh giá từ khách hàng</h3><div><label class="visually-hidden" for="reviews-sort">Sắp xếp đánh giá</label><select id="reviews-sort"><option value="newest">Mới nhất</option><option value="oldest">Cũ nhất</option></select></div></div>
+          <p id="reviews-message" role="status" aria-atomic="true"></p>
+          <button id="reviews-retry" class="button-secondary" type="button" hidden>Tải lại đánh giá</button>
+          <div id="reviews-list" class="reviews-list" aria-busy="true"></div>
+          <nav class="reviews-pagination" aria-label="Phân trang đánh giá"><button id="reviews-previous" class="button-secondary" type="button" disabled>Trang trước</button><span id="reviews-page">Trang 1</span><button id="reviews-next" class="button-secondary" type="button" disabled>Trang sau</button></nav>
+        </section>
       </article>
       <p id="product-message" class="detail-catalog-message" role="status" aria-atomic="true"></p>
     </main>

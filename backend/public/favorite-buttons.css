@@ -1,0 +1,72 @@
+.storefront-page .product .favorite-button,
+.product-detail-page .favorite-button {
+  --favorite-heart: #d51d38;
+  display: inline-flex;
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--favorite-heart) 28%, var(--line));
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--favorite-heart);
+  line-height: 1;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--text) 6%, transparent);
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+:root[data-theme="dark"] .favorite-button {
+  --favorite-heart: #ff7185;
+}
+
+.favorite-button > svg {
+  width: 21px;
+  height: 21px;
+  fill: transparent;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: fill 180ms ease, transform 180ms ease;
+}
+
+.storefront-page .product .favorite-button:hover,
+.product-detail-page .favorite-button:hover {
+  border-color: var(--favorite-heart);
+  background: color-mix(in srgb, var(--favorite-heart) 9%, var(--surface));
+  color: var(--favorite-heart);
+}
+
+.storefront-page .product .favorite-button[aria-pressed="true"],
+.product-detail-page .favorite-button[aria-pressed="true"] {
+  border-color: var(--favorite-heart);
+  background: color-mix(in srgb, var(--favorite-heart) 12%, var(--surface));
+  color: var(--favorite-heart);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--favorite-heart) 12%, transparent),
+    0 0 18px color-mix(in srgb, var(--favorite-heart) 24%, transparent);
+}
+
+.favorite-button[aria-pressed="true"] > svg {
+  fill: currentColor;
+  transform: scale(1.06);
+}
+
+.storefront-page .product .favorite-button:focus-visible,
+.product-detail-page .favorite-button:focus-visible {
+  outline: 3px solid var(--favorite-heart);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .favorite-button,
+  .favorite-button > svg {
+    transition: none !important;
+  }
+  .favorite-button[aria-pressed="true"] > svg {
+    transform: none;
+  }
+}

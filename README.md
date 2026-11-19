@@ -22,7 +22,7 @@ Website bán hàng bằng tiếng Việt, gồm cửa hàng cho khách và trang
 
 Bản demo chạy trên Cloudflare Workers và SQLite-backed Durable Object thuộc gói miễn phí, sử dụng tên miền phụ `workers.dev`. Website tiếp tục hoạt động khi tắt máy tính cá nhân. Đăng nhập admin bằng tài khoản có trong database tại lần triển khai đầu tiên.
 
-Đơn hàng, tài khoản, danh mục, tồn kho, quảng cáo, tin nhắn chăm sóc khách hàng, phiên đăng nhập và ảnh tải lên được lưu trên Cloudflare. Dữ liệu trực tuyến và [database trên máy](backend/shop.sqlite) được quản lý riêng. Lần triển khai đầu tiên nhập dữ liệu từ database của repo. Những lần cập nhật mã nguồn tiếp theo tiếp tục sử dụng dữ liệu trực tuyến đang có.
+Đơn hàng, tài khoản, danh mục, tồn kho, quảng cáo, đánh giá sản phẩm, tin nhắn chăm sóc khách hàng, phiên đăng nhập và ảnh tải lên được lưu trên Cloudflare. Dữ liệu trực tuyến và [database trên máy](backend/shop.sqlite) được quản lý riêng. Lần triển khai đầu tiên nhập dữ liệu từ database của repo. Những lần cập nhật mã nguồn tiếp theo tiếp tục sử dụng dữ liệu trực tuyến đang có.
 
 Bản demo hiện dùng thanh toán khi nhận hàng (COD). Để bật chuyển khoản, cần khai báo ba biến thông tin ngân hàng trong cấu hình Worker. Hướng dẫn SMTP bên dưới áp dụng cho bản Node.js local. Bật email trên Workers cần cấu hình SMTP và bộ xử lý gửi email, gồm hàng đợi thông báo đơn hàng.
 
@@ -79,7 +79,7 @@ npm.cmd start
 ## Mua hàng và xem đơn
 
 1. Bấm **Danh mục** trên menu để mở trang danh mục sản phẩm. Chọn **Tất cả**, **Kem đánh răng**, **Bàn chải đánh răng** hoặc danh mục khác được quản trị thêm vào. Có thể tìm theo tên, mô tả, lọc mức giá, thương hiệu, còn hàng, yêu thích và sắp xếp. Ô tìm kiếm trên header tìm trong toàn bộ sản phẩm của các danh mục đang hiển thị.
-2. Bấm ảnh hoặc tên sản phẩm để mở trang chi tiết. Xem ảnh lớn, chọn ảnh thu nhỏ, đọc thông tin và mô tả bên dưới, rồi chọn số lượng. Dùng **Thêm vào giỏ** hoặc **Mua ngay** để tiếp tục mua hàng. Các thẻ sản phẩm cũng có **Xem nhanh**, **Thêm vào giỏ** và **Mua nhanh**.
+2. Bấm ảnh hoặc tên sản phẩm để mở trang chi tiết. Ảnh thu nhỏ nằm bên trái ảnh lớn trên máy tính. Rê chuột lên ảnh lớn để phóng to, dùng ảnh thu nhỏ hoặc mũi tên để chuyển ảnh. Xem mô tả, thông số, tình trạng hàng và đánh giá trước khi chọn số lượng. Dùng **Thêm vào giỏ** hoặc **Mua ngay** để tiếp tục mua hàng. Các thẻ sản phẩm cũng có **Xem nhanh**, **Thêm vào giỏ** và **Mua nhanh**.
 3. Mở **Giỏ hàng** trong khu vực tài khoản. Chọn từng sản phẩm hoặc **Chọn tất cả**, điều chỉnh số lượng và kiểm tra tiền của các sản phẩm đã chọn. Dùng biểu tượng thùng rác để xóa riêng hoặc **Xóa đã chọn** để xóa nhiều sản phẩm.
 4. Bấm **Tiếp tục đặt hàng** để mở bước xác nhận. Kiểm tra sản phẩm, địa chỉ nhận hàng, phương thức thanh toán và tổng tiền. Khách chưa đăng nhập điền thông tin nhận hàng ở bước này.
 5. Bấm **Tạo đơn hàng** để gửi đơn. Lưu mã đơn sau khi đặt thành công. Các sản phẩm chưa chọn tiếp tục nằm trong giỏ hàng.
@@ -92,11 +92,23 @@ Lần gửi đang chờ giữ nguyên mã yêu cầu khi đổi phiên đăng nh
 
 Khi thêm sản phẩm thành công, ảnh sản phẩm bay tới biểu tượng giỏ hàng trên header và số lượng trên giỏ nhấn sáng nhẹ. Nếu thiết bị bật chế độ giảm chuyển động, phản hồi được rút gọn để hạn chế hiệu ứng.
 
+Nút yêu thích dùng biểu tượng trái tim đỏ trong hình tròn. Bấm để lưu hoặc bỏ yêu thích, trái tim được tô đầy và sáng lên khi đã chọn. Danh sách được lưu trên trình duyệt đang dùng, đồng bộ giữa trang chủ, danh mục và chi tiết sản phẩm trên cùng trình duyệt.
+
 Khách có thể đăng ký bằng email, mật khẩu, họ tên, số điện thoại và địa chỉ. Mật khẩu khách hàng dài từ 8 đến 128 ký tự. Khi đã đăng nhập, đơn hàng sử dụng địa chỉ nhận hàng mặc định trong tài khoản.
 
 Sau khi đăng nhập, góc tài khoản hiện **Xin chào** và hai từ đầu, cuối trong họ tên. Ví dụ **Nguyễn Văn An** hiện **Nguyễn An**. Avatar mặc định có chữ **NA**, màu nền và chữ được chọn ngẫu nhiên từ các cặp màu có tương phản rõ, giữ ổn định trên cùng trình duyệt. Tên một từ dùng hai chữ cái đầu, ví dụ **Trung** có avatar **TR**. Ảnh đại diện đã tải lên được hiển thị trên header và trang tài khoản.
 
 Bấm khu vực **Xin chào** trên header để mở menu tài khoản, gồm **Giỏ hàng của tôi**, **Đơn hàng của tôi**, **Cài đặt tài khoản** và **Đăng xuất**. Chọn mục cần sử dụng hoặc bấm ra ngoài, nhấn **Escape** để đóng menu. Khi chưa đăng nhập, menu có lựa chọn đăng nhập, đăng ký và mở giỏ hàng.
+
+### Ảnh và đánh giá sản phẩm
+
+Trên trang chi tiết, các nút chuyển ảnh hỗ trợ bàn phím. Điện thoại dùng ảnh thu nhỏ và các nút mũi tên. Sản phẩm chỉ có một ảnh sẽ không chuyển được sang ảnh khác. Thêm ảnh ở **Admin → Sản phẩm → Ảnh bổ sung** để mở rộng thư viện ảnh. Mỗi sản phẩm hỗ trợ một ảnh chính và tối đa bảy ảnh bổ sung.
+
+Tình trạng còn hàng, cảnh báo sắp hết hàng và số lượng đã bán lấy từ dữ liệu thực tế. Số đã bán chỉ tính các đơn ở trạng thái **Hoàn thành**. Giá trên trang là giá bán hiện tại của sản phẩm.
+
+Khu vực đánh giá có điểm trung bình, phân bố từ một đến năm sao, bộ lọc theo số sao hoặc có bình luận, sắp xếp và phân trang. Sản phẩm chưa có đánh giá hiển thị trạng thái trống.
+
+Đăng nhập và bấm **Viết đánh giá** để chọn từ một đến năm sao, kèm nội dung tối đa 2.000 ký tự nếu muốn. Tài khoản chỉ được đánh giá sản phẩm đã mua trong đơn **Hoàn thành**. Mỗi tài khoản có một đánh giá cho từng sản phẩm và có thể chỉnh sửa đánh giá của mình. Đánh giá công khai hiển thị tên rút gọn và nhãn **Đã mua hàng**, không hiển thị email, số điện thoại hay địa chỉ.
 
 ### Quản lý tài khoản cá nhân
 
@@ -300,6 +312,8 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Thẻ tiện ích và xem nhanh sản phẩm | [storefront-widgets.css](backend/public/storefront-widgets.css) |
 | Hiệu ứng thêm sản phẩm vào giỏ hàng | [cart-feedback.js](backend/public/cart-feedback.js), [cart-feedback.css](backend/public/cart-feedback.css) |
 | Trang thông tin từng sản phẩm | [chi-tiet-san-pham.html](backend/public/chi-tiet-san-pham.html), [product-detail.js](backend/public/product-detail.js), [product-detail.css](backend/public/product-detail.css) |
+| Đánh giá sản phẩm | [product-reviews.js](backend/public/product-reviews.js), [product-reviews.css](backend/public/product-reviews.css), [product-reviews.cjs](backend/src/services/product-reviews.cjs) |
+| Biểu tượng yêu thích dùng chung | [favorite-buttons.css](backend/public/favorite-buttons.css), [app.js](backend/public/app.js) |
 | Biên tập ảnh bổ sung, mô tả và thông số sản phẩm | [admin-products.js](backend/public/admin-products.js), [admin-products.css](backend/public/admin-products.css) |
 | Tìm kiếm, menu và hiển thị banner hai bên từ API | [header.js](backend/public/header.js) |
 | Lời chào, avatar và menu tài khoản trên header | [account.js](backend/public/account.js), [account-menu.js](backend/public/account-menu.js), [account-header.css](backend/public/account-header.css) |

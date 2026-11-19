@@ -438,7 +438,6 @@
   right: 24px;
   max-width: calc(100% - 48px);
   margin: 0;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--text) 6%, transparent);
 }
 
 .catalog-page .product:has(> .product-image-link:not([hidden])) > .product-preview-trigger {

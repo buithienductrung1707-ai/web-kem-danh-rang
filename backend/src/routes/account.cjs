@@ -10,6 +10,7 @@ const mailer = require("../services/mailer.cjs");
 const { getSessionOptions } = require("../services/session-options.cjs");
 const { createProductImageUpload } = require("../services/product-images.cjs");
 const addresses = require("../services/customer-addresses.cjs");
+const productReviews = require("../services/product-reviews.cjs");
 const { parseOrderFilters, orderFilterSql, orderFilterParameters } = require("../utils/order-filters.cjs");
 
 const router = express.Router();
@@ -76,6 +77,13 @@ const profileLimiter = rateLimit({
   message: {
     error: "Bạn đã cập nhật thông tin nhiều lần. Hãy chờ một phút rồi thử lại."
   }
+});
+const reviewLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Bạn đã gửi đánh giá nhiều lần. Hãy chờ một phút rồi thử lại." }
 });
 
 const claimLimiter = rateLimit({
@@ -268,6 +276,20 @@ function requireCustomerContext(req, res, next) {
 
 router.get("/me", requireCustomer, (req, res) => {
   res.json(res.locals.customer);
+});
+
+router.get("/products/:id/review", requireCustomer, requireCustomerContext, (req, res) => {
+  const result = productReviews.getOwnReview(res.locals.customer.id, productReviews.productId(req.params.id));
+  res.status(result.status).json(result.body);
+});
+
+router.put("/products/:id/review", requireCustomer, requireCustomerContext, reviewLimiter, (req, res) => {
+  if (req.get("X-Customer-Id") !== String(res.locals.customer.id)) {
+    return res.status(401).json({ error: "Phiên tài khoản đã thay đổi. Hãy kiểm tra và thử lại." });
+  }
+  const result = productReviews.saveReview(res.locals.customer.id,
+    productReviews.productId(req.params.id), req.body);
+  res.status(result.status).json(result.body);
 });
 
 router.patch("/profile", requireCustomer, requireCustomerContext, profileLimiter, (req, res) => {

@@ -14,6 +14,10 @@
   const mainImage = get("detail-main-image");
   const imageFallback = get("detail-image-fallback");
   const thumbnails = get("detail-thumbnails");
+  const media = get("detail-main-media");
+  const zoomButton = get("detail-image-zoom");
+  const favoriteButton = get("detail-favorite");
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
   const money = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" });
   const params = new URLSearchParams(window.location.search);
   const requestedId = params.get("id") ?? "";
@@ -29,6 +33,52 @@
   let imageIndex = 0;
   let gallerySignature = "";
   let maximumQuantity = 0;
+  let zoomPinned = false;
+  let pointerInside = false;
+  let zoomFrame = null;
+  let pointerPosition = null;
+
+  function updateZoom() {
+    const available = !mainImage.hidden && mainImage.complete && mainImage.naturalWidth > 0;
+    media.classList.toggle("can-zoom", available);
+    media.classList.toggle("is-zoomed", available && (zoomPinned || pointerInside && finePointer.matches));
+    zoomButton.hidden = !available;
+    zoomButton.setAttribute("aria-pressed", String(zoomPinned));
+    zoomButton.setAttribute("aria-label", zoomPinned ? "Thu nhỏ ảnh sản phẩm" : "Phóng to ảnh sản phẩm");
+  }
+
+  function resetZoom() {
+    zoomPinned = false;
+    pointerInside = false;
+    pointerPosition = null;
+    if (zoomFrame !== null) window.cancelAnimationFrame(zoomFrame);
+    zoomFrame = null;
+    media.style.removeProperty("--zoom-x");
+    media.style.removeProperty("--zoom-y");
+    updateZoom();
+  }
+
+  function renderFavorite() {
+    if (!favoriteButton) return;
+    const storefront = window.ShopStorefront;
+    const selected = Boolean(product && storefront?.isFavorite?.(productId));
+    favoriteButton.setAttribute("aria-pressed", String(selected));
+    favoriteButton.setAttribute("aria-label", (selected ? "Bỏ yêu thích " : "Yêu thích ") + (product?.name || "sản phẩm"));
+    favoriteButton.title = selected ? "Đã yêu thích" : "Yêu thích";
+    favoriteButton.disabled = !active || !product || !storefront?.ready || storefront.loading || storefront.locked;
+  }
+
+  function renderReviewSummary(summary = metadata?.reviewSummary) {
+    const valid = summary && Number.isSafeInteger(summary.count) && summary.count >= 0 &&
+      typeof summary.average === "number" && summary.average >= 0 && summary.average <= 5;
+    const average = valid ? summary.average : 0;
+    window.ShopProductReviews?.renderStars(get("detail-rating-stars"), average);
+    get("detail-rating-value").textContent = valid && summary.count ? average.toFixed(1) : "—";
+    get("detail-review-count").textContent = valid ? "(" + summary.count + " đánh giá)" : "Xem đánh giá";
+    get("detail-review-link").setAttribute("aria-label", valid && summary.count
+      ? "Đọc " + summary.count + " đánh giá, trung bình " + average.toFixed(1) + " trên 5 sao"
+      : "Xem đánh giá sản phẩm");
+  }
 
   function validImageUrl(value, allowEmpty = false) {
     if (allowEmpty && value === "") return true;
@@ -62,6 +112,7 @@
 
   function disablePurchase() {
     for (const control of [quantity, decrease, increase, addButton, buyButton]) control.disabled = true;
+    if (favoriteButton) favoriteButton.disabled = true;
   }
 
   function showLoading() {
@@ -82,9 +133,12 @@
     retry.disabled = false;
     get("detail-error-cart").hidden = true;
     disablePurchase();
+    window.ShopProductReviews?.clear();
+    resetZoom();
   }
 
   function selectImage(index, focusThumbnail = false) {
+    resetZoom();
     if (images.length === 0) {
       mainImage.hidden = true;
       mainImage.removeAttribute("src");
@@ -104,6 +158,7 @@
       thumbnails.children[imageIndex]?.focus();
       thumbnails.children[imageIndex]?.scrollIntoView({ block: "nearest", inline: "nearest" });
     }
+    updateZoom();
   }
 
   function renderGallery() {
@@ -139,8 +194,11 @@
       fragment.append(button);
     }
     thumbnails.replaceChildren(fragment);
-    thumbnails.hidden = images.length <= 1;
+    thumbnails.hidden = images.length === 0;
     get("detail-gallery-controls").hidden = images.length <= 1;
+    get("detail-gallery-help").textContent = images.length > 1
+      ? "Chọn ảnh thu nhỏ hoặc dùng mũi tên để chuyển ảnh. Rê chuột hoặc bấm phóng to để xem chi tiết."
+      : "Rê chuột hoặc bấm biểu tượng phóng to để xem chi tiết ảnh.";
     get("detail-main-media").tabIndex = images.length > 1 ? 0 : -1;
     get("detail-main-media").setAttribute("aria-label", images.length > 1
       ? "Thư viện ảnh sản phẩm. Dùng phím mũi tên để chuyển ảnh." : "Ảnh sản phẩm");
@@ -154,6 +212,12 @@
     get("detail-price").textContent = money.format(product.price);
     get("detail-summary").textContent = product.description;
     get("detail-summary").hidden = !product.description.trim();
+    const sold = metadata.soldCount;
+    get("detail-sold-count").hidden = !Number.isSafeInteger(sold) || sold < 0;
+    get("detail-sold-count").textContent = Number.isSafeInteger(sold) ? sold.toLocaleString("vi-VN") + " đã bán" : "";
+    renderReviewSummary();
+    renderFavorite();
+    window.ShopProductReviews?.setProduct({ id: productId, name: product.name, summary: metadata.reviewSummary });
     get("detail-description").textContent = metadata.detailedDescription.trim() || product.description.trim() ||
       "Cửa hàng đang cập nhật mô tả sản phẩm.";
     const specifications = metadata.specifications.map(specification => {
@@ -215,6 +279,11 @@
     get("detail-stock").textContent = product.stockTracked
       ? product.stockQuantity === 0 ? "Hết hàng" : "Có thể thêm " + stockAvailable + " sản phẩm vào giỏ"
       : "Sẵn sàng đặt hàng";
+    const soldOut = product.stockTracked && product.stockQuantity === 0;
+    get("detail-stock-badge").dataset.soldOut = String(soldOut);
+    get("detail-stock-badge").textContent = soldOut ? "Hết hàng" : product.stockTracked ? "Còn hàng" : "Sẵn sàng đặt hàng";
+    get("detail-low-stock").hidden = !product.stockTracked || product.stockQuantity < 1 || product.stockQuantity > 5;
+    get("detail-low-stock-text").textContent = "Sắp hết hàng — chỉ còn " + product.stockQuantity + " sp";
     get("detail-quantity-help").textContent = cartQuantity > 0 ? "Trong giỏ " + cartQuantity + " sản phẩm" : "";
     if (locked) {
       notice.textContent = "Đang kiểm tra dữ liệu giỏ hàng. Hãy chờ một chút.";
@@ -319,7 +388,39 @@
     catch { notice.textContent = "Đã thêm sản phẩm. Bấm Giỏ hàng trên thanh đầu trang để tiếp tục."; }
   }
 
-  mainImage.addEventListener("error", () => { mainImage.hidden = true; imageFallback.hidden = false; });
+  mainImage.addEventListener("error", () => { mainImage.hidden = true; imageFallback.hidden = false; resetZoom(); });
+  mainImage.addEventListener("load", updateZoom);
+  media.addEventListener("pointerenter", event => {
+    if (event.pointerType === "touch" || !finePointer.matches) return;
+    pointerInside = true;
+    updateZoom();
+  });
+  media.addEventListener("pointerleave", () => { pointerInside = false; updateZoom(); });
+  media.addEventListener("pointermove", event => {
+    if (event.pointerType === "touch" || !finePointer.matches) return;
+    pointerInside = true;
+    updateZoom();
+    pointerPosition = { x: event.clientX, y: event.clientY };
+    if (zoomFrame !== null) return;
+    zoomFrame = window.requestAnimationFrame(() => {
+      zoomFrame = null;
+      if (!pointerPosition || !active) return;
+      const bounds = media.getBoundingClientRect();
+      const x = Math.max(0, Math.min(100, (pointerPosition.x - bounds.left) / bounds.width * 100));
+      const y = Math.max(0, Math.min(100, (pointerPosition.y - bounds.top) / bounds.height * 100));
+      media.style.setProperty("--zoom-x", x + "%");
+      media.style.setProperty("--zoom-y", y + "%");
+    });
+  });
+  zoomButton.addEventListener("click", () => { zoomPinned = !zoomPinned; updateZoom(); });
+  media.addEventListener("keydown", event => {
+    if (event.key === "Escape") { resetZoom(); zoomButton.focus(); }
+  });
+  favoriteButton?.addEventListener("click", () => {
+    if (favoriteButton.disabled) return;
+    window.ShopStorefront?.toggleFavorite?.(productId);
+    renderFavorite();
+  });
   get("detail-image-previous").addEventListener("click", () => selectImage(imageIndex - 1));
   get("detail-image-next").addEventListener("click", () => selectImage(imageIndex + 1));
   get("detail-gallery").addEventListener("keydown", event => {
@@ -338,7 +439,13 @@
   retry.addEventListener("click", () => { void loadMetadata(true); });
   window.addEventListener("shop-catalog-ready", synchronize);
   window.addEventListener("shop-cart-change", synchronize);
-  window.addEventListener("pagehide", () => { active = false; controller?.abort(); controller = null; disablePurchase(); });
+  window.addEventListener("shop-favorites-change", renderFavorite);
+  window.addEventListener("shop-product-reviews-change", event => {
+    if (event.detail?.productId !== productId || !metadata) return;
+    metadata.reviewSummary = event.detail.summary;
+    renderReviewSummary();
+  });
+  window.addEventListener("pagehide", () => { active = false; controller?.abort(); controller = null; disablePurchase(); resetZoom(); });
   window.addEventListener("pageshow", event => { active = true; if (event.persisted) void loadMetadata(true); });
   void loadMetadata();
 })();

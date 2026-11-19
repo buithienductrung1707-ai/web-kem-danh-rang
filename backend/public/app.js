@@ -14,7 +14,8 @@ const catalogResults = document.getElementById("catalog-results");
 const favoritesOnlyFilter = document.getElementById("favorites-only");
 const availableOnlyFilter = document.getElementById("available-only");
 const clearCatalogFiltersButton = document.getElementById("clear-catalog-filters");
-const favoritesMessage = document.getElementById("favorites-message") ?? document.getElementById("featured-products-message");
+const favoritesMessage = document.getElementById("favorites-message") ?? document.getElementById("featured-products-message")
+  ?? document.getElementById("detail-favorite-message");
 const activeFilters = document.getElementById("active-filters");
 const productPreviewDialog = document.getElementById("product-preview-dialog");
 const productPreviewTitle = document.getElementById("product-preview-title");
@@ -252,20 +253,25 @@ function readLatestFavorites() {
   return latest;
 }
 
-function refreshFavorites() {
-  if (!productList && !featuredProductList) return;
-  try {
-    favoriteProducts = readLatestFavorites();
-    favoritesMessage.textContent = favoriteChanges.size > 0
-      ? "Một số thay đổi yêu thích chưa lưu được. Hãy giữ trang đang mở để tiếp tục sử dụng danh sách này."
-      : "";
-  } catch {
-    favoritesMessage.textContent = "Chưa đọc được danh sách yêu thích đã lưu. Những thay đổi mới được giữ tạm trên trang này.";
-  }
+function setFavoriteMessage(text) {
+  if (favoritesMessage) favoritesMessage.textContent = text;
 }
 
-function toggleFavorite(product) {
-  if (!catalogReady || orderPending || isSubmitting || quickBuyNavigating || !storefrontActive) return;
+function refreshFavorites() {
+  if (!productList && !featuredProductList && !document.getElementById("detail-favorite")) return;
+  try {
+    favoriteProducts = readLatestFavorites();
+    setFavoriteMessage(favoriteChanges.size > 0
+      ? "Một số thay đổi yêu thích chưa lưu được. Hãy giữ trang đang mở để tiếp tục sử dụng danh sách này."
+      : "");
+  } catch {
+    setFavoriteMessage("Chưa đọc được danh sách yêu thích đã lưu. Những thay đổi mới được giữ tạm trên trang này.");
+  }
+  window.dispatchEvent(new CustomEvent("shop-favorites-change"));
+}
+
+function toggleFavorite(product, opener = null) {
+  if (!catalogReady || orderPending || isSubmitting || quickBuyNavigating || !storefrontActive) return false;
   const selected = !favoriteProducts.has(product.id);
   refreshFavorites();
   favoriteChanges.set(product.id, selected);
@@ -277,16 +283,18 @@ function toggleFavorite(product) {
     localStorage.setItem(favoritesStorageKey, JSON.stringify([...latest].sort((a, b) => a - b)));
     favoriteProducts = latest;
     favoriteChanges.clear();
-    favoritesMessage.textContent = selected
+    setFavoriteMessage(selected
       ? "Đã lưu " + product.name + " vào yêu thích trên trình duyệt này."
-      : "Đã bỏ " + product.name + " khỏi yêu thích.";
+      : "Đã bỏ " + product.name + " khỏi yêu thích.");
   } catch {
-    favoritesMessage.textContent = "Chưa lưu được danh sách yêu thích. Hãy giữ trang đang mở để tiếp tục dùng các thay đổi đang được lưu tạm.";
+    setFavoriteMessage("Chưa lưu được danh sách yêu thích. Hãy giữ trang đang mở để tiếp tục dùng các thay đổi đang được lưu tạm.");
   }
   renderCatalog();
-  const button = document.getElementById("favorite-" + product.id);
+  window.dispatchEvent(new CustomEvent("shop-favorites-change"));
+  const button = opener?.isConnected ? opener : document.getElementById("favorite-" + product.id);
   if (button) button.focus();
   else favoritesOnlyFilter?.focus();
+  return true;
 }
 
 function trackingHref(orderId) {
@@ -1486,9 +1494,17 @@ function renderCatalog() {
     favoriteButton.className = "favorite-button button-secondary";
     favoriteButton.dataset.productId = String(product.id);
     favoriteButton.dataset.action = "favorite";
-    favoriteButton.textContent = favoriteProducts.has(product.id) ? "Đã yêu thích" : "Yêu thích";
+    const favoriteIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    favoriteIcon.setAttribute("viewBox", "0 0 24 24");
+    favoriteIcon.setAttribute("aria-hidden", "true");
+    const favoritePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    favoritePath.setAttribute("d", "M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z");
+    favoriteIcon.append(favoritePath);
+    favoriteButton.append(favoriteIcon);
     favoriteButton.setAttribute("aria-pressed", String(favoriteProducts.has(product.id)));
-    favoriteButton.setAttribute("aria-label", "Yêu thích · " + product.name);
+    const favoriteLabel = (favoriteProducts.has(product.id) ? "Bỏ yêu thích · " : "Thêm vào yêu thích · ") + product.name;
+    favoriteButton.setAttribute("aria-label", favoriteLabel);
+    favoriteButton.title = favoriteLabel;
     favoriteButton.addEventListener("click", () => toggleFavorite(product));
     card.append(favoriteButton);
     if (product.stockTracked) {
@@ -2078,6 +2094,11 @@ window.ShopStorefront = {
   get persisted() { return cartPersisted; },
   getProduct(id) { return catalogReady && products.has(id) ? { ...products.get(id) } : null; },
   getCartQuantity(id) { return cart.get(id) ?? 0; },
+  isFavorite(id) { return favoriteProducts.has(id); },
+  toggleFavorite(id) {
+    const product = products.get(id);
+    return Boolean(product) && toggleFavorite(product, document.getElementById("detail-favorite"));
+  },
   canAddProduct(id, quantity = 1) {
     return storefrontActive && !orderPending && !isSubmitting && !quickBuyNavigating &&
       !checkoutAccountChecking && canIncreaseQuantity(id, quantity);

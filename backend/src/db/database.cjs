@@ -87,6 +87,24 @@ function initializeSchema() {
       created_at INTEGER NOT NULL
     ) STRICT;
 
+    CREATE TABLE IF NOT EXISTS product_reviews (
+      id INTEGER PRIMARY KEY AUTOINCREMENT CHECK (id BETWEEN 1 AND 9007199254740991),
+      product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+      rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+      comment TEXT NOT NULL DEFAULT '' CHECK (length(comment) <= 2000),
+      verified_purchase INTEGER NOT NULL DEFAULT 1 CHECK (verified_purchase = 1),
+      revision INTEGER NOT NULL DEFAULT 0 CHECK (revision BETWEEN 0 AND 9007199254740991),
+      last_request_id TEXT NOT NULL,
+      last_request_payload TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      UNIQUE (customer_id, product_id)
+    ) STRICT;
+
+    CREATE INDEX IF NOT EXISTS product_reviews_product
+      ON product_reviews(product_id, created_at, id);
+
     CREATE INDEX IF NOT EXISTS password_resets_customer ON password_resets(customer_id);
 
     CREATE TABLE IF NOT EXISTS customer_addresses (
@@ -371,6 +389,7 @@ function initializeSchema() {
   const itemColumns = new Set(
     db.prepare("PRAGMA table_info(order_items)").all().map(column => column.name)
   );
+  db.exec("CREATE INDEX IF NOT EXISTS order_items_product_orders ON order_items(product_id, order_id)");
   if (!itemColumns.has("reserved_quantity")) {
     db.exec(`ALTER TABLE order_items ADD COLUMN reserved_quantity
       INTEGER NOT NULL DEFAULT 0 CHECK (reserved_quantity >= 0)`);
