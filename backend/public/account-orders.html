@@ -83,22 +83,4 @@
       </div>
     </div>
   </section>
-  <details id="orders-claim-panel" class="dashboard-card workspace-orders-claim" hidden>
-    <summary>Thêm đơn hàng đã có mã</summary>
-    <div class="dashboard-card-body">
-      <p class="field-help">Nhập mã đơn và số điện thoại nhận hàng để liên kết với tài khoản đang đăng nhập.</p>
-      <form id="orders-claim-form" method="post" action="/api/account/orders/claim">
-        <div class="field">
-          <label for="orders-claim-code">Mã đơn hàng</label>
-          <input id="orders-claim-code" name="orderId" type="text" autocomplete="off" required>
-        </div>
-        <div class="field">
-          <label for="orders-claim-phone">Số điện thoại nhận hàng</label>
-          <input id="orders-claim-phone" name="customerPhone" type="tel" autocomplete="tel" required>
-        </div>
-        <button id="orders-claim-submit" type="submit" disabled>Thêm vào đơn hàng của tôi</button>
-      </form>
-      <p id="orders-claim-message" role="status" aria-atomic="true"></p>
-    </div>
-  </details>
 </section>

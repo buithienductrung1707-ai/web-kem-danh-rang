@@ -18,12 +18,6 @@
   const previousButton = document.getElementById("orders-previous");
   const nextButton = document.getElementById("orders-next");
   const pageLabel = document.getElementById("orders-page");
-  const claimPanel = document.getElementById("orders-claim-panel");
-  const claimForm = document.getElementById("orders-claim-form");
-  const claimCode = document.getElementById("orders-claim-code");
-  const claimPhone = document.getElementById("orders-claim-phone");
-  const claimButton = document.getElementById("orders-claim-submit");
-  const claimMessage = document.getElementById("orders-claim-message");
   const statuses = {
     NEW: "Mới nhận", CONFIRMED: "Đã xác nhận", SHIPPING: "Đang giao",
     COMPLETED: "Hoàn thành", CANCELLED: "Đã hủy"
@@ -43,7 +37,6 @@
   let currentPage = 1;
   let totalPages = 1;
   let listController = null;
-  let claimController = null;
   if (root) {
     const savedFilters = new URLSearchParams(window.location.search);
     for (const [key, control] of [["status", statusFilter], ["sort", sortField],
@@ -73,8 +66,8 @@
   }
 
   function setControls() {
-    const busy = !active || listController !== null || claimController !== null || customerId === null;
-    for (const control of [statusFilter, reloadButton, claimCode, claimPhone, claimButton,
+    const busy = !active || listController !== null || customerId === null;
+    for (const control of [statusFilter, reloadButton,
       dateFrom, dateTo, searchField, sortField, resetButton, ...(filterForm?.querySelectorAll("button") || [])]) {
       if (control) control.disabled = busy;
     }
@@ -82,20 +75,14 @@
     nextButton.disabled = busy || currentPage >= totalPages;
     retryButton.disabled = !active || listController !== null;
     list.setAttribute("aria-busy", String(listController !== null));
-    claimForm.setAttribute("aria-busy", String(claimController !== null));
-    claimButton.textContent = claimController ? "Đang thêm đơn..." : "Thêm vào đơn hàng của tôi";
   }
 
   function clearPrivateContent() {
     customerId = null;
     panel.hidden = true;
-    claimPanel.hidden = true;
     prompt.hidden = true;
     list.replaceChildren();
     summary.textContent = "";
-    claimCode.value = "";
-    claimPhone.value = "";
-    claimMessage.textContent = "";
   }
 
   function orderDate(value) {
@@ -335,12 +322,10 @@
       totalPages = result.totalPages;
       params.set("page", String(currentPage));
       rememberFilters(params);
-      claimPhone.value = account.phone;
       renderOrders(result.orders);
       summary.textContent = result.totalOrders + " đơn hàng";
       pageLabel.textContent = "Trang " + currentPage + " / " + totalPages;
       panel.hidden = false;
-      claimPanel.hidden = false;
       message.textContent = "";
     } catch (error) {
       if (!active || listController !== controller) return;
@@ -359,87 +344,33 @@
     }
   }
 
-  claimForm.addEventListener("submit", async event => {
-    event.preventDefault();
-    if (!active || customerId === null || listController || claimController) return;
-    claimCode.value = claimCode.value.trim();
-    claimPhone.value = claimPhone.value.trim();
-    if (!claimForm.reportValidity()) return;
-    const expectedCustomerId = customerId;
-    const controller = new AbortController();
-    claimController = controller;
-    claimMessage.textContent = "Đang thêm đơn hàng...";
-    setControls();
-    let linkedCode = null;
-    try {
-      const response = await fetch("/api/account/orders/claim", {
-        method: "POST", credentials: "same-origin", cache: "no-store",
-        headers: { "Content-Type": "application/json", "X-Customer-Id": String(expectedCustomerId) },
-        body: JSON.stringify({ orderId: claimCode.value, customerPhone: claimPhone.value }),
-        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)])
-      });
-      const result = await response.json();
-      if (!active || claimController !== controller) return;
-      if (response.status === 401) {
-        clearPrivateContent();
-        prompt.hidden = false;
-        retryButton.hidden = false;
-        message.textContent = "Phiên tài khoản đã thay đổi. Hãy kiểm tra lại tài khoản.";
-        return;
-      }
-      if (!response.ok) {
-        claimMessage.textContent = typeof result?.error === "string" ? result.error : "Chưa thêm được đơn. Hãy thử lại.";
-        return;
-      }
-      if (!validOrder(result)) throw new Error("Đơn hàng chưa hợp lệ");
-      linkedCode = result.orderNumber ?? result.orderId;
-    } catch {
-      if (active && claimController === controller) {
-        claimMessage.textContent = "Chưa xác nhận được kết quả thêm đơn. Hãy thử lại với cùng mã đơn và số điện thoại.";
-      }
-    } finally {
-      if (claimController === controller) {
-        claimController = null;
-        setControls();
-      }
-    }
-    if (linkedCode !== null && active) {
-      filterForm?.reset();
-      statusFilter.value = "all";
-      await loadOrders(1);
-      if (active && customerId === expectedCustomerId) claimMessage.textContent = "Đã thêm đơn " + linkedCode + " vào tài khoản.";
-    }
-  });
-
   filterForm?.addEventListener("submit", event => {
     event.preventDefault();
-    if (!claimController && !listController) void loadOrders(1);
+    if (!listController) void loadOrders(1);
   });
   resetButton?.addEventListener("click", () => {
     filterForm.reset();
     void loadOrders(1);
   });
   sortField?.addEventListener("change", () => {
-    if (!claimController) void loadOrders(1);
+    void loadOrders(1);
   });
   statusFilter.addEventListener("change", () => {
-    if (!claimController) void loadOrders(1);
+    void loadOrders(1);
   });
   reloadButton.addEventListener("click", () => {
-    if (!claimController) void loadOrders(currentPage);
+    void loadOrders(currentPage);
   });
   retryButton.addEventListener("click", () => void loadOrders(1));
   previousButton.addEventListener("click", () => {
-    if (!listController && !claimController && currentPage > 1) void loadOrders(currentPage - 1);
+    if (!listController && currentPage > 1) void loadOrders(currentPage - 1);
   });
   nextButton.addEventListener("click", () => {
-    if (!listController && !claimController && currentPage < totalPages) void loadOrders(currentPage + 1);
+    if (!listController && currentPage < totalPages) void loadOrders(currentPage + 1);
   });
   function stopRequests() {
     listController?.abort();
-    claimController?.abort();
     listController = null;
-    claimController = null;
   }
   function setActive(value) {
     const next = value === true && pageActive;
