@@ -1,18 +1,28 @@
 (() => {
   const grids = [...document.querySelectorAll("[data-featured-categories]")];
   const menus = [...document.querySelectorAll("[data-products-menu] .catalog-nav-menu")];
+  const tabs = document.querySelector("[data-category-tabs]");
   const status = document.getElementById("categories-status");
   const retry = document.getElementById("categories-retry");
   const categoryId = Number(document.body.dataset.categoryId) || null;
-  const slug = new URLSearchParams(window.location.search).get("danh-muc");
-  const isCategoryPage = categoryId !== null || (document.body.classList.contains("category-page") && slug !== null);
+  const slugs = new URLSearchParams(window.location.search).getAll("danh-muc");
+  const slug = slugs.length === 1 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slugs[0]) ? slugs[0] : null;
+  const isCategoryPage = categoryId !== null || (document.body.classList.contains("category-page") && slugs.length > 0);
   let request = null;
   let categories = null;
   let active = true;
 
   function href(category) {
-    return category.id === 1 ? "/kem-danh-rang.html"
-      : "/san-pham.html?danh-muc=" + encodeURIComponent(category.slug);
+    const params = new URLSearchParams();
+    if (category) params.set("danh-muc", category.slug);
+    if (document.body.classList.contains("catalog-page")) {
+      const current = new URLSearchParams(window.location.search);
+      for (const key of ["q", "scope", "price", "sort", "brand"]) {
+        const value = current.get(key);
+        if (value) params.set(key, value);
+      }
+    }
+    return "/danh-muc.html" + (params.size ? "?" + params : "");
   }
 
   function currentCategory(items) {
@@ -30,7 +40,8 @@
       && typeof category.slug === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(category.slug)
       && category.slug.length <= 80 && typeof category.description === "string"
       && typeof category.imageUrl === "string" && typeof category.imageAlt === "string"
-      && category.enabled === true && Number.isSafeInteger(category.sortOrder);
+      && category.enabled === true && Number.isSafeInteger(category.sortOrder)
+      && (category.productCount === undefined || Number.isSafeInteger(category.productCount) && category.productCount >= 0);
   }
 
   function categoryImage(category) {
@@ -82,6 +93,7 @@
         const link = document.createElement("a");
         link.href = href(category);
         link.textContent = category.name;
+        link.dataset.categoryId = String(category.id);
         if (selected?.id === category.id) link.setAttribute("aria-current", "page");
         link.addEventListener("click", event => navigate(event, link));
         item.append(link);
@@ -103,27 +115,89 @@
   function renderPage(items) {
     if (!document.body.classList.contains("category-page")) return;
     const category = isCategoryPage ? currentCategory(items) : null;
-    const name = isCategoryPage ? category?.name || "Danh mục chưa khả dụng" : "Khám phá sản phẩm";
+    const name = isCategoryPage ? category?.name || "Danh mục chưa khả dụng" : "Danh mục sản phẩm";
     document.title = name + " — Cửa hàng kem đánh răng";
-    document.getElementById("category-title").textContent = name;
-    const breadcrumb = document.querySelector(".category-breadcrumb [aria-current]");
-    if (breadcrumb) breadcrumb.textContent = name;
-    document.getElementById("catalog-title").textContent = category ? "Sản phẩm " + category.name.toLocaleLowerCase("vi-VN") : "Sản phẩm";
+    const intro = document.getElementById("category-intro");
+    if (intro) intro.hidden = !isCategoryPage;
+    const title = document.getElementById("category-title");
+    if (title) title.textContent = name;
+    const breadcrumb = document.getElementById("catalog-breadcrumb-category");
+    if (breadcrumb) {
+      breadcrumb.hidden = !isCategoryPage;
+      breadcrumb.textContent = name;
+    }
+    const directoryCrumb = document.querySelector('.category-breadcrumb a[href="/danh-muc.html"]');
+    if (directoryCrumb) {
+      if (isCategoryPage) directoryCrumb.removeAttribute("aria-current");
+      else directoryCrumb.setAttribute("aria-current", "page");
+    }
+    let catalogTitle = document.getElementById("catalog-title");
+    if (catalogTitle) {
+      const tag = isCategoryPage ? "H2" : "H1";
+      if (catalogTitle.tagName !== tag) {
+        const replacement = document.createElement(tag.toLowerCase());
+        replacement.id = "catalog-title";
+        replacement.tabIndex = -1;
+        catalogTitle.replaceWith(replacement);
+        catalogTitle = replacement;
+      }
+      catalogTitle.textContent = "Danh mục sản phẩm";
+    }
     const description = document.getElementById("category-description");
     if (description) {
-      description.textContent = category?.description || "";
+      description.textContent = category ? category.description || (category.id === 1
+        ? "Khám phá các sản phẩm kem đánh răng cho nhu cầu chăm sóc răng miệng hằng ngày. Xem thông tin, so sánh giá và lựa chọn sản phẩm phù hợp với bạn."
+        : category.id === 2
+          ? "Lựa chọn bàn chải đánh răng cho nhu cầu chăm sóc răng miệng của bạn. Xem thông tin sản phẩm và tình trạng còn hàng trước khi đặt mua."
+          : "Khám phá các sản phẩm trong danh mục " + category.name + ". Sử dụng bộ lọc bên dưới để tìm sản phẩm phù hợp.") : "";
       description.hidden = !description.textContent;
     }
-    if (document.body.dataset.catalogPage === "dynamic") {
-      const media = document.querySelector(".category-intro-media");
-      const image = media?.querySelector("img");
-      if (media && image) {
-        media.hidden = !category?.imageUrl;
-        if (category?.imageUrl) {
-          image.src = category.imageUrl;
-          image.alt = category.imageAlt || category.name;
-          image.addEventListener("error", () => { media.hidden = true; }, { once: true });
-        }
+  }
+
+  function renderTabs(items) {
+    if (!tabs) return;
+    const selected = isCategoryPage ? currentCategory(items) : null;
+    const entries = [null, ...items].map(category => {
+      const link = document.createElement("a");
+      link.className = "catalog-category-pill";
+      link.href = href(category);
+      link.dataset.categoryId = category ? String(category.id) : "all";
+      const name = document.createElement("span");
+      name.textContent = category?.name || "Tất cả";
+      const count = document.createElement("span");
+      count.className = "catalog-category-count";
+      count.textContent = String(category?.productCount ?? items.reduce((sum, item) => sum + (item.productCount || 0), 0));
+      if (category ? selected?.id === category.id : !isCategoryPage) link.setAttribute("aria-current", "page");
+      link.append(name, count);
+      link.addEventListener("click", event => navigate(event, link));
+      return link;
+    });
+    tabs.replaceChildren(...entries);
+    tabs.setAttribute("aria-busy", "false");
+    const totalLabel = document.getElementById("catalog-total");
+    if (totalLabel) totalLabel.textContent = "Tổng " + items.reduce((sum, item) => sum + (item.productCount || 0), 0) + " sản phẩm";
+  }
+
+  function renderCatalogCounts(products) {
+    if (!tabs || !categories) return;
+    const counts = new Map(categories.map(category => [category.id, 0]));
+    for (const product of products) {
+      if (counts.has(product.categoryId)) counts.set(product.categoryId, counts.get(product.categoryId) + 1);
+    }
+    const total = [...counts.values()].reduce((sum, count) => sum + count, 0);
+    for (const link of tabs.querySelectorAll("[data-category-id]")) {
+      const all = link.dataset.categoryId === "all";
+      const category = all ? null : categories.find(item => item.id === Number(link.dataset.categoryId));
+      const count = link.querySelector(".catalog-category-count");
+      if (count) count.textContent = String(all ? total : counts.get(category?.id) ?? 0);
+      link.href = href(category);
+    }
+    const totalLabel = document.getElementById("catalog-total");
+    if (totalLabel) totalLabel.textContent = "Tổng " + total + " sản phẩm";
+    for (const menu of menus) {
+      for (const link of menu.querySelectorAll("[data-category-id]")) {
+        const category = categories.find(item => item.id === Number(link.dataset.categoryId));
+        if (category) link.href = href(category);
       }
     }
   }
@@ -144,8 +218,8 @@
     }
   }
 
-  function load() {
-    if (categories) return Promise.resolve(categories);
+  function load({ refresh = false } = {}) {
+    if (categories && !refresh) return Promise.resolve(categories);
     if (request) return request;
     grids.forEach(grid => grid.setAttribute("aria-busy", "true"));
     menus.forEach(menu => menu.setAttribute("aria-busy", "true"));
@@ -164,6 +238,7 @@
           renderCards(result);
           renderMenus(result);
           renderPage(result);
+          renderTabs(result);
         }
         return result;
       } catch (error) {
@@ -177,8 +252,11 @@
     return request;
   }
 
-  window.ShopCategories = { load, href, currentCategory, isCategoryPage };
-  retry?.addEventListener("click", () => void load().catch(() => {}));
+  window.ShopCategories = { load, href, currentCategory, isCategoryPage, renderCatalogCounts };
+  retry?.addEventListener("click", () => {
+    if (window.ShopStorefront?.reloadCatalog) void window.ShopStorefront.reloadCatalog();
+    else void load({ refresh: true }).catch(() => {});
+  });
   window.addEventListener("pagehide", () => { active = false; });
   window.addEventListener("pageshow", event => {
     active = true;
@@ -186,6 +264,7 @@
       renderCards(categories);
       renderMenus(categories);
       renderPage(categories);
+      renderTabs(categories);
     }
   });
   void load().catch(() => {});

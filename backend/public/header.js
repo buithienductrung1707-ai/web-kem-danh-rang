@@ -31,7 +31,9 @@
   }
 
   function setProductsMenu(menu, open) {
-    menu.querySelector("[data-products-toggle]")?.setAttribute("aria-expanded", String(open));
+    const toggle = menu.querySelector("[data-products-toggle]");
+    toggle?.setAttribute("aria-expanded", String(open));
+    toggle?.setAttribute("aria-label", open ? "Đóng danh sách danh mục" : "Mở danh sách danh mục");
     const options = menu.querySelector(".catalog-nav-menu");
     if (options) options.hidden = !open;
   }
@@ -54,6 +56,14 @@
       if (!menu.contains(event.relatedTarget)) setProductsMenu(menu, false);
     });
     menu.addEventListener("keydown", event => {
+      if (["ArrowDown", "ArrowUp"].includes(event.key) &&
+        event.target.matches("[data-products-link], [data-products-toggle]")) {
+        event.preventDefault();
+        setProductsMenu(menu, true);
+        const links = [...menu.querySelectorAll(".catalog-nav-menu a, .catalog-nav-menu button")];
+        (event.key === "ArrowDown" ? links[0] : links.at(-1))?.focus();
+        return;
+      }
       if (event.key !== "Escape" || toggle?.getAttribute("aria-expanded") !== "true") return;
       event.preventDefault();
       setProductsMenu(menu, false);
@@ -79,7 +89,7 @@
 
   function openSearchResults(query, scope, event) {
     const params = new URLSearchParams({ q: query, scope });
-    const target = "/san-pham.html?" + params.toString() + "#catalog";
+    const target = "/danh-muc.html?" + params.toString() + "#catalog";
     const storefront = window.ShopStorefront;
     if (storefront && !storefront.prepareNavigation(event, target)) {
       searchMessage = "Chưa chuyển sang tìm kiếm. Hãy kiểm tra thông báo lưu giỏ hàng hoặc lần gửi đơn trên trang này.";

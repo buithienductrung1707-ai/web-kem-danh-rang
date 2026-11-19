@@ -5,6 +5,11 @@ const reloadCatalogButton = document.getElementById("reload-catalog") ?? documen
 const productSearchField = document.getElementById("product-search")
   ?? (productList ? document.querySelector("[data-header-search-input]") : null);
 const productSortField = document.getElementById("product-sort");
+const catalogSearchField = document.getElementById("catalog-search");
+const priceFilter = document.getElementById("price-filter");
+const brandFilter = document.getElementById("brand-filter");
+const catalogPage = document.body.classList.contains("catalog-page");
+let requestedCatalogBrand = catalogPage ? new URLSearchParams(window.location.search).get("brand") : null;
 const catalogResults = document.getElementById("catalog-results");
 const favoritesOnlyFilter = document.getElementById("favorites-only");
 const availableOnlyFilter = document.getElementById("available-only");
@@ -990,12 +995,16 @@ function updateControls() {
     productSearchField.disabled = locked || !catalogReady;
     if (headerSearchSubmit) headerSearchSubmit.disabled = locked || !catalogReady;
     productSortField.disabled = locked || !catalogReady;
+    if (catalogSearchField) catalogSearchField.disabled = locked || !catalogReady;
+    if (priceFilter) priceFilter.disabled = locked || !catalogReady;
+    if (brandFilter) brandFilter.disabled = locked || !catalogReady;
     if (favoritesOnlyFilter) favoritesOnlyFilter.disabled = locked || !catalogReady;
     if (availableOnlyFilter) availableOnlyFilter.disabled = locked || !catalogReady;
     if (clearCatalogFiltersButton) {
       clearCatalogFiltersButton.disabled = locked || !catalogReady ||
         !(productSearchField.value.trim() || productSortField.value !== "default" ||
-          favoritesOnlyFilter?.checked || availableOnlyFilter?.checked);
+          favoritesOnlyFilter?.checked || availableOnlyFilter?.checked ||
+          priceFilter && priceFilter.value !== "all" || brandFilter && brandFilter.value !== "all");
     }
   }
   const catalogTarget = productList ?? featuredProductList;
@@ -1358,10 +1367,47 @@ function renderCheckoutVisuals() {
   document.getElementById("checkout-payment-label").textContent = paymentLabel(reviewedOrder?.paymentMethod ?? paymentMethodField.value);
 }
 
+function rememberCatalogFilters() {
+  if (!catalogPage || !catalogReady) return;
+  const url = new URL(window.location.href);
+  const scope = favoritesOnlyFilter?.checked
+    ? availableOnlyFilter?.checked ? "favorites-available" : "favorites"
+    : availableOnlyFilter?.checked ? "available" : "all";
+  const values = { q: productSearchField?.value.trim() || "", scope, price: priceFilter?.value || "all",
+    brand: brandFilter?.value || "all", sort: productSortField?.value || "default" };
+  for (const [key, value] of Object.entries(values)) {
+    if (!value || value === "all" || value === "default") url.searchParams.delete(key);
+    else url.searchParams.set(key, value);
+  }
+  window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+}
+
+function renderBrandOptions() {
+  if (!brandFilter) return;
+  const selected = requestedCatalogBrand ?? brandFilter.value;
+  const enabled = catalogCategories && new Set(catalogCategories.map(category => category.id));
+  const brands = [...new Set([...products.values()].filter(product => !enabled || enabled.has(product.categoryId))
+    .map(product => product.brand).filter(Boolean))].sort((a, b) => a.localeCompare(b, "vi"));
+  const options = [new Option("Tất cả thương hiệu", "all"), ...brands.map(brand => new Option(brand, brand))];
+  brandFilter.replaceChildren(...options);
+  brandFilter.value = brands.includes(selected) ? selected : "all";
+  requestedCatalogBrand = null;
+}
+
+function matchesPrice(product) {
+  switch (priceFilter?.value) {
+    case "under-50000": return product.price < 50000;
+    case "50000-100000": return product.price >= 50000 && product.price <= 100000;
+    case "over-100000": return product.price > 100000;
+    default: return true;
+  }
+}
+
 function renderCatalog() {
   const target = productList ?? featuredProductList;
   if (!target) return;
   const fragment = document.createDocumentFragment();
+  if (catalogSearchField) catalogSearchField.value = productSearchField?.value || "";
   const query = normalizeSearch(productSearchField?.value.trim() ?? "");
   const selectedCategory = catalogCategories && window.ShopCategories?.isCategoryPage
     ? window.ShopCategories.currentCategory(catalogCategories) : null;
@@ -1371,13 +1417,15 @@ function renderCatalog() {
     (!window.ShopCategories?.isCategoryPage || product.categoryId === selectedCategory?.id));
   const visibleProducts = categoryProducts.filter(product =>
     normalizeSearch(product.name + " " + product.description).includes(query) &&
+    matchesPrice(product) && (!brandFilter || brandFilter.value === "all" || product.brand === brandFilter.value) &&
     (!favoritesOnlyFilter?.checked || favoriteProducts.has(product.id)) &&
     (!availableOnlyFilter?.checked || !product.stockTracked || product.stockQuantity > 0));
   const sorters = {
     "price-asc": (a, b) => a.price - b.price || a.id - b.id,
     "price-desc": (a, b) => b.price - a.price || a.id - b.id,
     name: (a, b) => a.name.localeCompare(b.name, "vi") || a.id - b.id,
-    default: (a, b) => a.id - b.id
+    oldest: (a, b) => a.id - b.id,
+    default: (a, b) => catalogPage ? b.id - a.id : a.id - b.id
   };
   const sort = productSortField?.value ?? "default";
   const sorter = Object.hasOwn(sorters, sort) ? sorters[sort] : sorters.default;
@@ -1385,7 +1433,7 @@ function renderCatalog() {
   const displayedProducts = productList ? visibleProducts : visibleProducts.slice(0, 4);
   for (const product of displayedProducts) {
     const card = document.createElement("article");
-    card.className = productList && visibleProducts.length === 1 && product.imageUrl
+    card.className = productList && !catalogPage && visibleProducts.length === 1 && product.imageUrl
       ? "product product-featured" : "product";
     if (product.imageUrl) {
       const image = document.createElement("img");
@@ -1498,13 +1546,23 @@ function renderCatalog() {
   target.replaceChildren(fragment);
   if (catalogResults) {
     if (categoryProducts.length === 0) catalogResults.textContent = window.ShopCategories?.isCategoryPage && !selectedCategory
-      ? "Danh mục này hiện chưa được hiển thị. Hãy chọn danh mục khác trong Khám phá sản phẩm."
+      ? "Danh mục này hiện chưa được hiển thị. Hãy chọn danh mục khác trong Danh mục."
       : "Cửa hàng đang cập nhật sản phẩm cho danh mục này.";
     else if (visibleProducts.length === 0) catalogResults.textContent = favoritesOnlyFilter?.checked && favoriteProducts.size === 0
       ? "Bạn chưa lưu sản phẩm yêu thích. Hãy tắt bộ lọc yêu thích để chọn sản phẩm."
       : "Chưa tìm thấy sản phẩm phù hợp. Hãy thử từ khóa khác hoặc xóa bộ lọc.";
     else catalogResults.textContent = "Hiển thị " + visibleProducts.length + "/" + categoryProducts.length + " sản phẩm.";
+    if (catalogPage) {
+      const empty = document.getElementById("catalog-empty-state");
+      if (empty) {
+        empty.textContent = visibleProducts.length ? "" : catalogResults.textContent;
+        empty.hidden = visibleProducts.length > 0 || !catalogReady;
+      }
+      catalogResults.textContent = visibleProducts.length + " sản phẩm";
+    }
   }
+  rememberCatalogFilters();
+  window.ShopCategories?.renderCatalogCounts?.([...products.values()]);
   renderActiveFilters();
   updateControls();
 }
@@ -1535,8 +1593,14 @@ function renderActiveFilters() {
   }
   const query = productSearchField.value.trim();
   if (query) addFilter("Tìm “" + query + "”", () => { productSearchField.value = ""; });
-  if (favoritesOnlyFilter.checked) addFilter("Yêu thích", () => { favoritesOnlyFilter.checked = false; });
-  if (availableOnlyFilter.checked) addFilter("Còn hàng", () => { availableOnlyFilter.checked = false; });
+  if (favoritesOnlyFilter?.checked) addFilter("Yêu thích", () => { favoritesOnlyFilter.checked = false; });
+  if (availableOnlyFilter?.checked) addFilter("Còn hàng", () => { availableOnlyFilter.checked = false; });
+  if (priceFilter && priceFilter.value !== "all") {
+    addFilter(priceFilter.selectedOptions[0].textContent, () => { priceFilter.value = "all"; });
+  }
+  if (brandFilter && brandFilter.value !== "all") {
+    addFilter("Thương hiệu " + brandFilter.value, () => { brandFilter.value = "all"; });
+  }
   if (productSortField.value !== "default") {
     const label = productSortField.selectedOptions[0]?.textContent ?? "Sắp xếp";
     addFilter(label, () => { productSortField.value = "default"; });
@@ -1591,12 +1655,23 @@ productSearchField?.addEventListener("input", () => {
   renderCatalog();
 });
 
+catalogSearchField?.addEventListener("input", () => {
+  if (!catalogReady || orderPending || isSubmitting) return;
+  productSearchField.value = catalogSearchField.value;
+  renderCatalog();
+});
+
+document.getElementById("catalog-filter-form")?.addEventListener("submit", event => {
+  event.preventDefault();
+  if (catalogReady && !orderPending && !isSubmitting) renderCatalog();
+});
+
 productSortField?.addEventListener("change", () => {
   if (!catalogReady || orderPending || isSubmitting) return;
   renderCatalog();
 });
 
-for (const filter of [favoritesOnlyFilter, availableOnlyFilter]) {
+for (const filter of [favoritesOnlyFilter, availableOnlyFilter, priceFilter, brandFilter]) {
   filter?.addEventListener("change", () => {
     if (!catalogReady || orderPending || isSubmitting) return;
     renderCatalog();
@@ -1607,8 +1682,10 @@ clearCatalogFiltersButton?.addEventListener("click", () => {
   if (!catalogReady || orderPending || isSubmitting) return;
   productSearchField.value = "";
   productSortField.value = "default";
-  favoritesOnlyFilter.checked = false;
-  availableOnlyFilter.checked = false;
+  if (favoritesOnlyFilter) favoritesOnlyFilter.checked = false;
+  if (availableOnlyFilter) availableOnlyFilter.checked = false;
+  if (priceFilter) priceFilter.value = "all";
+  if (brandFilter) brandFilter.value = "all";
   renderCatalog();
   productSearchField.focus();
 });
@@ -1650,11 +1727,13 @@ async function loadCatalog() {
   productMessage.textContent = productList || featuredProductList || checkoutForm ? "Đang tải sản phẩm..." : "";
   productList?.setAttribute("aria-busy", "true");
   renderCatalogSkeleton();
+  const empty = document.getElementById("catalog-empty-state");
+  if (empty) empty.hidden = true;
   updateControls();
   try {
     const [response, categories] = await Promise.all([
       fetch("/api/products", { cache: "no-store", signal: AbortSignal.timeout(15000) }),
-      (productList || featuredProductList) && window.ShopCategories ? window.ShopCategories.load() : null
+      (productList || featuredProductList) && window.ShopCategories ? window.ShopCategories.load({ refresh: catalogCategories !== null }) : null
     ]);
     const result = await response.json();
     if (!storefrontActive || orderPending || isSubmitting) return;
@@ -1665,15 +1744,17 @@ async function loadCatalog() {
         typeof item.description === "string" && validImageUrl(item.imageUrl) &&
         (item.categoryId === undefined || Number.isSafeInteger(item.categoryId) && item.categoryId > 0) &&
         (item.categoryName === undefined || typeof item.categoryName === "string") &&
+        (item.brand === undefined || typeof item.brand === "string" && item.brand.length <= 200) &&
         ((item.stockTracked === undefined && item.stockQuantity === undefined) ||
           (typeof item.stockTracked === "boolean" && Number.isSafeInteger(item.stockQuantity) && item.stockQuantity >= 0))) ||
       new Set(result.map(item => item.id)).size !== result.length) {
       throw new Error("Dữ liệu sản phẩm chưa hợp lệ");
     }
     products = new Map(result.map(item => [item.id, {
-      stockTracked: false, stockQuantity: 0, categoryId: 1, categoryName: "Kem đánh răng", ...item
+      stockTracked: false, stockQuantity: 0, categoryId: 1, categoryName: "Kem đánh răng", brand: "", ...item
     }]));
     catalogCategories = categories;
+    renderBrandOptions();
     catalogReady = true;
     cartMessage.textContent = "";
     importReorder();
@@ -2010,6 +2091,12 @@ window.ShopStorefront = {
 
 if (productList) {
   const searchParams = new URLSearchParams(window.location.search);
+  if (catalogPage) {
+    for (const [key, field] of [["price", priceFilter], ["sort", productSortField]]) {
+      const value = searchParams.get(key);
+      if (field && [...field.options].some(option => option.value === value)) field.value = value;
+    }
+  }
   if (searchParams.has("q") || searchParams.has("scope")) {
     searchCatalog({ query: searchParams.get("q") ?? "", scope: searchParams.get("scope") ?? "all", scroll: false });
   }

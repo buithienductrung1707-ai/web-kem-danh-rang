@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Danh mục sản phẩm — Cửa hàng kem đánh răng</title>
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="storefront-widgets.css">
+    <link rel="stylesheet" href="support-chat.css">
+    <link rel="stylesheet" href="catalog-categories.css">
+    <link rel="stylesheet" href="account-header.css">
+    <link rel="stylesheet" href="cart-feedback.css">
+    <link rel="stylesheet" href="catalog-page.css">
+    <script src="catalog-categories.js" defer></script>
+    <script src="catalog-page.js" defer></script>
+    <script src="shop-memory.js" defer></script>
+    <script src="cart-feedback.js" defer></script>
+    <script src="app.js" defer></script>
+    <script src="account-menu.js" defer></script>
+    <script src="account.js" defer></script>
+    <script src="header.js" defer></script>
+    <script src="support-chat.js" defer></script>
+  </head>
+
+  <body class="storefront-page category-page catalog-page" data-catalog-page="dynamic">
+    <a class="skip-link" href="#main-content">Đến nội dung</a>
+    <header class="site-header commerce-header">
+      <div class="site-header-inner">
+        <a class="header-brand" href="/" aria-label="Trang chủ cửa hàng kem đánh răng">
+          <img src="/assets/shop-logo.png" width="48" height="48" alt="">
+          <span class="header-brand-name">Kem đánh răng</span>
+        </a>
+        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/danh-muc.html#catalog" method="get">
+          <label class="visually-hidden" for="product-search">Tìm sản phẩm</label>
+          <input id="product-search" data-header-search-input name="q" type="search" autocomplete="off" placeholder="Tìm tên hoặc mô tả sản phẩm...">
+          <button class="header-search-button" type="submit">
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg>
+            <span>Tìm</span>
+          </button>
+        </form>
+        <div class="header-actions">
+          <nav class="site-nav" aria-label="Điều hướng chính">
+            <a class="header-action-link" href="/tra-cuu.html" data-temporary-hidden="order-tracking" hidden>
+              <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 17h4V6H3v11h2m9-8h4l3 4v4h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+              <span class="header-link-copy"><span class="header-link-label">Tra cứu</span><strong>Đơn hàng</strong></span>
+            </a>
+            <a class="header-action-link" href="/dang-nhap.html" data-account-link>
+              <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+              <span class="header-link-copy"><span class="header-link-label">Tài khoản</span><strong data-account-label>Đăng nhập</strong></span>
+            </a>
+            <a class="header-action-link header-cart cart-navigation" href="/dang-nhap.html?view=cart">
+              <span class="header-link-icon" aria-hidden="true"><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m3 3 2 2 2.4 11.5h11.2L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span id="header-cart-count" class="cart-count" hidden>0</span></span>
+              <span class="header-link-copy"><span class="header-link-label">Giỏ hàng</span><strong id="header-cart-total" data-header-cart-total>0 ₫</strong></span>
+            </a>
+          </nav>
+          <button class="theme-toggle button-secondary" type="button" data-theme-toggle aria-label="Chế độ tối" aria-pressed="false" title="Bật chế độ tối">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>
+          </button>
+        </div>
+        <p id="theme-message" role="status" aria-atomic="true"></p>
+        <p id="header-message" role="status" aria-atomic="true"></p>
+      </div>
+      <nav class="catalog-nav" aria-label="Điều hướng cửa hàng">
+        <div class="catalog-nav-inner">
+          <div class="catalog-nav-products is-current" data-products-menu>
+            <a class="catalog-nav-link" data-products-link href="/danh-muc.html"><svg class="catalog-nav-category-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Danh mục</span></a>
+            <button class="catalog-nav-toggle" type="button" data-products-toggle aria-expanded="false" aria-controls="products-menu" aria-label="Mở danh sách danh mục">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <ul class="catalog-nav-menu" id="products-menu" hidden>
+              <li><a href="/danh-muc.html?danh-muc=kem-danh-rang">Kem đánh răng</a></li>
+              <li><a href="/danh-muc.html?danh-muc=ban-chai-danh-rang">Bàn chải đánh răng</a></li>
+            </ul>
+          </div>
+          <a class="catalog-nav-link" href="/dang-nhap.html?view=orders" data-temporary-hidden="my-orders" hidden><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>
+        </div>
+      </nav>
+    </header>
+    <main id="main-content" class="storefront catalog-page-shell">
+      <nav class="category-breadcrumb catalog-page-breadcrumb" aria-label="Đường dẫn trang">
+        <ol>
+          <li><a href="/"><svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg>Trang chủ</a></li>
+          <li><a href="/danh-muc.html">Danh mục sản phẩm</a></li>
+          <li id="catalog-breadcrumb-category" aria-current="page" hidden></li>
+        </ol>
+      </nav>
+
+      <section id="category-intro" class="catalog-category-intro" aria-labelledby="category-title" hidden>
+        <h1 id="category-title">Danh mục sản phẩm</h1>
+        <p id="category-description" hidden></p>
+      </section>
+
+      <section id="catalog" class="catalog-section catalog-directory" aria-labelledby="catalog-title">
+        <div class="catalog-page-heading">
+          <div>
+            <h1 id="catalog-title" tabindex="-1">Danh mục sản phẩm</h1>
+            <p>Lọc theo nhu cầu, mức giá và độ sẵn hàng để tìm sản phẩm phù hợp.</p>
+          </div>
+          <p id="catalog-total" class="catalog-total-badge">Đang tải sản phẩm…</p>
+        </div>
+
+        <div class="catalog-category-selector">
+          <button class="catalog-category-scroll button-secondary" type="button" data-category-scroll="previous" aria-controls="category-tabs" aria-label="Xem danh mục phía trước" disabled>
+            <svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
+          </button>
+          <nav id="category-tabs" class="catalog-category-tabs" data-category-tabs aria-label="Chọn danh mục sản phẩm" aria-busy="true">
+            <a class="catalog-category-pill" href="/danh-muc.html" aria-current="page"><span>Tất cả</span><span class="catalog-category-count">—</span></a>
+            <a class="catalog-category-pill" href="/danh-muc.html?danh-muc=kem-danh-rang"><span>Kem đánh răng</span><span class="catalog-category-count">—</span></a>
+            <a class="catalog-category-pill" href="/danh-muc.html?danh-muc=ban-chai-danh-rang"><span>Bàn chải đánh răng</span><span class="catalog-category-count">—</span></a>
+          </nav>
+          <button class="catalog-category-scroll button-secondary" type="button" data-category-scroll="next" aria-controls="category-tabs" aria-label="Xem thêm danh mục" disabled>
+            <svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg>
+          </button>
+        </div>
+        <p id="categories-status" class="catalog-page-status" role="status" aria-atomic="true"></p>
+        <button id="categories-retry" type="button" class="button-secondary" hidden>Tải lại danh mục</button>
+
+        <form id="catalog-filter-form" class="catalog-filter-toolbar" role="search" aria-label="Lọc sản phẩm">
+          <div class="catalog-filter-field catalog-filter-search">
+            <label for="catalog-search">Tìm sản phẩm</label>
+            <div class="catalog-filter-search-control">
+              <svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+              <input id="catalog-search" name="q" type="search" maxlength="200" autocomplete="off" placeholder="Tìm theo tên hoặc mô tả…">
+            </div>
+          </div>
+          <div class="catalog-filter-field">
+            <label for="price-filter">Mức giá</label>
+            <div class="catalog-filter-select-control">
+              <select id="price-filter" name="price">
+                <option value="all">Tất cả mức giá</option>
+                <option value="under-50000">Dưới 50.000 ₫</option>
+                <option value="50000-100000">50.000 – 100.000 ₫</option>
+                <option value="over-100000">Trên 100.000 ₫</option>
+              </select>
+              <svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+            </div>
+          </div>
+          <div class="catalog-filter-field">
+            <label for="product-sort">Sắp xếp</label>
+            <div class="catalog-filter-select-control">
+              <select id="product-sort" name="sort">
+                <option value="default">Mới nhất</option>
+                <option value="oldest">Cũ nhất</option>
+                <option value="price-asc">Giá tăng dần</option>
+                <option value="price-desc">Giá giảm dần</option>
+                <option value="name">Tên A–Z</option>
+              </select>
+              <svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+            </div>
+          </div>
+          <div class="catalog-filter-field">
+            <label for="brand-filter">Thương hiệu</label>
+            <div class="catalog-filter-select-control">
+              <select id="brand-filter" name="brand">
+                <option value="all">Tất cả thương hiệu</option>
+              </select>
+              <svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+            </div>
+          </div>
+          <label class="catalog-stock-filter" for="available-only">
+            <input id="available-only" type="checkbox">Còn hàng
+          </label>
+        </form>
+
+        <div class="catalog-page-secondary-controls">
+          <label class="catalog-favorite-filter" for="favorites-only"><input id="favorites-only" type="checkbox">Chỉ xem yêu thích</label>
+          <div class="catalog-page-actions">
+            <button id="clear-catalog-filters" type="button" class="button-secondary">Xóa bộ lọc</button>
+            <button type="button" id="reload-catalog" class="button-secondary">Tải lại sản phẩm</button>
+          </div>
+        </div>
+
+        <div id="active-filters" class="active-filters" aria-label="Bộ lọc đang áp dụng" hidden></div>
+        <div class="catalog-results-heading">
+          <h3>Kết quả</h3>
+          <p id="catalog-results" role="status" aria-atomic="true"></p>
+        </div>
+        <p id="favorites-message" role="status" aria-atomic="true"></p>
+        <p id="catalog-empty-state" class="catalog-empty-state" role="status" hidden></p>
+        <p id="product-message" role="status" aria-atomic="true"></p>
+        <div class="storefront-feedback">
+          <p id="cart-message" role="status" aria-atomic="true"></p>
+          <p id="storage-message" role="status"></p>
+          <p id="reorder-message" role="status" aria-atomic="true"></p>
+          <p id="pending-order-message" role="status" aria-atomic="true"></p>
+          <a id="pending-cart-link" class="navigation-link cart-navigation" href="/dang-nhap.html?view=cart" hidden>Đi đến giỏ hàng</a>
+        </div>
+        <div id="product-list" class="product-grid" aria-busy="true"></div>
+      </section>
+    </main>
+    <dialog id="product-preview-dialog" class="product-preview-dialog" aria-labelledby="product-preview-title">
+      <button id="product-preview-close" class="preview-close button-secondary" type="button" aria-label="Đóng xem nhanh" autofocus><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      <div class="preview-layout">
+        <div class="preview-media">
+          <img id="product-preview-image" width="640" height="480" alt="" hidden>
+          <p id="product-preview-no-image" hidden>Sản phẩm chưa có ảnh</p>
+        </div>
+        <div class="preview-copy">
+          <p class="preview-category">Sản phẩm</p>
+          <h2 id="product-preview-title"></h2>
+          <p id="product-preview-price" class="price"></p>
+          <p id="product-preview-stock" class="stock-status"></p>
+          <p id="product-preview-description" class="product-description"></p>
+          <button id="product-preview-add" type="button">Thêm vào giỏ</button>
+          <p id="product-preview-message" role="status" aria-atomic="true"></p>
+        </div>
+      </div>
+    </dialog>
+    <footer class="site-footer store-footer">
+      <div class="site-footer-inner">
+        <div class="footer-brand">
+          <a class="brand-name" href="/">Kem đánh răng</a>
+          <p>Lựa chọn kem đánh răng cho nhu cầu chăm sóc răng miệng hằng ngày.</p>
+        </div>
+        <section class="footer-column" aria-labelledby="footer-shop-title">
+          <h2 id="footer-shop-title">Mua sắm</h2>
+          <nav aria-label="Mua sắm cuối trang">
+            <a href="/">Trang chủ</a>
+            <a href="/danh-muc.html?danh-muc=kem-danh-rang">Kem đánh răng</a>
+            <a class="cart-navigation" href="/dang-nhap.html?view=cart">Giỏ hàng</a>
+          </nav>
+        </section>
+        <section class="footer-column" aria-labelledby="footer-account-title">
+          <h2 id="footer-account-title">Đơn hàng &amp; tài khoản</h2>
+          <nav aria-label="Tài khoản và đơn hàng cuối trang">
+            <a href="/dang-nhap.html?view=orders">Đơn hàng của tôi</a>
+            <a href="/tra-cuu.html">Tra cứu đơn hàng</a>
+            <a href="/dang-nhap.html">Tài khoản của bạn</a>
+            <a href="/dang-ky.html">Đăng ký tài khoản</a>
+          </nav>
+        </section>
+        <section class="footer-column" aria-labelledby="footer-payment-title">
+          <h2 id="footer-payment-title">Thanh toán</h2>
+          <ul class="footer-payment-list">
+            <li><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9h.01M18 15h.01"/></svg><span>Thanh toán khi nhận hàng</span></li>
+            <li><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m3 9 9-6 9 6H3Zm2 3v6m7-6v6m7-6v6M3 21h18"/></svg><span>Chuyển khoản ngân hàng</span></li>
+          </ul>
+        </section>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Cửa hàng kem đánh răng</p>
+        <a href="/admin.html">Quản trị cửa hàng</a>
+      </div>
+    </footer>
+  </body>
+</html>

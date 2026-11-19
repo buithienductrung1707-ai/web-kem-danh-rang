@@ -255,11 +255,11 @@
       title.textContent = filtered ? "Chưa có đơn hàng phù hợp" : "Bạn chưa có đơn hàng";
       const text = document.createElement("p");
       text.textContent = filtered ? "Hãy thay đổi bộ lọc hoặc tìm theo mã đơn và tên sản phẩm khác."
-        : "Khám phá sản phẩm chăm sóc răng miệng và đặt đơn đầu tiên của bạn.";
+        : "Chọn sản phẩm chăm sóc răng miệng và đặt đơn đầu tiên của bạn.";
       const explore = document.createElement("a");
       explore.className = "button-link";
-      explore.href = "/san-pham.html";
-      explore.textContent = "Khám phá sản phẩm";
+      explore.href = "/danh-muc.html";
+      explore.textContent = "Danh mục";
       empty.append(title, text, explore);
       fragment.append(empty);
     }

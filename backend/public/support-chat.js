@@ -82,7 +82,7 @@
   intro.id = "support-chat-intro";
   const links = element("nav", "support-chat-links");
   links.setAttribute("aria-label", "Liên kết hỗ trợ");
-  for (const [href, label] of [["/tra-cuu.html", "Tra cứu đơn hàng"], ["/kem-danh-rang.html", "Xem sản phẩm"]]) {
+  for (const [href, label] of [["/tra-cuu.html", "Tra cứu đơn hàng"], ["/danh-muc.html", "Danh mục"]]) {
     const link = element("a", "", label);
     link.href = href;
     link.addEventListener("click", event => window.ShopStorefront?.prepareNavigation(event, link));

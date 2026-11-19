@@ -63,6 +63,14 @@ function storedArray(value) {
   }
 }
 
+function productBrand(value) {
+  const specifications = specificationsData(storedArray(value)) ?? [];
+  const entry = specifications.find(item => ["thuong hieu", "brand"].includes(
+    item.label.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim()
+  ));
+  return entry?.value ?? "";
+}
+
 function productDetailsResponse(product) {
   const { galleryImagesJson, specificationsJson, ...fields } = product;
   return {
@@ -73,4 +81,4 @@ function productDetailsResponse(product) {
   };
 }
 
-module.exports = { validProductImageUrl, productDetailsData, productDetailsResponse };
+module.exports = { validProductImageUrl, productDetailsData, productDetailsResponse, productBrand };

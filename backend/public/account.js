@@ -35,7 +35,7 @@
   const guestFocusTarget = workspace && workspace.currentView !== "profile"
     ? document.getElementById("workspace-login") : fields.email ?? menu?.trigger;
   const returnTargets = new Set([
-    "/", "/kem-danh-rang.html", "/san-pham.html", "/chi-tiet-san-pham.html",
+    "/", "/danh-muc.html", "/kem-danh-rang.html", "/san-pham.html", "/chi-tiet-san-pham.html",
     "/gio-hang.html", "/tra-cuu.html", "/don-hang.html"
   ]);
   function safeReturnTarget(value) {

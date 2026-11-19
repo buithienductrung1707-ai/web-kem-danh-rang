@@ -8,7 +8,7 @@ const { customerSupportRouter } = require("./routes/support.cjs");
 const { createOrder, getOrderItems, getOrderHistory } = require("./services/orders.cjs");
 const { getPublicBanners } = require("./services/banners.cjs");
 const { getPublicCategories } = require("./services/categories.cjs");
-const { productDetailsResponse } = require("./services/product-details.cjs");
+const { productDetailsResponse, productBrand } = require("./services/product-details.cjs");
 const { getRuntime } = require("./runtime.cjs");
 
 const app = express();
@@ -30,7 +30,7 @@ const publicProductFields = `p.id, p.name, p.price, p.description, p.image_url A
     p.stock_tracked AS stockTracked, p.stock_quantity AS stockQuantity,
     p.category_id AS categoryId, c.slug AS categorySlug, c.name AS categoryName`;
 const productsQuery = db.prepare(`
-  SELECT ${publicProductFields}
+  SELECT ${publicProductFields}, p.specifications AS specificationsJson
   FROM products p LEFT JOIN product_categories c ON c.id = p.category_id
   WHERE p.active = 1
   ORDER BY p.id
@@ -50,8 +50,9 @@ const trackedOrderQuery = db.prepare(`
 
 app.get("/api/products", (req, res) => {
   res.set("Cache-Control", "no-store");
-  res.json(productsQuery.all().map(product => ({
+  res.json(productsQuery.all().map(({ specificationsJson, ...product }) => ({
     ...product,
+    brand: productBrand(specificationsJson),
     stockTracked: product.stockTracked === 1
   })));
 });

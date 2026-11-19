@@ -112,6 +112,15 @@
       Number.isSafeInteger(banner.revision) && banner.revision >= 0;
   }
 
+  function catalogDestination(value, legacyLabel) {
+    if (legacyLabel && ["#catalog", "/#catalog"].includes(value)) return "/danh-muc.html";
+    const url = new URL(value, window.location.origin);
+    if (url.origin !== window.location.origin) return value;
+    if (!["/san-pham.html", "/kem-danh-rang.html"].includes(url.pathname)) return value;
+    if (url.pathname === "/kem-danh-rang.html") url.searchParams.set("danh-muc", "kem-danh-rang");
+    return "/danh-muc.html" + url.search + url.hash;
+  }
+
   function renderSlide(announce = false) {
     stopTransition();
     const focusWithinHero = hero.contains(document.activeElement);
@@ -133,9 +142,10 @@
     title.textContent = banner.title;
     description.textContent = banner.description;
     description.hidden = banner.description === "";
-    link.textContent = banner.buttonLabel;
+    const legacyCatalogLabel = banner.buttonLabel === "Khám phá sản phẩm";
+    link.textContent = legacyCatalogLabel ? "Danh mục" : banner.buttonLabel;
     link.hidden = banner.buttonLabel === "";
-    link.href = banner.buttonUrl || "#catalog";
+    link.href = catalogDestination(banner.buttonUrl || "#catalog", legacyCatalogLabel);
     image.hidden = false;
     image.alt = banner.imageAlt;
     if (image.getAttribute("src") !== banner.imageUrl) image.src = banner.imageUrl;

@@ -7,9 +7,9 @@ Website bán hàng bằng tiếng Việt, gồm cửa hàng cho khách và trang
 | Trang | Đường dẫn |
 | --- | --- |
 | Trang chủ | [Mở trang chủ](https://web-kem-danh-rang.buithienductrung1707.workers.dev/) |
-| Kem đánh răng | [Xem sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/kem-danh-rang.html) |
-| Bàn chải đánh răng | [Xem danh mục bàn chải](https://web-kem-danh-rang.buithienductrung1707.workers.dev/san-pham.html?danh-muc=ban-chai-danh-rang) |
-| Tất cả sản phẩm | [Khám phá sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/san-pham.html) |
+| Kem đánh răng | [Xem sản phẩm](https://web-kem-danh-rang.buithienductrung1707.workers.dev/danh-muc.html?danh-muc=kem-danh-rang) |
+| Bàn chải đánh răng | [Xem danh mục bàn chải](https://web-kem-danh-rang.buithienductrung1707.workers.dev/danh-muc.html?danh-muc=ban-chai-danh-rang) |
+| Danh mục sản phẩm | [Mở danh mục](https://web-kem-danh-rang.buithienductrung1707.workers.dev/danh-muc.html) |
 | Chi tiết Sensodyne | [Xem Sensodyne](https://web-kem-danh-rang.buithienductrung1707.workers.dev/chi-tiet-san-pham.html?id=1) |
 | Chi tiết Crest | [Xem Crest](https://web-kem-danh-rang.buithienductrung1707.workers.dev/chi-tiet-san-pham.html?id=2) |
 | Giỏ hàng | [Mở giỏ hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=cart) |
@@ -78,7 +78,7 @@ npm.cmd start
 
 ## Mua hàng và xem đơn
 
-1. Chọn danh mục trên trang chủ hoặc trong menu **Khám phá sản phẩm**, tìm sản phẩm hoặc dùng bộ lọc và sắp xếp. Ô tìm kiếm trên header tìm trong toàn bộ sản phẩm của các danh mục đang hiển thị.
+1. Bấm **Danh mục** trên menu để mở trang danh mục sản phẩm. Chọn **Tất cả**, **Kem đánh răng**, **Bàn chải đánh răng** hoặc danh mục khác được quản trị thêm vào. Có thể tìm theo tên, mô tả, lọc mức giá, thương hiệu, còn hàng, yêu thích và sắp xếp. Ô tìm kiếm trên header tìm trong toàn bộ sản phẩm của các danh mục đang hiển thị.
 2. Bấm ảnh hoặc tên sản phẩm để mở trang chi tiết. Xem ảnh lớn, chọn ảnh thu nhỏ, đọc thông tin và mô tả bên dưới, rồi chọn số lượng. Dùng **Thêm vào giỏ** hoặc **Mua ngay** để tiếp tục mua hàng. Các thẻ sản phẩm cũng có **Xem nhanh**, **Thêm vào giỏ** và **Mua nhanh**.
 3. Mở **Giỏ hàng** trong khu vực tài khoản. Chọn từng sản phẩm hoặc **Chọn tất cả**, điều chỉnh số lượng và kiểm tra tiền của các sản phẩm đã chọn. Dùng biểu tượng thùng rác để xóa riêng hoặc **Xóa đã chọn** để xóa nhiều sản phẩm.
 4. Bấm **Tiếp tục đặt hàng** để mở bước xác nhận. Kiểm tra sản phẩm, địa chỉ nhận hàng, phương thức thanh toán và tổng tiền. Khách chưa đăng nhập điền thông tin nhận hàng ở bước này.
@@ -109,7 +109,11 @@ Chọn **Cài đặt tài khoản** trong menu tài khoản trên header để m
 
 Thông tin nhận hàng cũ được chuyển thành địa chỉ đầu tiên khi mở sổ địa chỉ. Xoá địa chỉ mặc định sẽ chọn địa chỉ còn lại đầu tiên làm mặc định. Khi sổ trống, thêm địa chỉ nhận hàng để tiếp tục đặt hàng. Khi có lỗi phiên bản, đóng cửa sổ chỉnh sửa, bấm **Tải lại địa chỉ** rồi kiểm tra thông tin hiện tại.
 
-**Danh mục nổi bật** và menu **Khám phá sản phẩm** dùng chung danh sách do quản trị quản lý. Có sẵn **Kem đánh răng** và **Bàn chải đánh răng**. Trang bàn chải hiển thị sản phẩm đã được gán đúng danh mục. Khi danh mục chưa có sản phẩm, trang hiển thị thông báo đang cập nhật.
+**Danh mục nổi bật**, menu **Danh mục** và các thẻ trên trang danh mục dùng chung danh sách do quản trị quản lý. Thẻ hiển thị số sản phẩm đang bán thực tế của từng danh mục. Bấm tên danh mục để xem phần giới thiệu cùng các sản phẩm thuộc danh mục đó. Danh mục chưa có sản phẩm hiển thị thông báo đang cập nhật. Nút mũi tên giúp cuộn khi có nhiều danh mục.
+
+Bộ lọc trên trang danh mục được giữ trong URL khi tải lại hoặc chuyển danh mục. Các khoảng giá gồm dưới 50.000 ₫, từ 50.000 đến 100.000 ₫ và trên 100.000 ₫. **Mới nhất** sắp xếp theo mã sản phẩm mới được tạo. Thương hiệu lấy từ thông số **Thương hiệu** hoặc **Brand** trong trình chỉnh sửa sản phẩm của admin. Những sản phẩm chưa nhập thông số này vẫn xuất hiện khi chọn **Tất cả thương hiệu**.
+
+Menu ngang đã bỏ nút **Trang chủ**. Bấm logo cửa hàng hoặc liên kết trong breadcrumb để về trang chủ. Các đường dẫn cũ `/san-pham.html` và `/kem-danh-rang.html` tự chuyển sang giao diện danh mục mới, giữ từ khóa và các tham số lọc.
 
 Khách mua bằng thông tin nhận hàng nhập tại giỏ có thể điền thêm email để nhận thông báo. Tồn kho trên máy chủ được trừ khi đơn hàng được tạo thành công.
 
@@ -152,7 +156,7 @@ Tin nhắn tự cập nhật mỗi **10 giây** khi đang xem mục này. Bấm 
 
 ### Danh mục
 
-Mở **Danh mục** trong quản trị để thêm hoặc chỉnh sửa tên, đường dẫn không dấu, mô tả, ảnh, thứ tự và trạng thái hiển thị. Số thứ tự nhỏ xuất hiện trước. Các danh mục đang hiển thị xuất hiện đồng thời ở trang chủ và menu **Khám phá sản phẩm** sau khi tải lại trang cửa hàng.
+Mở **Danh mục** trong quản trị để thêm hoặc chỉnh sửa tên, đường dẫn không dấu, mô tả, ảnh, thứ tự và trạng thái hiển thị. Số thứ tự nhỏ xuất hiện trước. Mô tả hiện ở đầu trang của danh mục đó. Các danh mục được bật xuất hiện đồng thời ở trang chủ, trang danh mục và menu **Danh mục** sau khi tải lại trang cửa hàng. Gán sản phẩm vào danh mục trong trình chỉnh sửa sản phẩm để đưa sản phẩm vào đúng trang.
 
 Dùng **Chọn ảnh từ máy tính** rồi **Tải ảnh lên**, hoặc nhập đường dẫn ảnh có sẵn. Bấm **Thêm danh mục** hoặc **Lưu danh mục** để áp dụng. Danh mục có sản phẩm cần chuyển các sản phẩm sang danh mục khác trước khi xóa. Danh mục mặc định dành cho sản phẩm cũ có thể ẩn. Khi có thông báo phiên bản đã thay đổi, bấm **Tải lại danh mục** trước khi lưu tiếp.
 
@@ -303,7 +307,8 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Điều hướng chung tài khoản, giỏ hàng và đơn hàng | [account-workspace.js](backend/public/account-workspace.js), [account-workspace.css](backend/public/account-workspace.css) |
 | Giỏ hàng và bước xác nhận mua hàng | [account-cart.html](backend/public/account-cart.html), [account-cart.css](backend/public/account-cart.css), [app.js](backend/public/app.js) |
 | Lịch sử đơn hàng và tiến trình xử lý | [account-orders.html](backend/public/account-orders.html), [order-history.js](backend/public/order-history.js), [account-orders.css](backend/public/account-orders.css) |
-| Danh mục nổi bật, menu danh mục và trang sản phẩm chung | [catalog-categories.js](backend/public/catalog-categories.js), [catalog-categories.css](backend/public/catalog-categories.css), [san-pham.html](backend/public/san-pham.html) |
+| Trang danh mục và sản phẩm theo danh mục | [danh-muc.html](backend/public/danh-muc.html), [catalog-page.css](backend/public/catalog-page.css), [catalog-page.js](backend/public/catalog-page.js) |
+| Danh mục nổi bật, menu và dữ liệu danh mục dùng chung | [catalog-categories.js](backend/public/catalog-categories.js), [catalog-categories.css](backend/public/catalog-categories.css) |
 | Quản lý danh mục trong trang admin | [admin-categories.js](backend/public/admin-categories.js), [admin-categories.css](backend/public/admin-categories.css) |
 | Ảnh logo dùng chung | [shop-logo.png](backend/public/assets/shop-logo.png) |
 | Danh mục sản phẩm, giỏ hàng và đặt hàng | [app.js](backend/public/app.js) |
@@ -316,7 +321,7 @@ Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải 
 
 Ảnh [danh mục bàn chải](backend/public/assets/category-toothbrush.png) được tạo bằng công cụ imagegen tích hợp. [Prompt tạo ảnh](backend/public/assets/category-toothbrush.prompt.txt) được lưu cùng ảnh để có thể tạo lại theo cùng phong cách.
 
-Trên điện thoại, header sắp xếp logo, tài khoản, giỏ hàng và nút đổi giao diện ở hàng đầu. Ô tìm kiếm nằm ở hàng riêng, tiếp theo là menu gồm **Trang chủ** và **Sản phẩm**. Mặt trăng/mặt trời đổi giao diện sáng/tối.
+Trên điện thoại, header sắp xếp logo, tài khoản, giỏ hàng và nút đổi giao diện ở hàng đầu. Ô tìm kiếm nằm ở hàng riêng, tiếp theo là nút **Danh mục** với biểu tượng menu và mũi tên. Bấm chữ để mở trang danh mục, bấm mũi tên để chọn nhanh một danh mục. Mặt trăng/mặt trời đổi giao diện sáng/tối.
 
 Liên kết **Tra cứu đơn hàng** trên hàng thao tác của header và **Đơn hàng của tôi** trên thanh menu ngang đang được tạm ẩn. Có thể mở **Đơn hàng** trong menu tài khoản hoặc thanh bên, và mở **Tra cứu đơn hàng** từ cuối trang.
 

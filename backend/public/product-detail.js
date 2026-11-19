@@ -172,9 +172,8 @@
     get("detail-category-crumb").hidden = !hasCategory;
     if (hasCategory) {
       categoryLink.textContent = product.categoryName;
-      categoryLink.href = product.categoryId === 1 ? "/kem-danh-rang.html"
-        : typeof product.categorySlug === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(product.categorySlug)
-          ? "/san-pham.html?danh-muc=" + encodeURIComponent(product.categorySlug) : "/san-pham.html";
+      categoryLink.href = typeof product.categorySlug === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(product.categorySlug)
+        ? "/danh-muc.html?danh-muc=" + encodeURIComponent(product.categorySlug) : "/danh-muc.html";
     }
     document.title = product.name + " — Cửa hàng kem đánh răng";
     document.querySelector('meta[name="description"]').content =

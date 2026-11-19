@@ -30,7 +30,7 @@
           <img src="/assets/shop-logo.png" width="48" height="48" alt="">
           <span class="header-brand-name">Kem đánh răng</span>
         </a>
-        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/san-pham.html#catalog" method="get">
+        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/danh-muc.html#catalog" method="get">
           <label class="visually-hidden" for="header-search-input">Tìm sản phẩm</label>
           <input id="header-search-input" data-header-search-input name="q" type="search" autocomplete="off" placeholder="Tìm tên hoặc mô tả sản phẩm...">
           <button class="header-search-button" type="submit">
@@ -63,15 +63,14 @@
       </div>
       <nav class="catalog-nav" aria-label="Điều hướng cửa hàng">
         <div class="catalog-nav-inner">
-          <a class="catalog-nav-link" href="/" aria-current="page">Trang chủ</a>
           <div class="catalog-nav-products" data-products-menu>
-            <a class="catalog-nav-link" data-products-link href="#catalog"><span class="catalog-label-desktop">Khám phá sản phẩm</span><span class="catalog-label-mobile" aria-hidden="true">Sản phẩm</span></a>
-            <button class="catalog-nav-toggle" type="button" data-products-toggle aria-expanded="false" aria-controls="products-menu" aria-label="Các lựa chọn sản phẩm">
+            <a class="catalog-nav-link" data-products-link href="/danh-muc.html"><svg class="catalog-nav-category-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Danh mục</span></a>
+            <button class="catalog-nav-toggle" type="button" data-products-toggle aria-expanded="false" aria-controls="products-menu" aria-label="Mở danh sách danh mục">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <ul class="catalog-nav-menu" id="products-menu" hidden>
-              <li><a href="/kem-danh-rang.html">Kem đánh răng</a></li>
-              <li><a href="/san-pham.html?danh-muc=ban-chai-danh-rang">Bàn chải đánh răng</a></li>
+              <li><a href="/danh-muc.html?danh-muc=kem-danh-rang">Kem đánh răng</a></li>
+              <li><a href="/danh-muc.html?danh-muc=ban-chai-danh-rang">Bàn chải đánh răng</a></li>
             </ul>
           </div>
           <a class="catalog-nav-link" href="/dang-nhap.html?view=orders" data-temporary-hidden="my-orders" hidden><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>
@@ -85,7 +84,7 @@
             <h1 id="hero-title">Chọn kem đánh răng cho mỗi ngày.</h1>
             <p id="hero-description">Xem sản phẩm, chọn số lượng và thanh toán khi nhận hàng.</p>
             <div class="hero-actions">
-              <a id="hero-link" class="button-link" href="#catalog">Khám phá sản phẩm</a>
+              <a id="hero-link" class="button-link" href="/danh-muc.html">Danh mục</a>
               <a class="button-link button-secondary cart-navigation" href="/dang-nhap.html?view=cart">Xem giỏ hàng</a>
             </div>
           </div>
@@ -115,7 +114,7 @@
           <h2 id="catalog-title" tabindex="-1">Danh mục nổi bật</h2>
         </div>
         <div class="featured-category-grid" data-featured-categories aria-busy="true">
-          <a class="featured-category-card" href="/kem-danh-rang.html">
+          <a class="featured-category-card" href="/danh-muc.html?danh-muc=kem-danh-rang">
             <div class="featured-category-photo">
               <img src="/kem-danh-rang.jpg" width="448" height="640" alt="" loading="lazy" decoding="async">
             </div>
@@ -124,7 +123,7 @@
               <span class="featured-category-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></span>
             </div>
           </a>
-          <a class="featured-category-card" href="/san-pham.html?danh-muc=ban-chai-danh-rang">
+          <a class="featured-category-card" href="/danh-muc.html?danh-muc=ban-chai-danh-rang">
             <div class="featured-category-photo">
               <img src="/assets/category-toothbrush.png" width="1254" height="1254" alt="" loading="lazy" decoding="async">
             </div>
@@ -140,7 +139,7 @@
       <section id="featured-products" class="featured-products-section" aria-labelledby="featured-products-title">
         <div class="section-heading">
           <h2 id="featured-products-title" tabindex="-1">Sản phẩm nổi bật</h2>
-          <a class="section-view-all" href="/san-pham.html">Xem tất cả sản phẩm <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a>
+          <a class="section-view-all" href="/danh-muc.html">Xem tất cả sản phẩm <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a>
         </div>
         <p id="product-message" role="status" aria-atomic="true"></p>
         <div id="featured-product-list" class="product-grid" aria-busy="true"></div>
@@ -203,7 +202,7 @@
           <h2 id="footer-shop-title">Mua sắm</h2>
           <nav aria-label="Mua sắm cuối trang">
             <a href="/">Trang chủ</a>
-            <a href="/kem-danh-rang.html">Kem đánh răng</a>
+            <a href="/danh-muc.html?danh-muc=kem-danh-rang">Kem đánh răng</a>
             <a class="cart-navigation" href="/dang-nhap.html?view=cart">Giỏ hàng</a>
           </nav>
         </section>
