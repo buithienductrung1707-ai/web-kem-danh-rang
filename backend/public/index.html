@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="account-header.css">
     <link rel="stylesheet" href="cart-feedback.css">
     <link rel="stylesheet" href="favorite-buttons.css">
+    <link rel="stylesheet" href="home-sections.css">
     <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
     <script src="cart-feedback.js" defer></script>
@@ -110,9 +111,15 @@
         <button id="hero-banner-retry" type="button" class="button-secondary" hidden>Tải lại quảng cáo</button>
       </div>
 
-      <section id="catalog" class="featured-categories" aria-labelledby="catalog-title">
-        <div class="section-heading">
-          <h2 id="catalog-title" tabindex="-1">Danh mục nổi bật</h2>
+      <section id="catalog" class="featured-categories home-panel home-panel--categories" aria-labelledby="catalog-title">
+        <div class="section-heading home-panel-heading">
+          <div class="home-panel-title">
+            <span class="home-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></span>
+            <div>
+              <h2 id="catalog-title" tabindex="-1">Danh mục nổi bật</h2>
+              <p class="home-panel-subtitle">Khám phá theo nhu cầu chăm sóc răng miệng.</p>
+            </div>
+          </div>
         </div>
         <div class="featured-category-grid" data-featured-categories aria-busy="true">
           <a class="featured-category-card" href="/danh-muc.html?danh-muc=kem-danh-rang">
@@ -137,9 +144,15 @@
         <p id="categories-status" role="status" aria-atomic="true"></p>
         <button id="categories-retry" type="button" class="button-secondary" hidden>Tải lại danh mục</button>
       </section>
-      <section id="featured-products" class="featured-products-section" aria-labelledby="featured-products-title">
-        <div class="section-heading">
-          <h2 id="featured-products-title" tabindex="-1">Sản phẩm nổi bật</h2>
+      <section id="featured-products" class="featured-products-section home-panel home-panel--products" aria-labelledby="featured-products-title">
+        <div class="section-heading home-panel-heading">
+          <div class="home-panel-title">
+            <span class="home-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></span>
+            <div>
+              <h2 id="featured-products-title" tabindex="-1">Sản phẩm nổi bật</h2>
+              <p class="home-panel-subtitle">Xem nhanh sản phẩm và thêm vào giỏ hàng.</p>
+            </div>
+          </div>
           <a class="section-view-all" href="/danh-muc.html">Xem tất cả sản phẩm <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a>
         </div>
         <p id="product-message" role="status" aria-atomic="true"></p>
@@ -154,9 +167,15 @@
         <p id="pending-order-message" role="status" aria-atomic="true"></p>
         <a id="pending-cart-link" class="navigation-link cart-navigation" href="/dang-nhap.html?view=cart" hidden>Đi đến giỏ hàng</a>
       </div>
-      <section class="shopping-faq" aria-labelledby="shopping-faq-title">
-        <div class="faq-heading">
-          <h2 id="shopping-faq-title">Bạn cần biết trước khi mua</h2>
+      <section class="shopping-faq home-panel home-panel--help" aria-labelledby="shopping-faq-title">
+        <div class="faq-heading home-panel-heading">
+          <div class="home-panel-title">
+            <span class="home-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-2 2V11.5A8.5 8.5 0 0 1 10.5 3h2a8.5 8.5 0 0 1 8.5 8.5Z"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4m0 3h.01"/></svg></span>
+            <div>
+              <h2 id="shopping-faq-title">Bạn cần biết trước khi mua</h2>
+              <p class="home-panel-subtitle">Thông tin đặt hàng, thanh toán và theo dõi đơn.</p>
+            </div>
+          </div>
           <a href="/tra-cuu.html">Tra cứu đơn hàng <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m7 17 10-10M7 7h10v10"/></svg></a>
         </div>
         <div class="faq-list">

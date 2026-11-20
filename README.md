@@ -125,6 +125,8 @@ Thông tin nhận hàng cũ được chuyển thành địa chỉ đầu tiên k
 
 Bộ lọc trên trang danh mục được giữ trong URL khi tải lại hoặc chuyển danh mục. Các khoảng giá gồm dưới 50.000 ₫, từ 50.000 đến 100.000 ₫ và trên 100.000 ₫. **Mới nhất** sắp xếp theo mã sản phẩm mới được tạo. Thương hiệu lấy từ thông số **Thương hiệu** hoặc **Brand** trong trình chỉnh sửa sản phẩm của admin. Những sản phẩm chưa nhập thông số này vẫn xuất hiện khi chọn **Tất cả thương hiệu**.
 
+Hai lựa chọn **Còn hàng** và **Yêu thích** nằm cạnh nhau dưới hàng tìm kiếm và sắp xếp. Dùng **Xóa bộ lọc** để trở về toàn bộ sản phẩm.
+
 Menu ngang đã bỏ nút **Trang chủ**. Bấm logo cửa hàng hoặc liên kết trong breadcrumb để về trang chủ. Các đường dẫn cũ `/san-pham.html` và `/kem-danh-rang.html` tự chuyển sang giao diện danh mục mới, giữ từ khóa và các tham số lọc.
 
 Khách mua bằng thông tin nhận hàng nhập tại giỏ có thể điền thêm email để nhận thông báo. Tồn kho trên máy chủ được trừ khi đơn hàng được tạo thành công.
@@ -336,6 +338,8 @@ Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải 
 Ảnh [danh mục bàn chải](backend/public/assets/category-toothbrush.png) được tạo bằng công cụ imagegen tích hợp. [Prompt tạo ảnh](backend/public/assets/category-toothbrush.prompt.txt) được lưu cùng ảnh để có thể tạo lại theo cùng phong cách.
 
 Header dùng nền xanh ngọc đậm, viền sáng và bóng đổ để tách khỏi nền trang trong cả chế độ sáng và tối. Thanh menu có nền xanh đậm riêng, cùng bo góc với header.
+
+Trên trang chủ, quảng cáo, **Danh mục nổi bật**, **Sản phẩm nổi bật** và phần hỏi đáp được phân thành các khung bo góc. Mỗi mục có nền, viền màu và tiêu đề riêng. Màu sắc tự điều chỉnh theo chế độ sáng/tối. Kiểu trình bày này được giới hạn ở trang chủ trong [home-sections.css](backend/public/home-sections.css).
 
 Trên điện thoại, header sắp xếp logo, tài khoản, giỏ hàng và nút đổi giao diện ở hàng đầu. Ô tìm kiếm nằm ở hàng riêng, tiếp theo là nút **Danh mục** với biểu tượng menu và mũi tên. Bấm chữ để mở trang danh mục, bấm mũi tên để chọn nhanh một danh mục. Mặt trăng/mặt trời đổi giao diện sáng/tối.
 

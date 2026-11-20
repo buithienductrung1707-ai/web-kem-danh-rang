@@ -160,16 +160,16 @@
               <svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
             </div>
           </div>
-          <label class="catalog-stock-filter" for="available-only">
-            <input id="available-only" type="checkbox">Còn hàng
-          </label>
         </form>
 
         <div class="catalog-page-secondary-controls">
-          <label class="catalog-favorite-filter" for="favorites-only"><input id="favorites-only" type="checkbox">Chỉ xem yêu thích</label>
+          <fieldset class="catalog-toggle-filters">
+            <legend class="visually-hidden">Lọc theo tình trạng và yêu thích</legend>
+            <label class="catalog-stock-filter" for="available-only"><input id="available-only" type="checkbox">Còn hàng</label>
+            <label class="catalog-favorite-filter" for="favorites-only"><input id="favorites-only" type="checkbox">Yêu thích</label>
+          </fieldset>
           <div class="catalog-page-actions">
             <button id="clear-catalog-filters" type="button" class="button-secondary">Xóa bộ lọc</button>
-            <button type="button" id="reload-catalog" class="button-secondary">Tải lại sản phẩm</button>
           </div>
         </div>
 

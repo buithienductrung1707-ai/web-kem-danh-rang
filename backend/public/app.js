@@ -1780,6 +1780,7 @@ async function loadCatalog() {
   } catch {
     if (!storefrontActive || orderPending || isSubmitting) return;
     if (checkoutForm) productMessage.textContent = "Tải sản phẩm gặp lỗi. Kiểm tra máy chủ rồi bấm Cập nhật sản phẩm.";
+    else if (catalogPage) productMessage.textContent = "Tải sản phẩm gặp lỗi. Kiểm tra kết nối rồi tải lại trang để thử lại.";
     else if (productList || featuredProductList) productMessage.textContent = "Tải sản phẩm gặp lỗi. Kiểm tra máy chủ rồi bấm Tải lại sản phẩm.";
     else {
       const queuedReorder = window.ShopMemory?.readReorder?.();
