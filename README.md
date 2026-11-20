@@ -339,7 +339,7 @@ Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải 
 
 Header dùng nền xanh ngọc đậm, viền sáng và bóng đổ để tách khỏi nền trang trong cả chế độ sáng và tối. Thanh menu có nền xanh đậm riêng, cùng bo góc với header.
 
-Trang chủ mở đầu bằng dòng chữ lớn **Kem đánh răng số 1 tại Mỹ**, với **số 1** được tô nền vàng bo góc. Dòng này luôn hiển thị độc lập với quảng cáo do admin quản lý. Các mục bên dưới xen kẽ hai nền sáng và xanh nhạt, tự điều chỉnh theo chế độ sáng/tối. Quảng cáo, **Danh mục nổi bật**, **Sản phẩm nổi bật** và phần hỏi đáp giữ khung bo góc; tiêu đề được tăng cỡ chữ và dùng màu xanh ngọc hoặc xanh dương. Kiểu trình bày này được giới hạn ở trang chủ trong [home-sections.css](backend/public/home-sections.css).
+Trang chủ mở đầu bằng dòng chữ lớn **Kem đánh răng số 1 tại Mỹ**, với **số 1** được tô nền vàng bo góc. Dòng này luôn hiển thị độc lập với quảng cáo do admin quản lý. Giữa các mục có đường kẻ ngang mảnh và khoảng cách thoáng; hai nền sáng/xanh xen kẽ chỉ chênh nhẹ, tự điều chỉnh theo chế độ sáng/tối. Các thẻ danh mục và sản phẩm giữ bo góc. Tiêu đề lớn màu xanh ngọc hoặc xanh dương dùng nét chữ vừa phải và khoảng cách chữ dễ đọc, ưu tiên font hệ thống để không cần tải font ngoài. Kiểu trình bày này được giới hạn ở trang chủ trong [home-sections.css](backend/public/home-sections.css).
 
 Trên điện thoại, header sắp xếp logo, tài khoản, giỏ hàng và nút đổi giao diện ở hàng đầu. Ô tìm kiếm nằm ở hàng riêng, tiếp theo là nút **Danh mục** với biểu tượng menu và mũi tên. Bấm chữ để mở trang danh mục, bấm mũi tên để chọn nhanh một danh mục. Mặt trăng/mặt trời đổi giao diện sáng/tối.
 

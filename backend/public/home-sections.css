@@ -1,7 +1,8 @@
 @media screen {
   .home-page {
     --home-band-plain: var(--surface);
-    --home-band-tinted: color-mix(in srgb, var(--primary) 14%, var(--surface));
+    --home-band-tinted: color-mix(in srgb, var(--primary) 5%, var(--surface));
+    --home-heading-font: "Segoe UI Variable Display", "Segoe UI Variable", "Inter", "Segoe UI", system-ui, sans-serif;
     --home-highlight-background: #f9ff79;
     --home-highlight-text: #173f32;
   }
@@ -14,11 +15,22 @@
     --home-section-background: var(--home-band-tinted);
   }
 
+  .home-page .home-section-divider {
+    width: 100%;
+    height: 0;
+    margin: clamp(32px, 4vw, 56px) 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .home-page .storefront:has(> #hero-carousel[hidden]) > .home-section-divider--hero {
+    display: none;
+  }
+
   .home-page .home-intro {
     min-width: 0;
-    margin: 0 0 40px;
+    margin: 0;
     padding: clamp(28px, 5vw, 64px) clamp(20px, 4vw, 52px);
-    border-radius: 28px;
     background: var(--home-section-background);
   }
 
@@ -26,10 +38,11 @@
     max-width: 15ch;
     margin: 0;
     color: var(--primary-dark);
-    font-size: clamp(40px, 7.2vw, 104px);
-    font-weight: 800;
-    line-height: 1.12;
-    letter-spacing: -0.055em;
+    font-family: var(--home-heading-font);
+    font-size: clamp(40px, 6.8vw, 96px);
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -0.035em;
     text-wrap: balance;
     overflow-wrap: anywhere;
   }
@@ -45,33 +58,31 @@
   }
 
   .home-page .hero.hero-carousel {
-    border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--line));
-    border-top-width: 3px;
+    border: 1px solid var(--line);
     background: var(--home-section-background);
-    box-shadow: var(--shadow), 0 0 0 4px color-mix(in srgb, var(--primary) 8%, transparent);
+    box-shadow: var(--shadow);
   }
 
   .home-page .hero-copy #hero-title {
     margin: 0 0 24px;
     color: var(--primary-dark);
     font-size: clamp(32px, 4.3vw, 54px);
-    font-weight: 750;
-    line-height: 1.15;
-    letter-spacing: -0.04em;
+    font-family: var(--home-heading-font);
+    font-weight: 600;
+    line-height: 1.22;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
 
   .home-page .home-panel {
     --home-section-accent: var(--primary);
-    --home-panel-radius: 28px;
     min-width: 0;
-    margin-top: 48px;
+    margin: 0;
     padding: 0;
-    border: 1px solid color-mix(in srgb, var(--home-section-accent) 38%, var(--line));
-    border-top: 3px solid var(--home-section-accent);
-    border-radius: var(--home-panel-radius);
+    border: 0;
+    border-radius: 0;
     background: var(--home-section-background, var(--surface));
-    box-shadow: var(--shadow);
+    box-shadow: none;
   }
 
   .home-page .home-panel--products {
@@ -93,8 +104,8 @@
     gap: 18px;
     margin: 0;
     padding: 32px 28px;
-    border-bottom: 1px solid color-mix(in srgb, var(--home-section-accent) 25%, var(--line));
-    border-radius: calc(var(--home-panel-radius) - 1px) calc(var(--home-panel-radius) - 1px) 0 0;
+    border: 0;
+    border-radius: 0;
     background: transparent;
   }
 
@@ -130,10 +141,11 @@
   .home-page .home-panel-heading h2 {
     margin: 0;
     color: var(--home-heading-color, var(--primary-dark));
-    font-size: clamp(30px, 4.2vw, 52px);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.04em;
+    font-family: var(--home-heading-font);
+    font-size: clamp(30px, 3.6vw, 48px);
+    font-weight: 600;
+    line-height: 1.22;
+    letter-spacing: -0.025em;
     overflow-wrap: anywhere;
   }
 
@@ -201,14 +213,8 @@
 }
 
 @media screen and (max-width: 650px) {
-  .home-page .home-intro {
-    margin-bottom: 28px;
-    border-radius: 22px;
-  }
-
-  .home-page .home-panel {
-    --home-panel-radius: 22px;
-    margin-top: 28px;
+  .home-page .home-section-divider {
+    margin-block: 28px;
   }
 
   .home-page .home-panel-heading {
