@@ -151,23 +151,25 @@
               <svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
             </div>
           </div>
-          <div class="catalog-filter-field">
-            <label for="brand-filter">Thương hiệu</label>
-            <div class="catalog-filter-select-control">
-              <select id="brand-filter" name="brand">
-                <option value="all">Tất cả thương hiệu</option>
-              </select>
-              <svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+          <div class="catalog-brand-options">
+            <div class="catalog-filter-field">
+              <label for="brand-filter">Thương hiệu</label>
+              <div class="catalog-filter-select-control">
+                <select id="brand-filter" name="brand">
+                  <option value="all">Tất cả thương hiệu</option>
+                </select>
+                <svg class="catalog-page-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+              </div>
             </div>
+            <fieldset class="catalog-toggle-filters">
+              <legend class="visually-hidden">Lọc theo tình trạng và yêu thích</legend>
+              <label class="catalog-stock-filter" for="available-only"><input id="available-only" type="checkbox">Còn hàng</label>
+              <label class="catalog-favorite-filter" for="favorites-only"><input id="favorites-only" type="checkbox">Yêu thích</label>
+            </fieldset>
           </div>
         </form>
 
         <div class="catalog-page-secondary-controls">
-          <fieldset class="catalog-toggle-filters">
-            <legend class="visually-hidden">Lọc theo tình trạng và yêu thích</legend>
-            <label class="catalog-stock-filter" for="available-only"><input id="available-only" type="checkbox">Còn hàng</label>
-            <label class="catalog-favorite-filter" for="favorites-only"><input id="favorites-only" type="checkbox">Yêu thích</label>
-          </fieldset>
           <div class="catalog-page-actions">
             <button id="clear-catalog-filters" type="button" class="button-secondary">Xóa bộ lọc</button>
           </div>
