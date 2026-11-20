@@ -2550,20 +2550,21 @@ button.button-danger:disabled:hover {
 
 @media screen {
   body:is(.storefront-page, .cart-page, .tracking-page, .account-page) > .site-header.commerce-header {
-    --header-background: linear-gradient(115deg, rgba(8, 32, 27, 0.7), rgba(10, 38, 31, 0.7));
+    --header-background: linear-gradient(115deg, rgba(9, 85, 77, 0.96), rgba(18, 110, 88, 0.96));
+    --header-nav-background: rgba(4, 42, 36, 0.38);
     --header-search-background: #f3fbf5;
     --header-bubble-color: #e3fff1;
-    --surface: #10382f;
+    --surface: #104d42;
     --text: #f1fbf4;
     --muted: #eff8f2;
     --primary: #9fe2c0;
     --primary-dark: #c6f3d8;
     --button-text: #12392e;
-    --soft: #275d4c;
-    --accent: #346c54;
-    --line: rgba(159, 226, 192, 0.32);
+    --soft: #21634f;
+    --accent: #367c62;
+    --line: rgba(168, 236, 205, 0.46);
     --control-border: #a8d9ba;
-    --shadow: 0 10px 28px rgba(10, 50, 36, 0.18);
+    --shadow: 0 14px 36px rgba(2, 39, 32, 0.2), 0 2px 8px rgba(2, 39, 32, 0.1);
     --header-search-accent: var(--primary);
     --header-search-hover: var(--primary-dark);
     top: 12px;
@@ -2575,9 +2576,17 @@ button.button-danger:disabled:hover {
     overflow: visible;
     background: var(--header-background);
     background-clip: padding-box;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow), inset 0 1px 0 rgba(227, 255, 241, 0.18);
     -webkit-backdrop-filter: blur(14px) saturate(125%);
     backdrop-filter: blur(14px) saturate(125%);
+  }
+
+  html[data-theme="dark"] body:is(.storefront-page, .cart-page, .tracking-page, .account-page) > .site-header.commerce-header {
+    --header-background: linear-gradient(115deg, rgba(21, 96, 84, 0.96), rgba(32, 119, 98, 0.96));
+    --header-nav-background: rgba(3, 33, 29, 0.4);
+    --surface: #155545;
+    --line: rgba(146, 232, 199, 0.64);
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.32), 0 3px 10px rgba(0, 0, 0, 0.2);
   }
 
   .commerce-header > .header-bubbles {
@@ -2922,7 +2931,7 @@ button.button-danger:disabled:hover {
 
 @media screen and (prefers-reduced-transparency: reduce) {
   body:is(.storefront-page, .cart-page, .tracking-page, .account-page) > .site-header.commerce-header {
-    background: linear-gradient(115deg, #123f36, #14463a);
+    background: linear-gradient(115deg, #09554d, #126e58);
     background-clip: padding-box;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -3385,7 +3394,7 @@ button.button-danger:disabled:hover {
     border: 0;
     border-top: 1px solid var(--line);
     border-radius: 0 0 26px 26px;
-    background: transparent;
+    background: var(--header-nav-background, transparent);
   }
 
   .catalog-nav-inner {

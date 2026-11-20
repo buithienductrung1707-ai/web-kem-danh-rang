@@ -335,6 +335,8 @@ Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải 
 
 Ảnh [danh mục bàn chải](backend/public/assets/category-toothbrush.png) được tạo bằng công cụ imagegen tích hợp. [Prompt tạo ảnh](backend/public/assets/category-toothbrush.prompt.txt) được lưu cùng ảnh để có thể tạo lại theo cùng phong cách.
 
+Header dùng nền xanh ngọc đậm, viền sáng và bóng đổ để tách khỏi nền trang trong cả chế độ sáng và tối. Thanh menu có nền xanh đậm riêng, cùng bo góc với header.
+
 Trên điện thoại, header sắp xếp logo, tài khoản, giỏ hàng và nút đổi giao diện ở hàng đầu. Ô tìm kiếm nằm ở hàng riêng, tiếp theo là nút **Danh mục** với biểu tượng menu và mũi tên. Bấm chữ để mở trang danh mục, bấm mũi tên để chọn nhanh một danh mục. Mặt trăng/mặt trời đổi giao diện sáng/tối.
 
 Liên kết **Tra cứu đơn hàng** trên hàng thao tác của header và **Đơn hàng của tôi** trên thanh menu ngang đang được tạm ẩn. Có thể mở **Đơn hàng** trong menu tài khoản hoặc thanh bên, và mở **Tra cứu đơn hàng** từ cuối trang.
