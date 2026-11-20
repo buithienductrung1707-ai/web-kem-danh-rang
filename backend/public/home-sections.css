@@ -248,10 +248,44 @@
     --home-heading-color: var(--primary-dark);
   }
 
-  .home-page .home-panel--help {
+  .home-page .shopping-faq.home-panel--help {
     --home-section-accent: var(--primary-dark);
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+    align-items: start;
+    gap: clamp(40px, 6vw, 96px);
+    padding: clamp(20px, 3vw, 40px) 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .home-page .shopping-faq .faq-heading h2 {
+    margin: 0;
+    color: var(--text);
+    font-family: var(--home-heading-font);
+    font-size: clamp(34px, 4vw, 54px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -.04em;
+  }
+
+  .home-page .shopping-faq .faq-heading h2 span {
+    display: block;
+  }
+
+  .home-page .shopping-faq .faq-heading p {
+    max-width: 32ch;
+    margin: 20px 0 0;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1.65;
+  }
+
+  .home-page .shopping-faq .faq-heading a {
+    color: var(--primary-dark);
+    font-weight: 650;
+    overflow-wrap: anywhere;
   }
 
   .home-page .home-panel-heading {
@@ -570,16 +604,68 @@
   }
 
   .home-page .faq-list details {
-    margin-top: 12px;
-    padding: 0 18px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--surface);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
   }
 
-  .home-page .faq-list details[open] {
-    border-color: color-mix(in srgb, var(--home-section-accent) 55%, var(--line));
-    background: color-mix(in srgb, var(--home-section-accent) 4%, var(--surface));
+  .home-page .faq-list details:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .home-page .faq-list summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 78px;
+    padding: 20px 10px;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 650;
+    line-height: 1.5;
+  }
+
+  .home-page .faq-list summary::after {
+    position: static;
+    display: grid;
+    flex: 0 0 36px;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--soft);
+    color: var(--text);
+    font-size: 22px;
+    line-height: 1;
+    content: "+";
+  }
+
+  .home-page .faq-list details[open] > summary::after {
+    background: var(--primary);
+    color: var(--button-text);
+    content: "×";
+  }
+
+  .home-page .faq-list summary:hover {
+    color: var(--primary-dark);
+  }
+
+  .home-page .faq-list summary:focus-visible {
+    border-radius: 4px;
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+  }
+
+  .home-page .faq-list details > p {
+    margin: 0;
+    padding: 0 54px 24px 10px;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.75;
   }
 }
 
@@ -634,6 +720,14 @@
 @media screen and (max-width: 1100px) {
   .home-page .hero.hero-carousel {
     --home-hero-gutter: 16px;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .home-page .shopping-faq.home-panel--help {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    padding: 0;
   }
 }
 
@@ -716,7 +810,4 @@
     padding: 0;
   }
 
-  .home-page .faq-list details {
-    padding-inline: 14px;
-  }
 }
