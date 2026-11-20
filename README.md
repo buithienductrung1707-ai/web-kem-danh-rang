@@ -117,7 +117,9 @@ Chọn **Cài đặt tài khoản** trong menu tài khoản trên header để m
 - Trong tab **Thông tin tài khoản**, chỉnh **Họ**, **Tên**, **Số điện thoại** rồi bấm **Cập nhật**. Bấm **Hoàn tác** để đưa các ô nhập về thông tin đã lưu. Email dùng để đăng nhập được hiển thị ở chế độ chỉ xem.
 - Bấm **Thay đổi** ở ảnh đại diện để chọn JPG, PNG hoặc WebP. Ảnh đầu vào tối đa **20 MiB**, được cắt vuông ở giữa, thu về **512 × 512px** và nén trước khi tải lên. Bấm **Xoá ảnh** để dùng lại avatar chữ cái.
 - Tab **Thay đổi mật khẩu** yêu cầu mật khẩu hiện tại, mật khẩu mới và nhập lại mật khẩu mới. Đổi thành công sẽ tiếp tục phiên hiện tại và yêu cầu các phiên khác đăng nhập lại. Nếu máy chủ thông báo mật khẩu đã đổi nhưng phiên chưa lưu được, đăng nhập bằng mật khẩu mới.
-- **Sổ địa chỉ giao nhận** hỗ trợ tối đa **5 địa chỉ**, gồm người nhận, số điện thoại và địa chỉ. Dùng **Thêm địa chỉ**, **Chỉnh sửa**, **Xoá** hoặc **Đặt mặc định**. Thông tin người nhận được quản lý riêng với họ tên và số điện thoại cá nhân.
+- **Sổ địa chỉ giao nhận** hỗ trợ tối đa **5 địa chỉ**, gồm người nhận, số điện thoại và địa chỉ. Địa chỉ đầu tiên tự động được đặt làm mặc định. Thẻ mặc định có viền và nhãn đỏ; tên, điện thoại nằm ở đầu thẻ, địa chỉ và các nút **Đặt mặc định**, **Sửa**, **Xoá** nằm bên dưới. Thông tin người nhận được quản lý riêng với họ tên và số điện thoại cá nhân.
+
+Các nút chính trong tài khoản (**Cập nhật**, **Thêm địa chỉ**, **Lưu địa chỉ**, **Cập nhật mật khẩu**) dùng nền chuyển đỏ–cam và chữ trắng. Nút **Đăng xuất** dùng màu đỏ. Phần hỏi đáp trên trang chủ đã bỏ nút tra cứu ở hàng tiêu đề; liên kết tra cứu vẫn có trong câu trả lời và cuối trang.
 
 Thông tin nhận hàng cũ được chuyển thành địa chỉ đầu tiên khi mở sổ địa chỉ. Xoá địa chỉ mặc định sẽ chọn địa chỉ còn lại đầu tiên làm mặc định. Khi sổ trống, thêm địa chỉ nhận hàng để tiếp tục đặt hàng. Khi có lỗi phiên bản, đóng cửa sổ chỉnh sửa, bấm **Tải lại địa chỉ** rồi kiểm tra thông tin hiện tại.
 

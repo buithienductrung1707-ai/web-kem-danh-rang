@@ -8,10 +8,20 @@
 }
 
 .account-dashboard {
+  --account-action-start: #d83243;
+  --account-action-end: #c45124;
+  --account-action-hover-start: #bd2437;
+  --account-action-hover-end: #a8411d;
+  --account-emphasis: #c5203b;
+  --account-danger-fill: #c5203b;
   display: grid;
   grid-template-columns: 264px minmax(0, 1fr);
   align-items: start;
   gap: 28px;
+}
+
+html[data-theme="dark"] .account-dashboard {
+  --account-emphasis: #ff7283;
 }
 
 .account-dashboard :is(.account-dashboard-content, .account-dashboard-sidebar, .field) {
@@ -157,9 +167,18 @@
 
 .account-dashboard-nav #account-logout {
   margin-top: 6px;
-  border-top: 1px solid var(--line);
-  border-radius: 0 0 14px 14px;
-  color: var(--muted);
+  border: 1px solid transparent;
+  border-radius: 14px;
+}
+
+.account-dashboard .account-dashboard-nav #account-logout {
+  background: var(--account-danger-fill);
+  color: #ffffff;
+}
+
+.account-dashboard .account-dashboard-nav #account-logout:hover:not(:disabled) {
+  background: #a71930;
+  color: #ffffff;
 }
 
 .dashboard-breadcrumb {
@@ -371,6 +390,26 @@
   transition: background-color .18s, color .18s, opacity .18s;
 }
 
+.account-dashboard button.dashboard-primary,
+.account-dashboard button.dashboard-primary:disabled:hover {
+  border-color: transparent;
+  border-radius: 999px;
+  background: linear-gradient(110deg, var(--account-action-start), var(--account-action-end));
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--account-action-start) 16%, transparent);
+}
+
+.account-dashboard button.dashboard-primary:hover:not(:disabled) {
+  background: linear-gradient(110deg, var(--account-action-hover-start), var(--account-action-hover-end));
+  color: #ffffff;
+}
+
+.account-dashboard :is(button.dashboard-primary, #account-logout):focus-visible {
+  outline: 3px solid var(--account-emphasis);
+  outline-offset: 3px;
+}
+
 .account-dashboard button.dashboard-secondary {
   border-color: var(--control-border);
   background: transparent;
@@ -410,67 +449,99 @@
 
 .dashboard-address-item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px 20px;
-  padding: 18px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
   border: 1px solid var(--line);
-  border-radius: 18px;
-  background: var(--background);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 60%, var(--background));
 }
 
 .dashboard-address-item.is-default {
-  border-color: var(--primary);
+  border-color: var(--account-emphasis);
+  background: color-mix(in srgb, var(--account-emphasis) 5%, var(--surface));
 }
 
-.dashboard-address-item h3 {
+.dashboard-address-heading {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 0 0 6px;
-  font-size: 16px;
+  gap: 6px 10px;
+  min-width: 0;
+}
+
+.dashboard-address-heading h3 {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
-.dashboard-address-item p {
-  margin: 4px 0;
+.dashboard-address-phone {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
+}
+
+.dashboard-address-item .dashboard-address-text {
+  margin: 8px 0 0;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
 }
 
 .dashboard-address-default-badge {
-  padding: 3px 8px;
-  border: 1px solid var(--primary);
-  border-radius: 8px;
-  color: var(--primary-dark);
-  font-size: 12px;
-  font-weight: 650;
+  padding: 2px 8px;
+  border: 1px solid var(--account-emphasis);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--account-emphasis) 7%, var(--surface));
+  color: var(--account-emphasis);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .04em;
+  line-height: 1.4;
+  text-transform: uppercase;
 }
 
 .dashboard-address-actions {
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 6px;
+  justify-content: flex-start;
+  gap: 8px;
 }
 
-.dashboard-address-actions button {
+.account-dashboard .dashboard-address-actions button {
   min-height: 44px;
-  padding: 8px 10px;
+  padding: 8px 14px;
   border: 1px solid var(--line);
   background: var(--surface);
-  color: var(--primary-dark);
+  color: var(--text);
   font-size: 13px;
 }
 
-.dashboard-address-actions button[data-action="delete"] {
-  color: var(--danger);
+.account-dashboard .dashboard-address-actions button:hover:not(:disabled) {
+  border-color: var(--control-border);
+  background: var(--soft);
+  color: var(--text);
 }
 
-.dashboard-address-actions button[data-action="default"] {
-  grid-column: 1 / -1;
+.account-dashboard .dashboard-address-actions button[data-action="delete"] {
+  color: var(--account-emphasis);
+}
+
+.account-dashboard .dashboard-address-actions button[data-action="delete"]:hover:not(:disabled) {
+  border-color: var(--account-emphasis);
+  background: color-mix(in srgb, var(--account-emphasis) 8%, var(--surface));
+  color: var(--account-emphasis);
 }
 
 .dashboard-empty {

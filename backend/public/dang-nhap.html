@@ -267,7 +267,7 @@
                       </div>
                     </div>
                     <div class="dashboard-form-actions">
-                      <button id="dashboard-save-profile" type="submit">Cập nhật</button>
+                      <button class="dashboard-primary" id="dashboard-save-profile" type="submit">Cập nhật</button>
                       <button class="dashboard-secondary" id="dashboard-reset-profile" type="button">Hoàn tác</button>
                     </div>
                     <p id="dashboard-profile-message" class="dashboard-message" role="status" aria-atomic="true"></p>
@@ -277,7 +277,7 @@
               <section class="dashboard-card dashboard-address-book" aria-labelledby="dashboard-address-title">
                 <header class="dashboard-card-heading">
                   <h2 id="dashboard-address-title">Sổ địa chỉ giao nhận</h2>
-                  <button class="dashboard-add-address" id="dashboard-add-address" type="button">
+                  <button class="dashboard-add-address dashboard-primary" id="dashboard-add-address" type="button">
                     <span aria-hidden="true">+</span>
                     Thêm địa chỉ
                   </button>
@@ -354,7 +354,7 @@
                     <input id="dashboard-show-password" type="checkbox">
                     Hiện mật khẩu
                   </label>
-                  <button id="dashboard-save-password" type="submit">Cập nhật mật khẩu</button>
+                  <button class="dashboard-primary" id="dashboard-save-password" type="submit">Cập nhật mật khẩu</button>
                   <p id="dashboard-password-message" class="dashboard-message" role="status" aria-atomic="true"></p>
                 </form>
               </div>
@@ -427,12 +427,13 @@
               <p id="dashboard-address-text-error" class="field-error" aria-live="polite"></p>
             </div>
             <label class="dashboard-checkbox" for="dashboard-address-default">
-              <input id="dashboard-address-default" name="isDefault" type="checkbox">
+              <input id="dashboard-address-default" name="isDefault" type="checkbox" aria-describedby="dashboard-address-default-help">
               Đặt làm địa chỉ mặc định
             </label>
+            <p id="dashboard-address-default-help" class="field-help">Địa chỉ đầu tiên sẽ tự động được đặt làm mặc định.</p>
             <p id="dashboard-address-form-message" class="dashboard-message" role="status" aria-atomic="true"></p>
             <div class="dashboard-form-actions">
-              <button id="dashboard-save-address" type="submit">Lưu địa chỉ</button>
+              <button class="dashboard-primary" id="dashboard-save-address" type="submit">Lưu địa chỉ</button>
               <button class="dashboard-secondary" id="dashboard-cancel-address" type="button">Huỷ</button>
             </div>
           </form>

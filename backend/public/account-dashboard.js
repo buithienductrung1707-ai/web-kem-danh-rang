@@ -284,7 +284,8 @@
   function renderAddresses() {
     const list = get("dashboard-addresses");
     list.replaceChildren();
-    get("dashboard-address-help").textContent = "Bạn có thể lưu tối đa 5 địa chỉ (" + addresses.length + "/5). Địa chỉ mặc định được dùng khi đặt hàng.";
+    get("dashboard-address-help").textContent = "Bạn có thể lưu tối đa 5 địa chỉ (" + addresses.length + "/5). " +
+      (addresses.length === 0 ? "Địa chỉ đầu tiên sẽ tự động được đặt làm mặc định." : "Địa chỉ mặc định được dùng khi đặt hàng.");
     if (!addresses.length) {
       const empty = document.createElement("p");
       empty.className = "dashboard-empty";
@@ -296,23 +297,28 @@
       item.className = "dashboard-address-item";
       item.classList.toggle("is-default", address.isDefault);
       const info = document.createElement("div");
+      const heading = document.createElement("div");
+      heading.className = "dashboard-address-heading";
       const title = document.createElement("h3");
       title.textContent = address.recipientName;
+      const phone = document.createElement("span");
+      phone.className = "dashboard-address-phone";
+      phone.textContent = address.phone;
+      heading.append(title, phone);
       if (address.isDefault) {
         const badge = document.createElement("span");
         badge.className = "dashboard-address-default-badge";
         badge.textContent = "Mặc định";
-        title.append(badge);
+        heading.append(badge);
       }
-      const phone = document.createElement("p");
-      phone.textContent = address.phone;
       const text = document.createElement("p");
+      text.className = "dashboard-address-text";
       text.textContent = address.address;
-      info.append(title, phone, text);
+      info.append(heading, text);
       const actions = document.createElement("div");
       actions.className = "dashboard-address-actions";
-      actions.append(addressButton("Chỉnh sửa", "edit", address), addressButton("Xoá", "delete", address));
       if (!address.isDefault) actions.append(addressButton("Đặt mặc định", "default", address));
+      actions.append(addressButton("Sửa", "edit", address), addressButton("Xoá", "delete", address));
       item.append(info, actions);
       list.append(item);
     }
