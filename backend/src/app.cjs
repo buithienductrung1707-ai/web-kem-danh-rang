@@ -31,8 +31,14 @@ const publicProductFields = `p.id, p.name, p.price, p.description, p.image_url A
     p.stock_tracked AS stockTracked, p.stock_quantity AS stockQuantity,
     p.category_id AS categoryId, c.slug AS categorySlug, c.name AS categoryName`;
 const productsQuery = db.prepare(`
-  SELECT ${publicProductFields}, p.specifications AS specificationsJson
+  SELECT ${publicProductFields}, p.specifications AS specificationsJson,
+    COALESCE(sales.soldCount, 0) AS soldCount
   FROM products p LEFT JOIN product_categories c ON c.id = p.category_id
+  LEFT JOIN (
+    SELECT i.product_id, SUM(i.quantity) AS soldCount
+    FROM orders o JOIN order_items i ON i.order_id = o.id
+    WHERE o.status = 'COMPLETED' GROUP BY i.product_id
+  ) sales ON sales.product_id = p.id
   WHERE p.active = 1
   ORDER BY p.id
 `);

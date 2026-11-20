@@ -80,15 +80,18 @@
       </nav>
     </header>
     <main id="main-content" class="storefront">
-      <section class="home-intro" data-home-band="plain" aria-labelledby="home-intro-title">
+      <div class="home-band" data-home-band="plain">
+      <section class="home-intro home-band-inner" aria-labelledby="home-intro-title">
         <h1 id="home-intro-title">Kem đánh răng <mark class="home-intro-highlight">số 1</mark> tại Mỹ</h1>
         <div class="home-intro-description">
           <p>Khám phá kem đánh răng và bàn chải phù hợp với nhu cầu chăm sóc răng miệng hằng ngày.</p>
           <p>Dễ dàng lựa chọn sản phẩm, đặt hàng và theo dõi đơn ngay trên website.</p>
         </div>
       </section>
+      </div>
       <hr class="home-section-divider home-section-divider--hero" aria-hidden="true">
-      <section id="hero-carousel" class="hero hero-carousel" data-home-band="tinted" aria-label="Quảng cáo cửa hàng" aria-roledescription="trình chiếu" tabindex="0">
+      <div class="home-band home-band--hero" data-home-band="tinted">
+      <section id="hero-carousel" class="hero hero-carousel home-band-inner" aria-label="Quảng cáo cửa hàng" aria-roledescription="trình chiếu" tabindex="0">
         <div id="hero-slide" class="hero-slide" role="group" aria-roledescription="trang chiếu" aria-label="Quảng cáo 1 trên 1">
           <div class="hero-copy">
             <h2 id="hero-title">Chọn kem đánh răng cho mỗi ngày.</h2>
@@ -114,19 +117,50 @@
         </div>
         <p id="hero-banner-status" class="visually-hidden" role="status" aria-atomic="true"></p>
       </section>
-      <div class="hero-banner-feedback">
+      <div class="hero-banner-feedback home-band-inner">
         <p id="hero-banner-message" role="status" aria-atomic="true"></p>
         <button id="hero-banner-retry" type="button" class="button-secondary" hidden>Tải lại quảng cáo</button>
       </div>
+      </div>
 
       <hr class="home-section-divider" aria-hidden="true">
-      <section id="catalog" class="featured-categories home-panel home-panel--categories" data-home-band="plain" aria-labelledby="catalog-title">
+      <div class="home-band" data-home-band="plain">
+      <section id="best-selling-products" class="home-band-inner home-panel home-panel--products" aria-labelledby="best-selling-title">
+        <div class="section-heading home-panel-heading">
+          <div class="home-panel-title"><div>
+            <h2 id="best-selling-title" tabindex="-1">Sản phẩm bán chạy</h2>
+            <p class="home-panel-subtitle">Những lựa chọn được khách hàng mua nhiều nhất.</p>
+          </div></div>
+          <a class="section-view-all" href="/danh-muc.html">Xem tất cả <span aria-hidden="true">→</span></a>
+        </div>
+        <div id="best-selling-product-list" class="product-grid" aria-busy="true"></div>
+        <p id="best-selling-message" role="status" aria-atomic="true"></p>
+        <button class="button-secondary" type="button" data-home-products-retry hidden>Thử tải lại sản phẩm</button>
+      </section>
+      </div>
+      <hr class="home-section-divider" aria-hidden="true">
+      <div class="home-band" data-home-band="tinted">
+      <section id="latest-products" class="home-band-inner home-panel home-panel--products" aria-labelledby="latest-products-title">
+        <div class="section-heading home-panel-heading">
+          <div class="home-panel-title"><div>
+            <h2 id="latest-products-title" tabindex="-1">Sản phẩm mới nhất</h2>
+            <p class="home-panel-subtitle">Cập nhật những sản phẩm vừa có mặt tại cửa hàng.</p>
+          </div></div>
+          <a class="section-view-all" href="/danh-muc.html?sort=default">Xem tất cả <span aria-hidden="true">→</span></a>
+        </div>
+        <div id="latest-product-list" class="product-grid" aria-busy="true"></div>
+        <p id="latest-products-message" role="status" aria-atomic="true"></p>
+        <button class="button-secondary" type="button" data-home-products-retry hidden>Thử tải lại sản phẩm</button>
+      </section>
+      </div>
+      <hr class="home-section-divider" aria-hidden="true">
+      <div class="home-band home-band--categories" data-home-band="accent">
+      <section id="catalog" class="featured-categories home-band-inner home-panel home-panel--categories" aria-labelledby="catalog-title">
         <div class="section-heading home-panel-heading">
           <div class="home-panel-title">
             <span class="home-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></span>
             <div>
               <h2 id="catalog-title" tabindex="-1">Danh mục nổi bật</h2>
-              <p class="home-panel-subtitle">Khám phá theo nhu cầu chăm sóc răng miệng.</p>
             </div>
           </div>
         </div>
@@ -153,8 +187,10 @@
         <p id="categories-status" role="status" aria-atomic="true"></p>
         <button id="categories-retry" type="button" class="button-secondary" hidden>Tải lại danh mục</button>
       </section>
+      </div>
       <hr class="home-section-divider" aria-hidden="true">
-      <section id="featured-products" class="featured-products-section home-panel home-panel--products" data-home-band="tinted" aria-labelledby="featured-products-title">
+      <div class="home-band" data-home-band="plain">
+      <section id="featured-products" class="featured-products-section home-band-inner home-panel home-panel--products" aria-labelledby="featured-products-title">
         <div class="section-heading home-panel-heading">
           <div class="home-panel-title">
             <span class="home-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></span>
@@ -170,15 +206,17 @@
         <p id="featured-products-message" role="status" aria-atomic="true"></p>
         <button id="featured-products-retry" class="button-secondary" type="button" hidden>Tải lại sản phẩm</button>
       </section>
-      <div class="storefront-feedback home-commerce-feedback">
+      <div class="storefront-feedback home-commerce-feedback home-band-inner">
         <p id="cart-message" role="status" aria-atomic="true"></p>
         <p id="storage-message" role="status"></p>
         <p id="reorder-message" role="status" aria-atomic="true"></p>
         <p id="pending-order-message" role="status" aria-atomic="true"></p>
         <a id="pending-cart-link" class="navigation-link cart-navigation" href="/dang-nhap.html?view=cart" hidden>Đi đến giỏ hàng</a>
       </div>
+      </div>
       <hr class="home-section-divider" aria-hidden="true">
-      <section class="shopping-faq home-panel home-panel--help" data-home-band="plain" aria-labelledby="shopping-faq-title">
+      <div class="home-band" data-home-band="tinted">
+      <section class="shopping-faq home-band-inner home-panel home-panel--help" aria-labelledby="shopping-faq-title">
         <div class="faq-heading home-panel-heading">
           <div class="home-panel-title">
             <span class="home-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-2 2V11.5A8.5 8.5 0 0 1 10.5 3h2a8.5 8.5 0 0 1 8.5 8.5Z"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4m0 3h.01"/></svg></span>
@@ -203,6 +241,7 @@
           </details>
         </div>
       </section>
+      </div>
     </main>
     <dialog id="product-preview-dialog" class="product-preview-dialog" aria-labelledby="product-preview-title">
       <button id="product-preview-close" class="preview-close button-secondary" type="button" aria-label="Đóng xem nhanh" autofocus><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button>

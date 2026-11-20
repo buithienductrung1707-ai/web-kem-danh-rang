@@ -1,5 +1,14 @@
 const productList = document.getElementById("product-list");
 const featuredProductList = document.getElementById("featured-product-list");
+const homeProductSections = [
+  { list: featuredProductList, kind: "featured" },
+  { list: document.getElementById("best-selling-product-list"), kind: "best-selling",
+    message: document.getElementById("best-selling-message") },
+  { list: document.getElementById("latest-product-list"), kind: "latest",
+    message: document.getElementById("latest-products-message") }
+].filter(section => section.list);
+const catalogTargets = [productList, ...homeProductSections.map(section => section.list)].filter(Boolean);
+const homeProductsRetryButtons = [...document.querySelectorAll("[data-home-products-retry]")];
 const productMessage = document.getElementById("product-message");
 const reloadCatalogButton = document.getElementById("reload-catalog") ?? document.getElementById("featured-products-retry");
 const productSearchField = document.getElementById("product-search")
@@ -291,7 +300,8 @@ function toggleFavorite(product, opener = null) {
   }
   renderCatalog();
   window.dispatchEvent(new CustomEvent("shop-favorites-change"));
-  const button = opener?.isConnected ? opener : document.getElementById("favorite-" + product.id);
+  const button = opener?.isConnected ? opener
+    : document.getElementById(opener?.id || "favorite-" + product.id);
   if (button) button.focus();
   else favoritesOnlyFilter?.focus();
   return true;
@@ -951,7 +961,7 @@ productPreviewDialog?.addEventListener("cancel", event => {
 });
 productPreviewDialog?.addEventListener("close", () => {
   const opener = previewOpener?.isConnected && !previewOpener.disabled
-    ? previewOpener : document.getElementById("preview-" + previewProductId);
+    ? previewOpener : document.getElementById(previewOpener?.id || "preview-" + previewProductId);
   previewProductId = null;
   previewOpener = null;
   document.body.classList.remove("has-product-preview");
@@ -996,7 +1006,11 @@ function updateControls() {
   renderProductPreview(locked);
   if (reloadCatalogButton) reloadCatalogButton.disabled = locked || catalogLoading;
   if (featuredProductList && reloadCatalogButton) {
-    reloadCatalogButton.hidden = catalogLoading || orderPending || (catalogReady && products.size > 0);
+    reloadCatalogButton.hidden = catalogLoading || orderPending || catalogReady;
+  }
+  for (const button of homeProductsRetryButtons) {
+    button.disabled = locked || catalogLoading;
+    button.hidden = catalogLoading || orderPending || catalogReady;
   }
   if (productList) {
     productList.setAttribute("aria-busy", String(catalogLoading || quickBuyNavigating));
@@ -1015,8 +1029,7 @@ function updateControls() {
           priceFilter && priceFilter.value !== "all" || brandFilter && brandFilter.value !== "all");
     }
   }
-  const catalogTarget = productList ?? featuredProductList;
-  if (catalogTarget) {
+  for (const catalogTarget of catalogTargets) {
     catalogTarget.setAttribute("aria-busy", String(catalogLoading || quickBuyNavigating));
     for (const button of catalogTarget.querySelectorAll("button")) {
       button.disabled = locked || !catalogReady ||
@@ -1411,38 +1424,14 @@ function matchesPrice(product) {
   }
 }
 
-function renderCatalog() {
-  const target = productList ?? featuredProductList;
-  if (!target) return;
+function renderProductCards(target, displayedProducts, singleFeatured = false) {
   const fragment = document.createDocumentFragment();
-  if (catalogSearchField) catalogSearchField.value = productSearchField?.value || "";
-  const query = normalizeSearch(productSearchField?.value.trim() ?? "");
-  const selectedCategory = catalogCategories && window.ShopCategories?.isCategoryPage
-    ? window.ShopCategories.currentCategory(catalogCategories) : null;
-  const visibleCategoryIds = catalogCategories ? new Set(catalogCategories.map(category => category.id)) : null;
-  const categoryProducts = [...products.values()].filter(product =>
-    (!visibleCategoryIds || visibleCategoryIds.has(product.categoryId)) &&
-    (!window.ShopCategories?.isCategoryPage || product.categoryId === selectedCategory?.id));
-  const visibleProducts = categoryProducts.filter(product =>
-    normalizeSearch(product.name + " " + product.description).includes(query) &&
-    matchesPrice(product) && (!brandFilter || brandFilter.value === "all" || product.brand === brandFilter.value) &&
-    (!favoritesOnlyFilter?.checked || favoriteProducts.has(product.id)) &&
-    (!availableOnlyFilter?.checked || !product.stockTracked || product.stockQuantity > 0));
-  const sorters = {
-    "price-asc": (a, b) => a.price - b.price || a.id - b.id,
-    "price-desc": (a, b) => b.price - a.price || a.id - b.id,
-    name: (a, b) => a.name.localeCompare(b.name, "vi") || a.id - b.id,
-    oldest: (a, b) => a.id - b.id,
-    default: (a, b) => catalogPage ? b.id - a.id : a.id - b.id
-  };
-  const sort = productSortField?.value ?? "default";
-  const sorter = Object.hasOwn(sorters, sort) ? sorters[sort] : sorters.default;
-  visibleProducts.sort(sorter);
-  const displayedProducts = productList ? visibleProducts : visibleProducts.slice(0, 4);
+  const idPrefix = target === productList || target === featuredProductList ? "" : target.id + "-";
   for (const product of displayedProducts) {
     const card = document.createElement("article");
-    card.className = productList && !catalogPage && visibleProducts.length === 1 && product.imageUrl
+    card.className = singleFeatured && product.imageUrl
       ? "product product-featured" : "product";
+    card.dataset.productId = String(product.id);
     if (product.imageUrl) {
       const image = document.createElement("img");
       image.className = "product-image";
@@ -1475,10 +1464,16 @@ function renderCatalog() {
     price.className = "price";
     price.textContent = money.format(product.price);
     card.append(heading, price);
+    if (!productList && product.soldCount > 0) {
+      const sold = document.createElement("p");
+      sold.className = "home-product-sold-count";
+      sold.textContent = "Đã bán " + product.soldCount.toLocaleString("vi-VN") + " sp";
+      card.append(sold);
+    }
     if (typeof productPreviewDialog?.showModal === "function") {
       const previewButton = document.createElement("button");
       previewButton.type = "button";
-      previewButton.id = "preview-" + product.id;
+      previewButton.id = "preview-" + idPrefix + product.id;
       previewButton.className = "product-preview-trigger button-secondary";
       previewButton.dataset.productId = String(product.id);
       previewButton.dataset.action = "preview";
@@ -1490,7 +1485,7 @@ function renderCatalog() {
     }
     const favoriteButton = document.createElement("button");
     favoriteButton.type = "button";
-    favoriteButton.id = "favorite-" + product.id;
+    favoriteButton.id = "favorite-" + idPrefix + product.id;
     favoriteButton.className = "favorite-button button-secondary";
     favoriteButton.dataset.productId = String(product.id);
     favoriteButton.dataset.action = "favorite";
@@ -1505,7 +1500,7 @@ function renderCatalog() {
     const favoriteLabel = (favoriteProducts.has(product.id) ? "Bỏ yêu thích · " : "Thêm vào yêu thích · ") + product.name;
     favoriteButton.setAttribute("aria-label", favoriteLabel);
     favoriteButton.title = favoriteLabel;
-    favoriteButton.addEventListener("click", () => toggleFavorite(product));
+    favoriteButton.addEventListener("click", () => toggleFavorite(product, favoriteButton));
     card.append(favoriteButton);
     if (product.stockTracked) {
       const stock = document.createElement("p");
@@ -1560,6 +1555,47 @@ function renderCatalog() {
     fragment.append(card);
   }
   target.replaceChildren(fragment);
+}
+
+function renderCatalog() {
+  if (catalogTargets.length === 0) return;
+  if (catalogSearchField) catalogSearchField.value = productSearchField?.value || "";
+  const query = normalizeSearch(productSearchField?.value.trim() ?? "");
+  const selectedCategory = catalogCategories && window.ShopCategories?.isCategoryPage
+    ? window.ShopCategories.currentCategory(catalogCategories) : null;
+  const visibleCategoryIds = catalogCategories ? new Set(catalogCategories.map(category => category.id)) : null;
+  const categoryProducts = [...products.values()].filter(product =>
+    (!visibleCategoryIds || visibleCategoryIds.has(product.categoryId)) &&
+    (!window.ShopCategories?.isCategoryPage || product.categoryId === selectedCategory?.id));
+  const visibleProducts = categoryProducts.filter(product =>
+    normalizeSearch(product.name + " " + product.description).includes(query) &&
+    matchesPrice(product) && (!brandFilter || brandFilter.value === "all" || product.brand === brandFilter.value) &&
+    (!favoritesOnlyFilter?.checked || favoriteProducts.has(product.id)) &&
+    (!availableOnlyFilter?.checked || !product.stockTracked || product.stockQuantity > 0));
+  const sorters = {
+    "price-asc": (a, b) => a.price - b.price || a.id - b.id,
+    "price-desc": (a, b) => b.price - a.price || a.id - b.id,
+    name: (a, b) => a.name.localeCompare(b.name, "vi") || a.id - b.id,
+    oldest: (a, b) => a.id - b.id,
+    default: (a, b) => catalogPage ? b.id - a.id : a.id - b.id
+  };
+  const sort = productSortField?.value ?? "default";
+  const sorter = Object.hasOwn(sorters, sort) ? sorters[sort] : sorters.default;
+  visibleProducts.sort(sorter);
+  if (productList) renderProductCards(productList, visibleProducts, !catalogPage && visibleProducts.length === 1);
+  for (const section of homeProductSections) {
+    const ordered = section.kind === "best-selling"
+      ? categoryProducts.filter(product => product.soldCount > 0)
+        .sort((a, b) => b.soldCount - a.soldCount || b.id - a.id)
+      : section.kind === "latest" ? [...categoryProducts].sort((a, b) => b.id - a.id) : visibleProducts;
+    renderProductCards(section.list, ordered.slice(0, 4));
+    if (section.message) section.message.textContent = ordered.length ? ""
+      : section.kind === "best-selling" && categoryProducts.length > 0
+        ? "Sản phẩm bán chạy sẽ xuất hiện khi có đơn hàng hoàn thành."
+        : "Cửa hàng đang cập nhật sản phẩm. Bạn hãy quay lại sau.";
+  }
+  if (featuredProductList) productMessage.textContent = visibleProducts.length ? ""
+    : "Cửa hàng đang cập nhật sản phẩm. Bạn hãy quay lại sau.";
   if (catalogResults) {
     if (categoryProducts.length === 0) catalogResults.textContent = window.ShopCategories?.isCategoryPage && !selectedCategory
       ? "Danh mục này hiện chưa được hiển thị. Hãy chọn danh mục khác trong Danh mục."
@@ -1719,21 +1755,21 @@ function validImageUrl(value) {
 }
 
 function renderCatalogSkeleton() {
-  const target = productList ?? featuredProductList;
-  if (!target) return;
-  const fragment = document.createDocumentFragment();
-  for (let index = 0; index < 4; index += 1) {
-    const card = document.createElement("article");
-    card.className = "product product-skeleton";
-    card.setAttribute("aria-hidden", "true");
-    for (const className of ["skeleton-media", "skeleton-line", "skeleton-line skeleton-line-short"]) {
-      const placeholder = document.createElement("div");
-      placeholder.className = className;
-      card.append(placeholder);
+  for (const target of catalogTargets) {
+    const fragment = document.createDocumentFragment();
+    for (let index = 0; index < 4; index += 1) {
+      const card = document.createElement("article");
+      card.className = "product product-skeleton";
+      card.setAttribute("aria-hidden", "true");
+      for (const className of ["skeleton-media", "skeleton-line", "skeleton-line skeleton-line-short"]) {
+        const placeholder = document.createElement("div");
+        placeholder.className = className;
+        card.append(placeholder);
+      }
+      fragment.append(card);
     }
-    fragment.append(card);
+    target.replaceChildren(fragment);
   }
-  target.replaceChildren(fragment);
 }
 
 async function loadCatalog() {
@@ -1741,7 +1777,9 @@ async function loadCatalog() {
   catalogLoading = true;
   catalogReady = false;
   productMessage.textContent = productList || featuredProductList || checkoutForm ? "Đang tải sản phẩm..." : "";
-  productList?.setAttribute("aria-busy", "true");
+  for (const section of homeProductSections) {
+    if (section.message) section.message.textContent = "Đang tải sản phẩm...";
+  }
   renderCatalogSkeleton();
   const empty = document.getElementById("catalog-empty-state");
   if (empty) empty.hidden = true;
@@ -1761,13 +1799,14 @@ async function loadCatalog() {
         (item.categoryId === undefined || Number.isSafeInteger(item.categoryId) && item.categoryId > 0) &&
         (item.categoryName === undefined || typeof item.categoryName === "string") &&
         (item.brand === undefined || typeof item.brand === "string" && item.brand.length <= 200) &&
+        (item.soldCount === undefined || Number.isSafeInteger(item.soldCount) && item.soldCount >= 0) &&
         ((item.stockTracked === undefined && item.stockQuantity === undefined) ||
           (typeof item.stockTracked === "boolean" && Number.isSafeInteger(item.stockQuantity) && item.stockQuantity >= 0))) ||
       new Set(result.map(item => item.id)).size !== result.length) {
       throw new Error("Dữ liệu sản phẩm chưa hợp lệ");
     }
     products = new Map(result.map(item => [item.id, {
-      stockTracked: false, stockQuantity: 0, categoryId: 1, categoryName: "Kem đánh răng", brand: "", ...item
+      stockTracked: false, stockQuantity: 0, categoryId: 1, categoryName: "Kem đánh răng", brand: "", soldCount: 0, ...item
     }]));
     catalogCategories = categories;
     renderBrandOptions();
@@ -1775,7 +1814,7 @@ async function loadCatalog() {
     cartMessage.textContent = "";
     importReorder();
     renderCatalog();
-    productMessage.textContent = (productList || featuredProductList || checkoutForm) && result.length === 0
+    if (homeProductSections.length === 0) productMessage.textContent = (productList || checkoutForm) && result.length === 0
       ? "Cửa hàng đang cập nhật sản phẩm. Bạn hãy quay lại sau." : "";
   } catch {
     if (!storefrontActive || orderPending || isSubmitting) return;
@@ -1787,22 +1826,26 @@ async function loadCatalog() {
       productMessage.textContent = cart.size > 0 || queuedReorder?.reorder || queuedReorder?.error
         ? "Chưa tải được sản phẩm để cập nhật giỏ hàng. Mở giỏ hàng hoặc trang sản phẩm để thử lại." : "";
     }
+    for (const section of homeProductSections) {
+      if (section.message) section.message.textContent = "Chưa tải được sản phẩm. Hãy bấm Tải lại sản phẩm để thử lại.";
+    }
   } finally {
     catalogLoading = false;
     if (storefrontActive) {
-      if (!catalogReady) (productList ?? featuredProductList)?.replaceChildren();
-      productList?.setAttribute("aria-busy", "false");
+      if (!catalogReady) for (const target of catalogTargets) target.replaceChildren();
       renderCart();
       window.dispatchEvent(new CustomEvent("shop-catalog-ready", { detail: { ready: catalogReady } }));
     }
   }
 }
 
-reloadCatalogButton?.addEventListener("click", async () => {
-  if (orderPending || isSubmitting) return;
-  clearOrderReview();
-  await loadCatalog();
-});
+for (const button of new Set([reloadCatalogButton, ...homeProductsRetryButtons].filter(Boolean))) {
+  button.addEventListener("click", async () => {
+    if (orderPending || isSubmitting) return;
+    clearOrderReview();
+    await loadCatalog();
+  });
+}
 
 clearButton?.addEventListener("click", () => {
   if (orderPending || isSubmitting) return;
