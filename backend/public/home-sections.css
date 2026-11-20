@@ -274,31 +274,8 @@
     letter-spacing: -0.02em;
   }
 
-  .home-page .home-product-sold-count {
-    width: fit-content;
-    margin: 0 0 12px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    background: var(--soft);
-    color: var(--primary-dark);
-    font-size: 13px;
-    font-weight: 650;
-  }
-
   .home-page .home-panel .product > details {
     display: none;
-  }
-
-  .home-page .home-panel .product > .product-preview-trigger,
-  .home-page .home-panel .product:has(> .product-image-link:not([hidden])) > .product-preview-trigger {
-    position: static;
-    inset: auto;
-    width: auto;
-    max-width: 100%;
-    min-height: 44px;
-    margin: 0 0 12px;
-    padding: 8px;
-    font-size: 13px;
   }
 
   .home-page .home-panel .product:has(> .product-image-link:not([hidden])) > .favorite-button {

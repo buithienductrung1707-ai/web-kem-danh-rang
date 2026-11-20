@@ -79,7 +79,7 @@ npm.cmd start
 ## Mua hàng và xem đơn
 
 1. Bấm **Danh mục** trên menu để mở trang danh mục sản phẩm. Chọn **Tất cả**, **Kem đánh răng**, **Bàn chải đánh răng** hoặc danh mục khác được quản trị thêm vào. Có thể tìm theo tên, mô tả, lọc mức giá, thương hiệu, còn hàng, yêu thích và sắp xếp. Ô tìm kiếm trên header tìm trong toàn bộ sản phẩm của các danh mục đang hiển thị.
-2. Bấm ảnh hoặc tên sản phẩm để mở trang chi tiết. Ảnh thu nhỏ nằm bên trái ảnh lớn trên máy tính. Rê chuột lên ảnh lớn để phóng to, dùng ảnh thu nhỏ hoặc mũi tên để chuyển ảnh. Xem mô tả, thông số, tình trạng hàng và đánh giá trước khi chọn số lượng. Dùng **Thêm vào giỏ** hoặc **Mua ngay** để tiếp tục mua hàng. Các thẻ sản phẩm cũng có **Xem nhanh**, **Thêm vào giỏ** và **Mua nhanh**.
+2. Bấm ảnh hoặc tên sản phẩm để mở trang chi tiết. Ảnh thu nhỏ nằm bên trái ảnh lớn trên máy tính. Rê chuột lên ảnh lớn để phóng to, dùng ảnh thu nhỏ hoặc mũi tên để chuyển ảnh. Xem mô tả, thông số, tình trạng hàng và đánh giá trước khi chọn số lượng. Dùng **Thêm vào giỏ** hoặc **Mua ngay** để tiếp tục mua hàng. Các thẻ sản phẩm ở trang chủ và danh mục có một nút **Thêm vào giỏ**, nút yêu thích và thanh **Đã bán**; sản phẩm hết kho có nút **Hết hàng** bị vô hiệu hoá.
 3. Mở **Giỏ hàng** trong khu vực tài khoản. Chọn từng sản phẩm hoặc **Chọn tất cả**, điều chỉnh số lượng và kiểm tra tiền của các sản phẩm đã chọn. Dùng biểu tượng thùng rác để xóa riêng hoặc **Xóa đã chọn** để xóa nhiều sản phẩm.
 4. Bấm **Tiếp tục đặt hàng** để mở bước xác nhận. Kiểm tra sản phẩm, địa chỉ nhận hàng, phương thức thanh toán và tổng tiền. Khách chưa đăng nhập điền thông tin nhận hàng ở bước này.
 5. Bấm **Tạo đơn hàng** để gửi đơn. Lưu mã đơn sau khi đặt thành công. Các sản phẩm chưa chọn tiếp tục nằm trong giỏ hàng.
@@ -180,7 +180,7 @@ Dùng **Chọn ảnh từ máy tính** rồi **Tải ảnh lên**, hoặc nhập
 ### Sản phẩm
 
 - Chọn **Thêm sản phẩm** hoặc chọn một sản phẩm hiện có. Biểu mẫu chia thành thông tin cơ bản, ảnh, nội dung chi tiết và tồn kho cùng trạng thái hiển thị.
-- Điền tên, giá bán bằng đồng Việt Nam, danh mục và mô tả ngắn. Mô tả ngắn dùng trong danh sách và cửa sổ xem nhanh.
+- Điền tên, giá bán bằng đồng Việt Nam, danh mục và mô tả ngắn. Mô tả ngắn dùng trong danh sách và trang chi tiết sản phẩm.
 - Trong phần ảnh, đặt một ảnh chính và tối đa **7 ảnh bổ sung**. Có thể nhập đường dẫn ảnh hoặc tải ảnh từ máy tính, thay đổi thứ tự và gỡ ảnh bổ sung.
 - Trong **Nội dung chi tiết**, điền ô **Giới thiệu và hướng dẫn sử dụng** tối đa **12.000 ký tự**. Nội dung hiển thị theo đoạn văn bên dưới khu vực mua hàng của trang sản phẩm.
 - Thêm tối đa **12 thông số**, mỗi dòng gồm tên và giá trị. Chẳng hạn tên thông số là Thương hiệu, giá trị là tên thương hiệu trên bao bì.
@@ -314,7 +314,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Mục cần sửa | Tệp |
 | --- | --- |
 | Màu sắc, header, menu và banner hai bên | [style.css](backend/public/style.css) |
-| Thẻ tiện ích và xem nhanh sản phẩm | [storefront-widgets.css](backend/public/storefront-widgets.css) |
+| Thẻ tiện ích và thanh số đã bán trên thẻ sản phẩm | [storefront-widgets.css](backend/public/storefront-widgets.css), [product-cards.css](backend/public/product-cards.css) |
 | Hiệu ứng thêm sản phẩm vào giỏ hàng | [cart-feedback.js](backend/public/cart-feedback.js), [cart-feedback.css](backend/public/cart-feedback.css) |
 | Trang thông tin từng sản phẩm | [chi-tiet-san-pham.html](backend/public/chi-tiet-san-pham.html), [product-detail.js](backend/public/product-detail.js), [product-detail.css](backend/public/product-detail.css) |
 | Đánh giá sản phẩm | [product-reviews.js](backend/public/product-reviews.js), [product-reviews.css](backend/public/product-reviews.css), [product-reviews.cjs](backend/src/services/product-reviews.cjs) |
@@ -344,7 +344,7 @@ Header dùng nền xanh ngọc đậm, viền sáng và bóng đổ để tách 
 
 Trang chủ mở đầu bằng dòng chữ lớn **Kem đánh răng số 1 tại Mỹ** được căn giữa, với **số 1** được tô nền vàng bo góc và phần mô tả nhỏ, màu dịu bên dưới. Dòng này luôn hiển thị độc lập với quảng cáo do admin quản lý. Mỗi khu vực có nền kéo hết bề ngang trang, xen kẽ nền trắng và xanh nhạt, cùng đường phân cách mảnh; nội dung vẫn giữ lề phù hợp khi có banner hai bên và tự điều chỉnh theo chế độ sáng/tối. Tiêu đề các mục dùng chữ in hoa và gạch ngắn phía dưới. **Danh mục nổi bật** có nền xanh chuyển sắc, thẻ nhỏ bo góc, ảnh tròn và tên căn giữa; danh mục vẫn được quản lý tại trang quản trị. Kiểu trình bày này được giới hạn ở trang chủ trong [home-sections.css](backend/public/home-sections.css).
 
-Phía trên **Danh mục nổi bật** có hai khu vực **Sản phẩm bán chạy** và **Sản phẩm mới nhất**, mỗi khu vực hiển thị tối đa 4 sản phẩm. Bán chạy xếp theo tổng số lượng trong các đơn đã **Hoàn thành** và chỉ hiển thị sản phẩm đã có lượt mua thực tế; đơn mới, đang xử lý hoặc đã huỷ không được cộng. Nếu chưa có lượt mua hoàn thành, khu vực có hướng dẫn thay cho số bán minh hoạ. Mới nhất lấy thứ tự sản phẩm vừa được thêm vào cửa hàng (ID giảm dần). Sản phẩm ngừng bán hoặc thuộc danh mục bị ẩn không xuất hiện. Cả ba khu vực bán chạy, mới nhất và nổi bật dùng chung thao tác xem nhanh, yêu thích, thêm giỏ và trạng thái kho.
+Phía trên **Danh mục nổi bật** có hai khu vực **Sản phẩm bán chạy** và **Sản phẩm mới nhất**, mỗi khu vực hiển thị tối đa 4 sản phẩm. Bán chạy xếp theo tổng số lượng trong các đơn đã **Hoàn thành** và chỉ hiển thị sản phẩm đã có lượt mua thực tế; đơn mới, đang xử lý hoặc đã huỷ không được cộng. Nếu chưa có lượt mua hoàn thành, khu vực có hướng dẫn thay cho số bán minh hoạ. Mới nhất lấy thứ tự sản phẩm vừa được thêm vào cửa hàng (ID giảm dần). Sản phẩm ngừng bán hoặc thuộc danh mục bị ẩn không xuất hiện. Cả ba khu vực bán chạy, mới nhất và nổi bật dùng chung thao tác yêu thích, thêm giỏ và bảo vệ tồn kho. Thẻ sản phẩm dùng thanh **Đã bán** nền xanh nhạt, dải đỏ–cam và biểu tượng ngọn lửa, hiển thị số lượng thực từ đơn hoàn thành, kể cả 0. Dải màu là trang trí, không biểu thị phần trăm tồn kho; số lượng tồn không còn hiện riêng trên thẻ. Bấm tên hoặc ảnh để xem thông tin chi tiết.
 
 Trên điện thoại, header sắp xếp logo, tài khoản, giỏ hàng và nút đổi giao diện ở hàng đầu. Ô tìm kiếm nằm ở hàng riêng, tiếp theo là nút **Danh mục** với biểu tượng menu và mũi tên. Bấm chữ để mở trang danh mục, bấm mũi tên để chọn nhanh một danh mục. Mặt trăng/mặt trời đổi giao diện sáng/tối.
 

@@ -1034,6 +1034,12 @@ function updateControls() {
     for (const button of catalogTarget.querySelectorAll("button")) {
       button.disabled = locked || !catalogReady ||
         (!["favorite", "preview"].includes(button.dataset.action) && !canIncreaseQuantity(Number(button.dataset.productId)));
+      if (button.dataset.action === "add") {
+        const product = products.get(Number(button.dataset.productId));
+        const outOfStock = product?.stockTracked && product.stockQuantity === 0;
+        button.textContent = outOfStock ? "Hết hàng" : "Thêm vào giỏ";
+        button.setAttribute("aria-label", button.textContent + " · " + (product?.name || "Sản phẩm"));
+      }
     }
   }
   for (const button of activeFilters?.querySelectorAll("button") ?? []) button.disabled = locked || !catalogReady;
@@ -1464,25 +1470,6 @@ function renderProductCards(target, displayedProducts, singleFeatured = false) {
     price.className = "price";
     price.textContent = money.format(product.price);
     card.append(heading, price);
-    if (!productList && product.soldCount > 0) {
-      const sold = document.createElement("p");
-      sold.className = "home-product-sold-count";
-      sold.textContent = "Đã bán " + product.soldCount.toLocaleString("vi-VN") + " sp";
-      card.append(sold);
-    }
-    if (typeof productPreviewDialog?.showModal === "function") {
-      const previewButton = document.createElement("button");
-      previewButton.type = "button";
-      previewButton.id = "preview-" + idPrefix + product.id;
-      previewButton.className = "product-preview-trigger button-secondary";
-      previewButton.dataset.productId = String(product.id);
-      previewButton.dataset.action = "preview";
-      previewButton.textContent = "Xem nhanh";
-      previewButton.setAttribute("aria-label", "Xem nhanh · " + product.name);
-      previewButton.setAttribute("aria-haspopup", "dialog");
-      previewButton.addEventListener("click", () => openProductPreview(product, previewButton));
-      card.append(previewButton);
-    }
     const favoriteButton = document.createElement("button");
     favoriteButton.type = "button";
     favoriteButton.id = "favorite-" + idPrefix + product.id;
@@ -1502,12 +1489,6 @@ function renderProductCards(target, displayedProducts, singleFeatured = false) {
     favoriteButton.title = favoriteLabel;
     favoriteButton.addEventListener("click", () => toggleFavorite(product, favoriteButton));
     card.append(favoriteButton);
-    if (product.stockTracked) {
-      const stock = document.createElement("p");
-      stock.className = "stock-status";
-      stock.textContent = product.stockQuantity === 0 ? "Hết hàng" : "Còn " + product.stockQuantity + " " + productUnit(product);
-      card.append(stock);
-    }
     if (product.description) {
       const details = document.createElement("details");
       const summary = document.createElement("summary");
@@ -1525,32 +1506,31 @@ function renderProductCards(target, displayedProducts, singleFeatured = false) {
     addButton.textContent = "Thêm vào giỏ";
     addButton.setAttribute("aria-label", "Thêm vào giỏ · " + product.name);
     addButton.addEventListener("click", () => addProductToCart(product, addButton));
-    const quickBuyButton = document.createElement("button");
-    quickBuyButton.type = "button";
-    quickBuyButton.className = "button-secondary";
-    quickBuyButton.dataset.productId = String(product.id);
-    quickBuyButton.dataset.action = "quick-buy";
-    quickBuyButton.textContent = "Mua nhanh";
-    quickBuyButton.setAttribute("aria-label", "Thêm 1 " + product.name + " và mở giỏ hàng");
-    quickBuyButton.addEventListener("click", event => {
-      if (addProductToCart(product) && prepareNavigation(event, "/gio-hang.html")) {
-        quickBuyNavigating = true;
-        quickBuyButton.textContent = "Đang mở giỏ...";
-        cartMessage.textContent = "Đã thêm " + product.name + ". Đang mở giỏ hàng...";
-        updateControls();
-        try {
-          window.location.assign("/gio-hang.html");
-        } catch {
-          quickBuyNavigating = false;
-          quickBuyButton.textContent = "Mua nhanh";
-          cartMessage.textContent = "Đã thêm sản phẩm vào giỏ. Hãy bấm Giỏ hàng trên thanh điều hướng để tiếp tục.";
-          updateControls();
-        }
-      }
-    });
+    const salesMeter = document.createElement("div");
+    salesMeter.className = "product-sales-meter";
+    const salesFill = document.createElement("span");
+    salesFill.className = "product-sales-meter-fill";
+    salesFill.setAttribute("aria-hidden", "true");
+    const flame = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    flame.classList.add("product-sales-meter-flame");
+    flame.setAttribute("viewBox", "0 0 24 24");
+    flame.setAttribute("aria-hidden", "true");
+    for (const d of [
+      "M13 2c1 5-3 5-1 9 2-1 3-3 3-5 4 4 6 7 5 11-1 4-4 5-8 5-5 0-8-3-8-7 0-4 4-6 5-10 0 3 1 4 2 5 0-4 1-6 2-8Z",
+      "M12 12c1 3-2 3-2 6 0 2 1 3 3 3s4-2 3-4c0-1-1-2-2-3 0 2-1 3-2 3 0-1 1-3 0-5Z"
+    ]) {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", d);
+      flame.append(path);
+    }
+    const salesLabel = document.createElement("span");
+    salesLabel.className = "product-sales-meter-label";
+    salesLabel.textContent = "Đã bán " + product.soldCount.toLocaleString("vi-VN");
+    salesMeter.title = salesLabel.textContent;
+    salesMeter.append(salesFill, flame, salesLabel);
     const actions = document.createElement("div");
     actions.className = "product-actions";
-    actions.append(addButton, quickBuyButton);
+    actions.append(salesMeter, addButton);
     card.append(actions);
     fragment.append(card);
   }

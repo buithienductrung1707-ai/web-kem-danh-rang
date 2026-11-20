@@ -1,0 +1,66 @@
+@media screen {
+  .storefront-page .product-sales-meter {
+    --sales-track: #e4eeff;
+    --sales-start: #d41442;
+    --sales-end: #ffb82b;
+    --sales-label: #ffffff;
+    --sales-label-outline: #78300d;
+    --sales-flame: #ff315b;
+    --sales-flame-core: #ffe446;
+    --sales-fill-width: 75%;
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--sales-track);
+  }
+
+  .storefront-page .product-sales-meter-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--sales-fill-width);
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--sales-start), var(--sales-end));
+  }
+
+  .storefront-page .product-sales-meter-label {
+    position: relative;
+    display: block;
+    width: var(--sales-fill-width);
+    padding: 0 4px 0 20px;
+    overflow: hidden;
+    color: var(--sales-label);
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 18px;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -webkit-text-stroke: 2px var(--sales-label-outline);
+    paint-order: stroke fill;
+  }
+
+  .storefront-page .product-sales-meter-flame {
+    position: absolute;
+    z-index: 1;
+    left: -1px;
+    bottom: -1px;
+    width: 22px;
+    height: 25px;
+    pointer-events: none;
+  }
+
+  .storefront-page .product-sales-meter-flame path:first-child {
+    fill: var(--sales-flame);
+  }
+
+  .storefront-page .product-sales-meter-flame path:last-child {
+    fill: var(--sales-flame-core);
+  }
+
+  .storefront-page .product > .product-actions {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}
