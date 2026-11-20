@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="home-sections.css">
     <link rel="stylesheet" href="product-cards.css">
     <link rel="stylesheet" href="section-decorations.css">
+    <link rel="stylesheet" href="hero-decorations.css">
     <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
     <script src="cart-feedback.js" defer></script>
@@ -144,11 +145,23 @@
       </div>
       <hr class="home-section-divider home-section-divider--hero" aria-hidden="true">
       <div class="home-band home-band--hero" data-home-band="tinted">
-      <section id="hero-carousel" class="hero hero-carousel home-band-inner" aria-label="Quảng cáo cửa hàng" aria-roledescription="trình chiếu" tabindex="0">
+      <section id="hero-carousel" class="hero hero-carousel home-band-inner" data-hero-style="care" aria-label="Quảng cáo cửa hàng" aria-roledescription="trình chiếu" tabindex="0">
         <div id="hero-slide" class="hero-slide" role="group" aria-roledescription="trang chiếu" aria-label="Quảng cáo 1 trên 1">
           <div class="hero-copy">
+            <p class="hero-eyebrow">
+              <span class="hero-decoration-icon" aria-hidden="true">
+                <svg data-hero-icon="care" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M16 8C12 5 6 6 6 12c0 5 3 15 6 15 2 0 1-8 4-8s2 8 4 8c3 0 6-10 6-15 0-6-6-7-10-4Z"/><path d="M12 9c1 1 3 2 5 2M26 2v5m-2.5-2.5h5"/></svg>
+                <svg data-hero-icon="fresh" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M6 23C4 11 13 6 27 5c0 14-6 23-17 20M6 28 22 11"/><path d="m13 20 1-8m3 4 7-1M5 4v5M2.5 6.5h5"/></svg>
+                <svg data-hero-icon="daily" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m16 28-10-9C-3 11 9 1 16 10c7-9 19 1 10 9L16 28Z"/><path d="M26 2v6m-3-3h6"/></svg>
+              </span>
+              <span id="hero-eyebrow-text">Góc chăm sóc nụ cười</span>
+            </p>
             <h2 id="hero-title">Chọn kem đánh răng cho mỗi ngày.</h2>
             <p id="hero-description">Xem sản phẩm, chọn số lượng và thanh toán khi nhận hàng.</p>
+            <ul class="hero-detail-notes" aria-label="Gợi ý mua sắm">
+              <li><span id="hero-note-first">Kem đánh răng &amp; bàn chải</span></li>
+              <li><span id="hero-note-second">Chọn theo nhu cầu</span></li>
+            </ul>
             <div class="hero-actions">
               <a id="hero-link" class="button-link" href="/danh-muc.html">Danh mục</a>
               <a class="button-link button-secondary cart-navigation" href="/dang-nhap.html?view=cart">Xem giỏ hàng</a>
@@ -157,6 +170,16 @@
           <div class="hero-media">
             <img id="hero-image" src="/assets/dental-care-hero.png" width="1536" height="1024"
               alt="Ảnh minh họa bộ chăm sóc răng miệng trên khay gốm" fetchpriority="high">
+            <span class="hero-media-spark hero-media-spark--top" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 3.5 9.5L29 16l-9.5 3.5L16 29l-3.5-9.5L3 16l9.5-3.5L16 3Z"/></svg></span>
+            <span class="hero-media-spark hero-media-spark--bottom" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M16 5v22M5 16h22M8 8l16 16M8 24 24 8"/></svg></span>
+            <div class="hero-photo-stamp">
+              <span class="hero-stamp-icon" aria-hidden="true">
+                <svg data-hero-icon="care" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M16 8C12 5 6 6 6 12c0 5 3 15 6 15 2 0 1-8 4-8s2 8 4 8c3 0 6-10 6-15 0-6-6-7-10-4Z"/><path d="M26 2v5m-2.5-2.5h5"/></svg>
+                <svg data-hero-icon="fresh" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M6 23C4 11 13 6 27 5c0 14-6 23-17 20M6 28 22 11"/></svg>
+                <svg data-hero-icon="daily" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m16 28-10-9C-3 11 9 1 16 10c7-9 19 1 10 9L16 28Z"/></svg>
+              </span>
+              <span id="hero-stamp-text">Một chút chăm sóc mỗi ngày</span>
+            </div>
           </div>
           <button id="hero-previous" class="hero-arrow hero-arrow--previous" type="button" aria-label="Quảng cáo trước" aria-controls="hero-slide" hidden>
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m14 6-6 6 6 6"/></svg>
@@ -176,6 +199,41 @@
       </div>
       </div>
 
+      <hr class="home-section-divider" aria-hidden="true">
+      <div class="home-band home-band--categories" data-home-band="accent">
+      <section id="catalog" class="featured-categories home-band-inner home-panel home-panel--categories" aria-labelledby="catalog-title">
+        <div class="section-heading home-panel-heading">
+          <div class="home-panel-title">
+            <span class="home-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></span>
+            <div>
+              <h2 id="catalog-title" tabindex="-1">Danh mục nổi bật</h2>
+            </div>
+          </div>
+        </div>
+        <div class="featured-category-grid" data-featured-categories aria-busy="true">
+          <a class="featured-category-card" href="/danh-muc.html?danh-muc=kem-danh-rang">
+            <div class="featured-category-photo">
+              <img src="/kem-danh-rang.jpg" width="448" height="640" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="featured-category-body">
+              <h3>Kem đánh răng</h3>
+              <span class="featured-category-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></span>
+            </div>
+          </a>
+          <a class="featured-category-card" href="/danh-muc.html?danh-muc=ban-chai-danh-rang">
+            <div class="featured-category-photo">
+              <img src="/assets/category-toothbrush.png" width="1254" height="1254" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="featured-category-body">
+              <h3>Bàn chải đánh răng</h3>
+              <span class="featured-category-arrow" aria-hidden="true">→</span>
+            </div>
+          </a>
+        </div>
+        <p id="categories-status" role="status" aria-atomic="true"></p>
+        <button id="categories-retry" type="button" class="button-secondary" hidden>Tải lại danh mục</button>
+      </section>
+      </div>
       <div class="home-products-feedback home-band-inner">
         <p id="product-message" role="status" aria-atomic="true">Đang tải sản phẩm...</p>
         <p id="featured-products-message" role="status" aria-atomic="true"></p>
@@ -235,41 +293,6 @@
         <div id="latest-product-list" class="product-grid" aria-busy="true"></div>
         <p id="latest-products-message" role="status" aria-atomic="true"></p>
         <button class="button-secondary" type="button" data-home-products-retry hidden>Thử tải lại sản phẩm</button>
-      </section>
-      </div>
-      <hr class="home-section-divider" aria-hidden="true">
-      <div class="home-band home-band--categories" data-home-band="accent">
-      <section id="catalog" class="featured-categories home-band-inner home-panel home-panel--categories" aria-labelledby="catalog-title">
-        <div class="section-heading home-panel-heading">
-          <div class="home-panel-title">
-            <span class="home-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></span>
-            <div>
-              <h2 id="catalog-title" tabindex="-1">Danh mục nổi bật</h2>
-            </div>
-          </div>
-        </div>
-        <div class="featured-category-grid" data-featured-categories aria-busy="true">
-          <a class="featured-category-card" href="/danh-muc.html?danh-muc=kem-danh-rang">
-            <div class="featured-category-photo">
-              <img src="/kem-danh-rang.jpg" width="448" height="640" alt="" loading="lazy" decoding="async">
-            </div>
-            <div class="featured-category-body">
-              <h3>Kem đánh răng</h3>
-              <span class="featured-category-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></span>
-            </div>
-          </a>
-          <a class="featured-category-card" href="/danh-muc.html?danh-muc=ban-chai-danh-rang">
-            <div class="featured-category-photo">
-              <img src="/assets/category-toothbrush.png" width="1254" height="1254" alt="" loading="lazy" decoding="async">
-            </div>
-            <div class="featured-category-body">
-              <h3>Bàn chải đánh răng</h3>
-              <span class="featured-category-arrow" aria-hidden="true">→</span>
-            </div>
-          </a>
-        </div>
-        <p id="categories-status" role="status" aria-atomic="true"></p>
-        <button id="categories-retry" type="button" class="button-secondary" hidden>Tải lại danh mục</button>
       </section>
       </div>
       <hr class="home-section-divider" data-home-product-divider="featured" aria-hidden="true" hidden>

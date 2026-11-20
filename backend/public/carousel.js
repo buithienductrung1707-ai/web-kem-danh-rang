@@ -18,6 +18,13 @@
   const fallbackAlt = image.alt;
   const motionPreference = window.matchMedia?.("(prefers-reduced-motion: reduce)");
   const rotationDelay = 4000;
+  const decorationThemes = [
+    { key: "care", eyebrow: "Góc chăm sóc nụ cười", notes: ["Kem đánh răng & bàn chải", "Chọn theo nhu cầu"], stamp: "Một chút chăm sóc mỗi ngày" },
+    { key: "fresh", eyebrow: "Khám phá lựa chọn mới", notes: ["Tìm hiểu trước khi mua", "Dễ dàng đặt hàng"], stamp: "Khởi đầu thói quen tươi mới" },
+    { key: "daily", eyebrow: "Chăm chút từ điều nhỏ", notes: ["Thông tin rõ ràng", "Thanh toán linh hoạt"], stamp: "Đồng hành cùng nụ cười" }
+  ];
+  const decorationLabels = ["hero-eyebrow-text", "hero-note-first", "hero-note-second", "hero-stamp-text"]
+    .map(id => document.getElementById(id));
   let banners = [{
     id: null, title: title.textContent.trim(), description: description.textContent.trim(),
     imageUrl: fallbackImage, imageAlt: fallbackAlt,
@@ -139,6 +146,11 @@
       return;
     }
     if (controls.hidden && navigationFocused) hero.focus();
+    const theme = decorationThemes[index % decorationThemes.length];
+    hero.dataset.heroStyle = theme.key;
+    for (const [position, text] of [theme.eyebrow, ...theme.notes, theme.stamp].entries()) {
+      if (decorationLabels[position]) decorationLabels[position].textContent = text;
+    }
     title.textContent = banner.title;
     description.textContent = banner.description;
     description.hidden = banner.description === "";
