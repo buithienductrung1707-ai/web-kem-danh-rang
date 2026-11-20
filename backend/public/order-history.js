@@ -13,11 +13,10 @@
   const dateTo = document.getElementById("orders-date-to");
   const searchField = document.getElementById("orders-search");
   const sortField = document.getElementById("orders-sort");
-  const resetButton = document.getElementById("orders-filter-reset");
-  const reloadButton = document.getElementById("orders-reload");
   const previousButton = document.getElementById("orders-previous");
   const nextButton = document.getElementById("orders-next");
   const pageLabel = document.getElementById("orders-page");
+  const pagination = pageLabel.closest("nav");
   const statuses = {
     NEW: "Mới nhận", CONFIRMED: "Đã xác nhận", SHIPPING: "Đang giao",
     COMPLETED: "Hoàn thành", CANCELLED: "Đã hủy"
@@ -37,6 +36,8 @@
   let currentPage = 1;
   let totalPages = 1;
   let listController = null;
+  let filterTimer = null;
+  let searchComposing = false;
   if (root) {
     const savedFilters = new URLSearchParams(window.location.search);
     for (const [key, control] of [["status", statusFilter], ["sort", sortField],
@@ -66,23 +67,23 @@
   }
 
   function setControls() {
-    const busy = !active || listController !== null || customerId === null;
-    for (const control of [statusFilter, reloadButton,
-      dateFrom, dateTo, searchField, sortField, resetButton, ...(filterForm?.querySelectorAll("button") || [])]) {
-      if (control) control.disabled = busy;
+    const busy = !active || listController !== null || filterTimer !== null || customerId === null;
+    for (const control of [statusFilter, dateFrom, dateTo, searchField, sortField]) {
+      if (control) control.disabled = !active || !pageActive || panel.hidden;
     }
     previousButton.disabled = busy || currentPage <= 1;
     nextButton.disabled = busy || currentPage >= totalPages;
-    retryButton.disabled = !active || listController !== null;
-    list.setAttribute("aria-busy", String(listController !== null));
+    retryButton.disabled = !active || listController !== null || filterTimer !== null;
+    list.setAttribute("aria-busy", String(listController !== null || filterTimer !== null || searchComposing));
   }
 
-  function clearPrivateContent() {
+  function clearPrivateContent(keepFilters = false) {
     customerId = null;
-    panel.hidden = true;
+    panel.hidden = !keepFilters;
     prompt.hidden = true;
     list.replaceChildren();
     summary.textContent = "";
+    pagination.hidden = true;
   }
 
   function orderDate(value) {
@@ -271,17 +272,24 @@
     if (orders.length === 0) {
       const empty = document.createElement("div");
       empty.className = "workspace-orders-empty";
+      const icon = document.createElement("span");
+      icon.className = "workspace-orders-empty-icon";
+      icon.setAttribute("aria-hidden", "true");
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      for (const d of ["m21 8-9-5-9 5 9 5 9-5Z", "M3 8v9l9 5 9-5V8M12 13v9M7.5 5.5l9 5"]) {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", d);
+        svg.append(path);
+      }
+      icon.append(svg);
       const filtered = statusFilter.value !== "all" || dateFrom?.value || dateTo?.value || searchField?.value.trim();
       const title = document.createElement("h2");
-      title.textContent = filtered ? "Chưa có đơn hàng phù hợp" : "Bạn chưa có đơn hàng";
+      title.textContent = "Không có đơn ở mục này";
       const text = document.createElement("p");
-      text.textContent = filtered ? "Hãy thay đổi bộ lọc hoặc tìm theo mã đơn và tên sản phẩm khác."
-        : "Chọn sản phẩm chăm sóc răng miệng và đặt đơn đầu tiên của bạn.";
-      const explore = document.createElement("a");
-      explore.className = "button-link";
-      explore.href = "/danh-muc.html";
-      explore.textContent = "Danh mục";
-      empty.append(title, text, explore);
+      text.textContent = filtered ? "Chọn trạng thái khác hoặc thay đổi bộ lọc phía trên để xem các đơn còn lại."
+        : "Các đơn hàng bạn đặt sẽ hiển thị ở đây để bạn dễ dàng theo dõi trạng thái.";
+      empty.append(icon, title, text);
       fragment.append(empty);
     }
     list.replaceChildren(fragment);
@@ -289,6 +297,7 @@
 
   async function loadOrders(page = 1) {
     if (!active || !pageActive) return;
+    cancelFilterTimer();
     listController?.abort();
     const controller = new AbortController();
     listController = controller;
@@ -298,7 +307,7 @@
     if (dateTo?.value) params.set("dateTo", dateTo.value);
     if (searchField?.value.trim()) params.set("q", searchField.value.trim());
     if (sortField) params.set("sort", sortField.value);
-    clearPrivateContent();
+    clearPrivateContent(!panel.hidden);
     prompt.hidden = true;
     retryButton.hidden = true;
     message.textContent = "Đang tải đơn hàng...";
@@ -311,6 +320,7 @@
       const accountResponse = await fetch("/api/account/me", options);
       if (!active || listController !== controller) return;
       if (accountResponse.status === 401) {
+        clearPrivateContent();
         prompt.hidden = false;
         message.textContent = "";
         return;
@@ -325,6 +335,7 @@
       const result = await response.json();
       if (!active || listController !== controller) return;
       if (response.status === 401) {
+        clearPrivateContent();
         prompt.hidden = false;
         retryButton.hidden = false;
         message.textContent = "Phiên tài khoản đã thay đổi. Hãy kiểm tra lại tài khoản.";
@@ -346,6 +357,7 @@
       renderOrders(result.orders);
       summary.textContent = result.totalOrders + " đơn hàng";
       pageLabel.textContent = "Trang " + currentPage + " / " + totalPages;
+      pagination.hidden = result.totalOrders === 0;
       panel.hidden = false;
       message.textContent = "";
     } catch (error) {
@@ -358,29 +370,67 @@
       if (listController === controller) {
         listController = null;
         setControls();
-        if (!panel.hidden && customerId === null) {
-          for (const control of filterForm?.elements || []) control.disabled = false;
-        }
       }
     }
   }
 
+  function cancelFilterTimer() {
+    clearTimeout(filterTimer);
+    filterTimer = null;
+  }
+
+  function applyFilters() {
+    cancelFilterTimer();
+    if (!searchComposing) void loadOrders(1);
+  }
+
+  function prepareSearch() {
+    if (!active || !pageActive || panel.hidden) return false;
+    stopRequests();
+    clearPrivateContent(true);
+    retryButton.hidden = true;
+    message.textContent = "Đang cập nhật bộ lọc...";
+    return true;
+  }
+
+  function scheduleSearch() {
+    if (!prepareSearch()) return;
+    if (!searchComposing) {
+      filterTimer = setTimeout(() => {
+        filterTimer = null;
+        void loadOrders(1);
+      }, 300);
+    }
+    setControls();
+  }
+
   filterForm?.addEventListener("submit", event => {
     event.preventDefault();
-    if (!listController) void loadOrders(1);
+    applyFilters();
   });
-  resetButton?.addEventListener("click", () => {
-    filterForm.reset();
-    void loadOrders(1);
+  for (const field of [dateFrom, dateTo, sortField, statusFilter]) {
+    field?.addEventListener("change", applyFilters);
+  }
+  searchField?.addEventListener("input", event => {
+    if (event.isComposing || searchComposing) {
+      if (prepareSearch()) setControls();
+      return;
+    }
+    scheduleSearch();
   });
-  sortField?.addEventListener("change", () => {
-    void loadOrders(1);
+  searchField?.addEventListener("compositionstart", () => {
+    searchComposing = true;
+    if (prepareSearch()) setControls();
   });
-  statusFilter.addEventListener("change", () => {
-    void loadOrders(1);
+  searchField?.addEventListener("compositionend", () => {
+    searchComposing = false;
+    scheduleSearch();
   });
-  reloadButton.addEventListener("click", () => {
-    void loadOrders(currentPage);
+  searchField?.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.isComposing && !searchComposing && event.keyCode !== 229) {
+      event.preventDefault();
+      applyFilters();
+    }
   });
   retryButton.addEventListener("click", () => void loadOrders(1));
   previousButton.addEventListener("click", () => {
@@ -390,6 +440,7 @@
     if (!listController && currentPage < totalPages) void loadOrders(currentPage + 1);
   });
   function stopRequests() {
+    cancelFilterTimer();
     listController?.abort();
     listController = null;
   }
@@ -398,6 +449,7 @@
     if (active === next) return;
     active = next;
     stopRequests();
+    searchComposing = false;
     clearPrivateContent();
     message.textContent = "";
     retryButton.hidden = true;
@@ -408,6 +460,7 @@
   window.addEventListener("shop-workspace-view", event => setActive(event.detail?.view === "orders"));
   window.addEventListener("shop-account-change", event => {
     stopRequests();
+    searchComposing = false;
     clearPrivateContent();
     message.textContent = "";
     retryButton.hidden = true;
@@ -422,6 +475,7 @@
     pageActive = false;
     active = false;
     stopRequests();
+    searchComposing = false;
     clearPrivateContent();
     message.textContent = "";
     setControls();
