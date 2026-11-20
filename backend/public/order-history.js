@@ -135,14 +135,35 @@
       const changedAt = orderDate(entry.changedAt);
       if (Number.isFinite(changedAt.getTime())) history.set(entry.status, changedAt);
     }
-    for (const stage of ["NEW", "CONFIRMED", "SHIPPING", "COMPLETED"]) {
+    const stages = ["NEW", "CONFIRMED", "SHIPPING", "COMPLETED"];
+    for (const [index, stage] of stages.entries()) {
       const item = document.createElement("li");
+      item.dataset.status = stage;
+      const recorded = history.has(stage);
+      const current = order.status === stage;
+      const marker = document.createElement("span");
+      marker.className = "customer-order-stage-marker";
+      marker.setAttribute("aria-hidden", "true");
+      if (recorded) {
+        const check = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        check.setAttribute("viewBox", "0 0 24 24");
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", "m6 12 4 4 8-8");
+        check.append(path);
+        marker.append(check);
+      }
       const label = document.createElement("span");
       label.className = "customer-order-stage-label";
       label.textContent = statuses[stage];
-      item.append(label);
-      if (history.has(stage)) item.classList.add("is-complete");
-      if (order.status === stage) item.setAttribute("aria-current", "step");
+      const state = document.createElement("span");
+      state.className = "visually-hidden";
+      state.textContent = current ? "Hiện tại. " : recorded ? "Đã ghi nhận. " : "Chưa ghi nhận. ";
+      item.append(marker, state, label);
+      if (recorded) item.classList.add("is-complete");
+      if (current) item.setAttribute("aria-current", "step");
+      if (index > 0 && (recorded || current) && history.has(stages[index - 1])) {
+        item.classList.add("is-connected");
+      }
       const changedAt = history.get(stage);
       if (changedAt) {
         const timestamp = document.createElement("time");

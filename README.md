@@ -133,8 +133,8 @@ Khách mua bằng thông tin nhận hàng nhập tại giỏ có thể điền t
 
 - Mở **Tra cứu đơn hàng** ở cuối trang, nhập mã đơn và số điện thoại nhận hàng để xem trạng thái.
 - Mở **Đơn hàng** trên thanh bên tài khoản sau khi đăng nhập để xem lịch sử. Có thể lọc theo khoảng ngày, mã đơn hoặc tên sản phẩm, trạng thái và sắp xếp mới nhất hoặc cũ nhất.
-- Nút **Tạo đơn hàng** nằm ở góc phải phía trên danh sách và mở giỏ hàng. Hàng lọc chính gồm **Từ ngày**, **Đến ngày**, tìm kiếm và sắp xếp. Chọn trạng thái hoặc dùng **Tìm kiếm**, **Xóa bộ lọc**, **Tải lại** ở hàng bên dưới.
-- Thẻ đơn hiển thị ảnh sản phẩm, tổng tiền và tiến trình xử lý. Mốc thời gian dùng lịch sử trạng thái thực tế của đơn. Bấm **Xem chi tiết** để xem thông tin nhận hàng và các sản phẩm, hoặc **Mua lại** để thêm sản phẩm vào giỏ.
+- Hàng lọc chính gồm **Từ ngày**, **Đến ngày**, tìm kiếm và sắp xếp. Chọn trạng thái hoặc dùng **Tìm kiếm**, **Xóa bộ lọc**, **Tải lại** ở hàng bên dưới.
+- Thẻ đơn hiển thị ảnh sản phẩm, tổng tiền và tiến trình xử lý. Các mốc đã ghi nhận dùng màu riêng: **Mới nhận** hồng, **Đã xác nhận** vàng, **Đang giao** xanh dương và **Hoàn thành** xanh lá. Mốc có lịch sử hiển thị dấu tích và thời gian thực tế; mốc hiện tại có vòng sáng, mốc chưa ghi nhận để màu dịu. Đơn hủy có nhãn riêng. Bấm **Xem chi tiết** để xem thông tin nhận hàng và các sản phẩm, hoặc **Mua lại** để thêm sản phẩm vào giỏ.
 
 Các trạng thái đơn hàng được hiển thị theo luồng xử lý.
 

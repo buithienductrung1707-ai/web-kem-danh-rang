@@ -1,5 +1,39 @@
 .account-orders {
+  --order-new: #a52252;
+  --order-confirmed: #806000;
+  --order-shipping: #08758b;
+  --order-completed: #08754f;
   min-width: 0;
+}
+
+[data-theme="dark"] .account-orders {
+  --order-new: #ff9ebd;
+  --order-confirmed: #f8d76a;
+  --order-shipping: #68ddec;
+  --order-completed: #73e1b6;
+}
+
+.account-orders [data-status="NEW"] {
+  --order-stage-color: var(--order-new);
+}
+
+.account-orders [data-status="CONFIRMED"] {
+  --order-stage-color: var(--order-confirmed);
+  --order-stage-previous: var(--order-new);
+}
+
+.account-orders [data-status="SHIPPING"] {
+  --order-stage-color: var(--order-shipping);
+  --order-stage-previous: var(--order-confirmed);
+}
+
+.account-orders [data-status="COMPLETED"] {
+  --order-stage-color: var(--order-completed);
+  --order-stage-previous: var(--order-shipping);
+}
+
+.account-orders [data-status="CANCELLED"] {
+  --order-stage-color: var(--danger);
 }
 
 .workspace-orders-heading {
@@ -24,32 +58,6 @@
 
 .account-orders #orders-message:empty {
   display: none;
-}
-
-.workspace-orders-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  min-height: 76px;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--line);
-}
-
-.account-orders .workspace-orders-create {
-  min-height: 44px;
-  padding: 12px 28px;
-  border-radius: 999px;
-  background: linear-gradient(110deg, var(--primary-dark), var(--primary));
-  color: var(--button-text);
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--primary) 16%, transparent);
-  font-size: 14px;
-  font-weight: 750;
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-.account-orders .workspace-orders-create:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 28px color-mix(in srgb, var(--primary) 24%, transparent);
 }
 
 .workspace-orders-filters {
@@ -235,18 +243,25 @@
 }
 
 .account-orders .customer-order-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 6px 10px;
-  border: 1px solid var(--line);
+  border: 1px solid color-mix(in srgb, var(--order-stage-color, var(--primary-dark)) 35%, transparent);
   border-radius: 18px;
-  background: var(--surface);
-  color: var(--primary-dark);
+  background: color-mix(in srgb, var(--order-stage-color, var(--primary-dark)) 9%, var(--surface));
+  color: var(--order-stage-color, var(--primary-dark));
   font-size: 12px;
   font-weight: 750;
   white-space: nowrap;
 }
 
-.account-orders .customer-order-status[data-status="CANCELLED"] {
-  color: var(--danger);
+.account-orders .customer-order-status::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
 }
 
 .account-orders .customer-order-items {
@@ -331,21 +346,21 @@
   margin: 0;
 }
 
-.customer-order-progress li {
+.account-orders .customer-order-progress li {
   position: relative;
   min-width: 0;
-  padding: 22px 4px 0;
+  padding: 28px 4px 0;
   text-align: center;
   font-size: 11px;
   color: var(--muted);
 }
 
-.customer-order-stage-label {
+.account-orders .customer-order-stage-label {
   display: block;
   min-height: 3.2em;
 }
 
-.customer-order-progress time {
+.account-orders .customer-order-progress time {
   display: block;
   margin-top: 5px;
   color: var(--muted);
@@ -355,53 +370,64 @@
   line-height: 1.5;
 }
 
-.customer-order-progress li::before {
+.account-orders .customer-order-progress li::before {
   position: absolute;
-  top: 5px;
-  left: 0;
-  right: 0;
-  height: 2px;
+  top: 9px;
+  left: -50%;
+  right: 50%;
+  height: 3px;
   background: var(--line);
   content: "";
 }
 
-.customer-order-progress li:first-child::before {
-  left: 50%;
+.account-orders .customer-order-progress li:first-child::before {
+  content: none;
 }
 
-.customer-order-progress li:last-child::before {
-  right: 50%;
-}
-
-.customer-order-progress li::after {
+.account-orders .customer-order-stage-marker {
   position: absolute;
-  top: 0;
-  left: calc(50% - 6px);
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--line);
+  z-index: 1;
+  top: 1px;
+  left: calc(50% - 9px);
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--control-border);
   border-radius: 50%;
   background: var(--surface);
-  content: "";
 }
 
-.customer-order-progress li.is-complete::before {
-  background: var(--primary);
+.account-orders .customer-order-stage-marker svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.customer-order-progress li.is-complete::after {
-  border-color: var(--primary);
-  background: var(--primary);
+.account-orders .customer-order-progress li.is-connected::before {
+  background: linear-gradient(90deg, var(--order-stage-previous), var(--order-stage-color));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--order-stage-color) 28%, transparent);
 }
 
-.customer-order-progress li[aria-current="step"] {
+.account-orders .customer-order-progress li:is(.is-complete, [aria-current="step"]) {
   font-weight: 750;
-  color: var(--primary-dark);
+  color: var(--order-stage-color);
 }
 
-.customer-order-progress li[aria-current="step"]::after {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 16%, transparent);
+.account-orders .customer-order-progress li.is-complete .customer-order-stage-marker {
+  border-color: var(--order-stage-color);
+  background: var(--order-stage-color);
+  color: var(--surface);
+}
+
+.account-orders .customer-order-progress li[aria-current="step"] .customer-order-stage-marker {
+  border-color: var(--order-stage-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--order-stage-color) 18%, transparent),
+    0 0 16px color-mix(in srgb, var(--order-stage-color) 30%, transparent);
 }
 
 .account-orders .customer-order-cancelled {
@@ -493,10 +519,6 @@
   .workspace-orders-heading {
     gap: 12px;
   }
-  .workspace-orders-toolbar {
-    min-height: 72px;
-    padding: 14px 16px;
-  }
   .workspace-orders-filters {
     padding: 16px;
     gap: 16px;
@@ -565,14 +587,5 @@
   .account-orders .orders-pagination button {
     padding-inline: 12px;
     font-size: 13px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .account-orders .workspace-orders-create {
-    transition: none;
-  }
-  .account-orders .workspace-orders-create:hover {
-    transform: none;
   }
 }
