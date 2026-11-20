@@ -4,6 +4,7 @@
   const detailed = document.getElementById("edit-product-detailed-description");
   const gallery = document.getElementById("product-gallery-list");
   const galleryUrl = document.getElementById("product-gallery-url");
+  const galleryUrlMessage = document.getElementById("product-gallery-url-message");
   const addGallery = document.getElementById("product-gallery-add");
   const galleryFile = document.getElementById("product-gallery-file");
   const uploadGallery = document.getElementById("upload-product-gallery");
@@ -183,6 +184,7 @@
     specs.replaceChildren();
     galleryUrl.value = "";
     galleryUrl.setCustomValidity("");
+    clearGalleryUrlError();
     galleryFile.value = "";
     galleryMessage.textContent = "";
     detailed.value = product?.detailedDescription ?? "";
@@ -196,25 +198,47 @@
     sync();
   }
 
-  addGallery.addEventListener("click", () => {
-    if (disabled || gallery.children.length >= 7) return;
+  function clearGalleryUrlError() {
+    galleryUrl.removeAttribute("aria-invalid");
+    galleryUrlMessage.textContent = "";
+  }
+
+  function addPendingImage(required = false) {
+    clearGalleryUrlError();
     const value = galleryUrl.value.trim();
+    if (!value && !required) return true;
     if (!validImage(value)) {
-      galleryUrl.setCustomValidity("Nhập đường dẫn ảnh http(s) hoặc bắt đầu bằng /.");
-      galleryUrl.reportValidity();
-      return;
+      galleryUrl.setAttribute("aria-invalid", "true");
+      galleryUrlMessage.textContent = "Nhập đường dẫn ảnh http(s) hoặc bắt đầu bằng /, hoặc để trống nếu dùng ảnh từ máy tính.";
+      galleryUrl.focus();
+      return false;
     }
-    addImage(value);
+    if (!addImage(value)) return false;
     galleryUrl.value = "";
     changed();
-    gallery.lastElementChild?.querySelector("input").focus();
+    return true;
+  }
+
+  function prepareSave() {
+    const pendingCount = Number(Boolean(galleryUrl.value.trim())) + Number(galleryFile.files.length > 0);
+    if (gallery.children.length + pendingCount > 7) {
+      galleryMessage.textContent = "Bộ sưu tập có tối đa 7 ảnh bổ sung. Xóa bớt ảnh hoặc bỏ ảnh đang chọn trước khi lưu.";
+      return false;
+    }
+    return addPendingImage();
+  }
+
+  addGallery.addEventListener("click", () => {
+    if (disabled || gallery.children.length >= 7) return;
+    if (addPendingImage(true)) gallery.lastElementChild?.querySelector("input").focus();
   });
-  galleryUrl.addEventListener("input", () => galleryUrl.setCustomValidity(""));
+  galleryUrl.addEventListener("input", clearGalleryUrlError);
   galleryFile.addEventListener("change", () => {
     const file = galleryFile.files[0];
     const error = file ? hooks.validateImageFile?.(file) : "";
     if (error) galleryFile.value = "";
-    galleryMessage.textContent = error || (file ? "Đã chọn " + file.name + ". Bấm Tải ảnh vào bộ sưu tập để tiếp tục." : "");
+    if (file && !error) clearGalleryUrlError();
+    galleryMessage.textContent = error || (file ? "Đã chọn " + file.name + ". Bấm Lưu sản phẩm để tải và lưu ảnh, hoặc Tải ảnh vào bộ sưu tập để xem trước." : "");
     sync();
   });
   uploadGallery.addEventListener("click", () => { if (!disabled) void hooks.upload?.(); });
@@ -228,7 +252,7 @@
   window.ShopAdminProductDetails = {
     configure(options) { hooks = options; },
     setBusy(value) { disabled = Boolean(value); sync(); },
-    fill, read, validate, addImage,
+    fill, read, validate, addImage, prepareSave,
     get galleryFile() { return galleryFile; },
     get galleryMessage() { return galleryMessage; },
     get galleryUploadButton() { return uploadGallery; }

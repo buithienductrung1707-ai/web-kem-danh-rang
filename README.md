@@ -180,7 +180,7 @@ Dùng **Chọn ảnh từ máy tính** rồi **Tải ảnh lên**, hoặc nhập
 - Trong **Nội dung chi tiết**, điền ô **Giới thiệu và hướng dẫn sử dụng** tối đa **12.000 ký tự**. Nội dung hiển thị theo đoạn văn bên dưới khu vực mua hàng của trang sản phẩm.
 - Thêm tối đa **12 thông số**, mỗi dòng gồm tên và giá trị. Chẳng hạn tên thông số là Thương hiệu, giá trị là tên thương hiệu trên bao bì.
 - Để thêm bàn chải, chọn **Bàn chải đánh răng** trong ô **Danh mục sản phẩm**, điền thông tin và lưu. Giỏ hàng hỗ trợ sản phẩm từ nhiều danh mục trong cùng đơn.
-- Khi dùng ảnh từ máy tính, chọn ảnh rồi bấm **Tải ảnh lên**. Tiếp tục bấm **Lưu sản phẩm** để áp dụng.
+- Khi dùng ảnh từ máy tính, chọn ảnh chính hoặc ảnh bổ sung rồi bấm **Lưu sản phẩm**. Website tự tải ảnh đã chọn lên trước khi lưu. Có thể dùng **Tải ảnh lên** hoặc **Tải ảnh vào bộ sưu tập** để xem trước, sau đó bấm **Lưu sản phẩm**. Đường dẫn ảnh bổ sung đang nhập cũng được thêm khi lưu, không cần nhập đường dẫn nếu chọn ảnh từ máy tính. Nếu tải ảnh gặp lỗi, bản chỉnh sửa được giữ để thử lại.
 - Định dạng ảnh hỗ trợ gồm JPEG, PNG và WebP, dung lượng tối đa **5 MiB**.
 
 Sau khi lưu và bật hiển thị, dùng liên kết xem trang sản phẩm để kiểm tra giao diện. Mỗi sản phẩm dùng địa chỉ chi tiết riêng theo ID và tự nhận nội dung mới sau khi tải lại trang.

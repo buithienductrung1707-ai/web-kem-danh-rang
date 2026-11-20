@@ -1154,7 +1154,7 @@ productImageFileField.addEventListener("change", () => {
   const error = validateProductImageFile(file);
   if (error) productImageFileField.value = "";
   productImageMessage.textContent = error ||
-    "Đã chọn " + file.name + ". Bấm Tải ảnh lên để tiếp tục.";
+    "Đã chọn " + file.name + ". Bấm Lưu sản phẩm để tải và lưu ảnh, hoặc Tải ảnh lên để xem trước.";
   setBusy(busy);
 });
 
@@ -1184,8 +1184,8 @@ clearProductImageButton.addEventListener("click", () => {
   productImageField.focus();
 });
 
-async function uploadProductImage(gallery = false) {
-  if (busy || !["edit", "new"].includes(productMode)) return;
+async function uploadProductImage(gallery = false, saving = false) {
+  if ((busy && !saving) || !["edit", "new"].includes(productMode)) return false;
   const fileField = gallery ? productDetails.galleryFile : productImageFileField;
   const status = gallery ? productDetails.galleryMessage : productImageMessage;
   const uploadButton = gallery ? productDetails.galleryUploadButton : uploadProductImageButton;
@@ -1193,7 +1193,7 @@ async function uploadProductImage(gallery = false) {
   const error = validateProductImageFile(file);
   if (error) {
     status.textContent = error;
-    return;
+    return false;
   }
 
   const controller = new AbortController();
@@ -1210,27 +1210,31 @@ async function uploadProductImage(gallery = false) {
       signal: AbortSignal.any([controller.signal, AbortSignal.timeout(30000)])
     });
 
-    if (productImageUploadController !== controller || sessionCheckQueued || !pageActive) return;
+    if (productImageUploadController !== controller || sessionCheckQueued || !pageActive) return false;
 
     if (response.status === 401) {
       showAuth(null);
       messageLabel.textContent =
         "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.";
-      return;
+      return false;
     }
     if (!response.ok) {
       status.textContent = typeof result?.error === "string"
         ? result.error
         : "Tải ảnh gặp lỗi. Bấm Tải ảnh lên để thử lại.";
-      return;
+      return false;
     }
     if (typeof result?.imageUrl !== "string" ||
       !/^\/uploads\/products\/[a-f0-9]{64}\.(jpg|png|webp)$/.test(result.imageUrl)) {
       throw new Error("Đường dẫn ảnh tải lên chưa hợp lệ");
     }
 
-    if (gallery) productDetails.addImage(result.imageUrl);
-    else {
+    if (gallery) {
+      if (!productDetails.addImage(result.imageUrl)) {
+        status.textContent = "Bộ sưu tập đã đủ 7 ảnh. Xóa bớt ảnh rồi thử lại.";
+        return false;
+      }
+    } else {
       productImageField.value = result.imageUrl;
       showProductImagePreview();
     }
@@ -1238,18 +1242,23 @@ async function uploadProductImage(gallery = false) {
     status.textContent =
       "Đã tải ảnh lên. Bấm Lưu sản phẩm để áp dụng ảnh này.";
     productEditorMessage.textContent = "";
+    return true;
   } catch {
     if (productImageUploadController === controller && !sessionCheckQueued && pageActive) {
       status.textContent =
         "Chưa xác nhận được kết quả tải ảnh. Giữ ảnh đã chọn và bấm Tải ảnh lên để thử lại.";
     }
+    return false;
   } finally {
     if (productImageUploadController === controller) productImageUploadController = null;
     uploadButton.textContent = gallery ? "Tải ảnh vào bộ sưu tập" : "Tải ảnh lên";
-    if (pageActive) {
-      finishRequest(gallery ? productDetails.galleryFile : productImageField);
-    } else {
-      setBusy(false);
+    // Saving keeps the form locked until the product write also finishes.
+    if (!saving) {
+      if (pageActive) {
+        finishRequest(gallery ? productDetails.galleryFile : productImageField);
+      } else {
+        setBusy(false);
+      }
     }
   }
 }
@@ -1426,6 +1435,7 @@ productForm.addEventListener("submit", async (event) => {
   productNameField.value = productNameField.value.trim();
 
   if (!productForm.reportValidity()) return;
+  if (!productDetails.prepareSave()) return;
 
   const name = productNameField.value;
   const price = Number(productPriceField.value);
@@ -1448,28 +1458,45 @@ productForm.addEventListener("submit", async (event) => {
   }
 
   const creating = productMode === "new";
-  const details = productDetails.read(productImageField.value.trim());
+  let details = productDetails.read(productImageField.value.trim());
   if (!details) return;
-  const data = {
-    ...details,
-    name,
-    price,
-    categoryId,
-    description: productDescriptionField.value.trim(),
-    imageUrl: productImageField.value.trim(),
-    active: productActiveField.checked,
-    stockTracked: productStockTrackedField.checked,
-    stockQuantity
-  };
-  const body = JSON.stringify({ ...data,
-    ...(creating ? { requestId: productCreationKey } : { expectedRevision: productSnapshot.revision })
-  });
-  const path = creating ? "/products" : "/products/" + productSnapshot.id;
 
   setBusy(true);
+  saveProductButton.textContent = "Đang lưu sản phẩm...";
   productEditorMessage.textContent = "Đang lưu sản phẩm...";
+  let focusTarget = saveProductButton;
 
   try {
+    for (const gallery of [false, true]) {
+      const fileField = gallery ? productDetails.galleryFile : productImageFileField;
+      if (!fileField.files.length) continue;
+      if (!await uploadProductImage(gallery, true)) {
+        if (!sessionCheckQueued && pageActive && !adminPanel.hidden) {
+          productEditorMessage.textContent = "Chưa lưu sản phẩm vì ảnh chưa tải lên thành công. Kiểm tra thông báo tại phần ảnh rồi thử lưu lại.";
+          focusTarget = fileField;
+        }
+        return;
+      }
+    }
+    if (sessionCheckQueued || !pageActive || adminPanel.hidden) return;
+    details = productDetails.read(productImageField.value.trim());
+    if (!details) return;
+    const data = {
+      ...details,
+      name,
+      price,
+      categoryId,
+      description: productDescriptionField.value.trim(),
+      imageUrl: productImageField.value.trim(),
+      active: productActiveField.checked,
+      stockTracked: productStockTrackedField.checked,
+      stockQuantity
+    };
+    const body = JSON.stringify({ ...data,
+      ...(creating ? { requestId: productCreationKey } : { expectedRevision: productSnapshot.revision })
+    });
+    const path = creating ? "/products" : "/products/" + productSnapshot.id;
+    productEditorMessage.textContent = "Đang lưu sản phẩm...";
     const { response, result } = await callAdmin(path, {
       method: creating ? "POST" : "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -1518,8 +1545,9 @@ productForm.addEventListener("submit", async (event) => {
     productEditorMessage.textContent =
       "Chưa xác định được kết quả lưu. Bấm Tải lại sản phẩm để kiểm tra.";
   } finally {
+    saveProductButton.textContent = productMode === "new" ? "Thêm sản phẩm" : "Lưu sản phẩm";
     finishRequest(
-      productMode === "unknown" ? reloadProductButton : saveProductButton
+      productMode === "unknown" ? reloadProductButton : focusTarget
     );
   }
 });

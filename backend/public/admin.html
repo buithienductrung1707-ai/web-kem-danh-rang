@@ -378,7 +378,7 @@
                             </label>
                             <input id="product-image-file" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="product-image-file-help product-image-message" disabled>
                             <p id="product-image-file-help" class="field-help">
-                              Ảnh JPEG, PNG hoặc WebP, tối đa 5 MiB. Tải ảnh lên rồi bấm Lưu sản phẩm để áp dụng.
+                              Ảnh JPEG, PNG hoặc WebP, tối đa 5 MiB. Bấm Lưu sản phẩm để tải và lưu ảnh đã chọn.
                             </p>
                             <div class="product-image-tools">
                               <button type="button" id="upload-product-image" class="button-secondary" disabled>
@@ -411,7 +411,8 @@
                           <label for="product-gallery-url">
                             Thêm bằng đường dẫn ảnh
                           </label>
-                          <input id="product-gallery-url" type="text" maxlength="2048" placeholder="https:// hoặc /uploads/..." disabled>
+                          <input id="product-gallery-url" type="text" maxlength="2048" placeholder="https:// hoặc /uploads/..." aria-describedby="product-gallery-url-message" disabled>
+                          <p id="product-gallery-url-message" class="field-help" role="status" aria-atomic="true"></p>
                         </div>
                         <button id="product-gallery-add" type="button" class="button-secondary" disabled>
                           Thêm ảnh
@@ -424,7 +425,7 @@
                           </label>
                           <input id="product-gallery-file" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="product-gallery-file-help product-gallery-message" disabled>
                           <p id="product-gallery-file-help" class="field-help">
-                            JPEG, PNG hoặc WebP, tối đa 5 MiB mỗi ảnh.
+                            JPEG, PNG hoặc WebP, tối đa 5 MiB mỗi ảnh. Bấm Lưu sản phẩm để tải và lưu ảnh đã chọn.
                           </p>
                         </div>
                         <button id="upload-product-gallery" type="button" class="button-secondary" disabled>
