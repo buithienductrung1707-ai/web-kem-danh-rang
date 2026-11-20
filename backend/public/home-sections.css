@@ -53,6 +53,7 @@
   }
 
   .home-page .home-intro {
+    container: home-intro / inline-size;
     min-width: 0;
     margin-inline: auto;
     padding: clamp(28px, 5vw, 64px) clamp(20px, 4vw, 52px);
@@ -99,6 +100,96 @@
     color: var(--home-highlight-text);
     line-height: 1.02;
     white-space: nowrap;
+  }
+
+  .home-page .home-benefits {
+    margin-top: clamp(36px, 4vw, 56px);
+  }
+
+  .home-page .home-benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .home-page .home-benefit-item {
+    --home-benefit-accent: var(--primary-dark);
+    min-width: 0;
+    text-align: center;
+  }
+
+  .home-page .home-benefit-item--information {
+    --home-benefit-accent: var(--info);
+  }
+
+  .home-page .home-benefit-item--payment {
+    --home-benefit-accent: var(--danger);
+  }
+
+  .home-page .home-benefit-item--orders {
+    --home-benefit-accent: #8a5c08;
+  }
+
+  [data-theme="dark"] .home-page .home-benefit-item--orders {
+    --home-benefit-accent: #f2cc7a;
+  }
+
+  .home-page .home-benefit-icon {
+    display: grid;
+    place-items: center;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    border: 1px solid color-mix(in srgb, var(--home-benefit-accent) 18%, var(--surface));
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 20%,
+      color-mix(in srgb, var(--home-benefit-accent) 5%, var(--surface)),
+      color-mix(in srgb, var(--home-benefit-accent) 18%, var(--surface)));
+    color: var(--home-benefit-accent);
+    box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--surface) 60%, transparent),
+      0 8px 20px color-mix(in srgb, var(--home-benefit-accent) 8%, transparent);
+  }
+
+  .home-page .home-benefit-icon svg {
+    display: block;
+    width: 42px;
+    height: 42px;
+  }
+
+  .home-page .home-benefit-icon-fill {
+    fill: color-mix(in srgb, var(--home-benefit-accent) 8%, var(--surface));
+  }
+
+  .home-page .home-benefit-icon-badge {
+    fill: var(--home-benefit-accent);
+    stroke: var(--surface);
+    stroke-width: 1.4;
+  }
+
+  .home-page .home-benefit-icon-check {
+    stroke: var(--surface);
+  }
+
+  .home-page .home-benefit-item h3 {
+    margin: 0 0 8px;
+    color: var(--text);
+    font-family: var(--home-heading-font);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-wrap: balance;
+  }
+
+  .home-page .home-benefit-item p {
+    max-width: 30ch;
+    margin: 0 auto;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.65;
+    text-wrap: pretty;
   }
 
   .home-page .hero.hero-carousel {
@@ -462,6 +553,24 @@
   .home-page .faq-list details[open] {
     border-color: color-mix(in srgb, var(--home-section-accent) 55%, var(--line));
     background: color-mix(in srgb, var(--home-section-accent) 4%, var(--surface));
+  }
+}
+
+@container home-intro (max-width: 680px) {
+  .home-page .home-benefits-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 20px;
+  }
+
+  .home-page .home-benefit-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+  }
+
+  .home-page .home-benefit-icon svg {
+    width: 36px;
+    height: 36px;
   }
 }
 
