@@ -1,26 +1,82 @@
 @media screen {
+  .home-page {
+    --home-band-plain: var(--surface);
+    --home-band-tinted: color-mix(in srgb, var(--primary) 14%, var(--surface));
+    --home-highlight-background: #f9ff79;
+    --home-highlight-text: #173f32;
+  }
+
+  .home-page [data-home-band="plain"] {
+    --home-section-background: var(--home-band-plain);
+  }
+
+  .home-page [data-home-band="tinted"] {
+    --home-section-background: var(--home-band-tinted);
+  }
+
+  .home-page .home-intro {
+    min-width: 0;
+    margin: 0 0 40px;
+    padding: clamp(28px, 5vw, 64px) clamp(20px, 4vw, 52px);
+    border-radius: 28px;
+    background: var(--home-section-background);
+  }
+
+  .home-page .home-intro h1 {
+    max-width: 15ch;
+    margin: 0;
+    color: var(--primary-dark);
+    font-size: clamp(40px, 7.2vw, 104px);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.055em;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  .home-page .home-intro-highlight {
+    display: inline-block;
+    padding: 0 0.14em 0.06em;
+    border-radius: 0.18em;
+    background: var(--home-highlight-background);
+    color: var(--home-highlight-text);
+    line-height: 1.02;
+    white-space: nowrap;
+  }
+
   .home-page .hero.hero-carousel {
     border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--line));
     border-top-width: 3px;
-    background: linear-gradient(125deg, color-mix(in srgb, var(--primary) 12%, var(--surface)), var(--surface));
+    background: var(--home-section-background);
     box-shadow: var(--shadow), 0 0 0 4px color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+
+  .home-page .hero-copy #hero-title {
+    margin: 0 0 24px;
+    color: var(--primary-dark);
+    font-size: clamp(32px, 4.3vw, 54px);
+    font-weight: 750;
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
   }
 
   .home-page .home-panel {
     --home-section-accent: var(--primary);
     --home-panel-radius: 28px;
     min-width: 0;
-    margin-top: 36px;
+    margin-top: 48px;
     padding: 0;
     border: 1px solid color-mix(in srgb, var(--home-section-accent) 38%, var(--line));
     border-top: 3px solid var(--home-section-accent);
     border-radius: var(--home-panel-radius);
-    background: linear-gradient(145deg, color-mix(in srgb, var(--home-section-accent) 8%, var(--surface)), var(--surface));
+    background: var(--home-section-background, var(--surface));
     box-shadow: var(--shadow);
   }
 
   .home-page .home-panel--products {
     --home-section-accent: var(--info);
+    --home-heading-color: var(--info);
   }
 
   .home-page .home-panel--help {
@@ -36,10 +92,10 @@
     justify-content: space-between;
     gap: 18px;
     margin: 0;
-    padding: 24px 28px;
+    padding: 32px 28px;
     border-bottom: 1px solid color-mix(in srgb, var(--home-section-accent) 25%, var(--line));
     border-radius: calc(var(--home-panel-radius) - 1px) calc(var(--home-panel-radius) - 1px) 0 0;
-    background: color-mix(in srgb, var(--home-section-accent) 10%, var(--surface));
+    background: transparent;
   }
 
   .home-page .home-panel-title {
@@ -73,17 +129,18 @@
 
   .home-page .home-panel-heading h2 {
     margin: 0;
-    color: var(--text);
-    font-size: clamp(22px, 2.6vw, 28px);
-    line-height: 1.3;
-    letter-spacing: -0.03em;
+    color: var(--home-heading-color, var(--primary-dark));
+    font-size: clamp(30px, 4.2vw, 52px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.04em;
     overflow-wrap: anywhere;
   }
 
   .home-page .home-panel-subtitle {
     margin: 6px 0 0;
     color: var(--muted);
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.6;
   }
 
@@ -144,6 +201,11 @@
 }
 
 @media screen and (max-width: 650px) {
+  .home-page .home-intro {
+    margin-bottom: 28px;
+    border-radius: 22px;
+  }
+
   .home-page .home-panel {
     --home-panel-radius: 22px;
     margin-top: 28px;
@@ -168,7 +230,7 @@
   }
 
   .home-page .home-panel-subtitle {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .home-page .home-panel :is(.featured-category-grid, .product-grid) {
