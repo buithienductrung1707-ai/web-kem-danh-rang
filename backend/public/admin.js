@@ -112,6 +112,7 @@ let ordersDownloadUrl = null;
 let ordersDownloadTimer = null;
 let pageActive = true;
 const categoryEditor = window.ShopAdminCategories;
+const homeSectionsEditor = window.ShopAdminHomeSections;
 
 function setBusy(value) {
   busy = value;
@@ -170,6 +171,7 @@ function setBusy(value) {
   ordersList.setAttribute("aria-busy", String(value));
   loginForm.setAttribute("aria-busy", String(value));
   categoryEditor.setBusy(value);
+  homeSectionsEditor.setBusy(value);
 }
 
 function finishRequest(focusTarget = logoutButton) {
@@ -193,6 +195,7 @@ function finishRequest(focusTarget = logoutButton) {
 
 function showAuth(admin) {
   categoryEditor.clear();
+  homeSectionsEditor.clear();
   clearOrdersExport();
   clearOrdersSummary();
   clearOrderSearch();
@@ -221,6 +224,7 @@ function showAuth(admin) {
 
 function showUnknown(message) {
   categoryEditor.clear();
+  homeSectionsEditor.clear();
   clearOrdersExport();
   clearOrdersSummary();
   clearOrderSearch();
@@ -281,6 +285,9 @@ async function checkSession() {
     if (!adminPanel.hidden && !sessionCheckQueued && pageActive) {
       await loadBannerEditor();
     }
+    if (!adminPanel.hidden && !sessionCheckQueued && pageActive) {
+      await homeSectionsEditor.load();
+    }
   } catch {
     if (sessionCheckQueued || !pageActive) return;
     showUnknown(
@@ -339,6 +346,9 @@ loginForm.addEventListener("submit", async (event) => {
     if (!adminPanel.hidden && !sessionCheckQueued && pageActive) {
       await loadBannerEditor();
     }
+    if (!adminPanel.hidden && !sessionCheckQueued && pageActive) {
+      await homeSectionsEditor.load();
+    }
   } catch {
     if (sessionCheckQueued || !pageActive) return;
     showUnknown(
@@ -358,6 +368,7 @@ logoutButton.addEventListener("click", async () => {
   clearBannerEditor();
   clearProductEditor();
   categoryEditor.clear();
+  homeSectionsEditor.clear();
   clearOrders();
   messageLabel.textContent = "Đang đăng xuất...";
 
@@ -2076,6 +2087,7 @@ window.addEventListener("pagehide", clearProductEditor);
 window.addEventListener("pagehide", clearBannerEditor);
 window.addEventListener("pagehide", clearOrdersSummary);
 window.addEventListener("pagehide", () => categoryEditor.clear());
+window.addEventListener("pagehide", () => homeSectionsEditor.clear());
 
 categoryEditor.configure({
   request: callAdmin,
@@ -2091,6 +2103,18 @@ categoryEditor.configure({
   onChange() {
     renderProductCategories();
     setBusy(busy);
+  }
+});
+
+homeSectionsEditor.configure({
+  request: callAdmin,
+  isActive: () => !adminPanel.hidden && pageActive && !sessionCheckQueued,
+  setBusy,
+  finish: finishRequest,
+  categories: () => categoryEditor.items,
+  onUnauthorized() {
+    showAuth(null);
+    messageLabel.textContent = "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.";
   }
 });
 

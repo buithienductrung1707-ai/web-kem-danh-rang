@@ -1,7 +1,7 @@
 const productList = document.getElementById("product-list");
 const featuredProductList = document.getElementById("featured-product-list");
 const homeProductSections = [
-  { list: featuredProductList, kind: "featured" },
+  { list: featuredProductList, kind: "featured", message: document.getElementById("featured-products-empty-message") },
   { list: document.getElementById("best-selling-product-list"), kind: "best-selling",
     message: document.getElementById("best-selling-message") },
   { list: document.getElementById("latest-product-list"), kind: "latest",
@@ -9,6 +9,7 @@ const homeProductSections = [
 ].filter(section => section.list);
 const catalogTargets = [productList, ...homeProductSections.map(section => section.list)].filter(Boolean);
 const homeProductsRetryButtons = [...document.querySelectorAll("[data-home-products-retry]")];
+let homeProductSettings = null;
 const productMessage = document.getElementById("product-message");
 const reloadCatalogButton = document.getElementById("reload-catalog") ?? document.getElementById("featured-products-retry");
 const productSearchField = document.getElementById("product-search")
@@ -421,7 +422,8 @@ window.addEventListener("pageshow", event => {
   if (event.persisted) {
     refreshIdleCustomerState();
     refreshFavorites();
-    if ((productList || featuredProductList) && catalogReady) renderCatalog();
+    if (homeProductSections.length > 0 && !catalogLoading) void loadCatalog();
+    else if ((productList || featuredProductList) && catalogReady) renderCatalog();
     if (checkoutForm) void refreshCheckoutAccount();
     if (checkoutForm) void refreshBankTransferDetails();
   }
@@ -1564,18 +1566,27 @@ function renderCatalog() {
   visibleProducts.sort(sorter);
   if (productList) renderProductCards(productList, visibleProducts, !catalogPage && visibleProducts.length === 1);
   for (const section of homeProductSections) {
-    const ordered = section.kind === "best-selling"
+    const settings = homeProductSettings?.get(section.kind);
+    if (!settings?.enabled) {
+      section.list.replaceChildren();
+      if (section.message) section.message.textContent = "";
+      continue;
+    }
+    const available = new Map(categoryProducts.map(product => [product.id, product]));
+    const ordered = settings.mode === "manual"
+      ? settings.productIds.map(id => available.get(id)).filter(Boolean)
+      : section.kind === "best-selling"
       ? categoryProducts.filter(product => product.soldCount > 0)
         .sort((a, b) => b.soldCount - a.soldCount || b.id - a.id)
       : section.kind === "latest" ? [...categoryProducts].sort((a, b) => b.id - a.id) : visibleProducts;
-    renderProductCards(section.list, ordered.slice(0, 4));
+    renderProductCards(section.list, ordered.slice(0, settings.limit));
     if (section.message) section.message.textContent = ordered.length ? ""
+      : settings.mode === "manual" ? "Mục này đang được cập nhật sản phẩm."
       : section.kind === "best-selling" && categoryProducts.length > 0
         ? "Sản phẩm bán chạy sẽ xuất hiện khi có đơn hàng hoàn thành."
         : "Cửa hàng đang cập nhật sản phẩm. Bạn hãy quay lại sau.";
   }
-  if (featuredProductList) productMessage.textContent = visibleProducts.length ? ""
-    : "Cửa hàng đang cập nhật sản phẩm. Bạn hãy quay lại sau.";
+  if (homeProductSections.length > 0) productMessage.textContent = "";
   if (catalogResults) {
     if (categoryProducts.length === 0) catalogResults.textContent = window.ShopCategories?.isCategoryPage && !selectedCategory
       ? "Danh mục này hiện chưa được hiển thị. Hãy chọn danh mục khác trong Danh mục."
@@ -1752,10 +1763,49 @@ function renderCatalogSkeleton() {
   }
 }
 
+function validateHomeProductSettings(items) {
+  const keys = new Set(homeProductSections.map(section => section.kind));
+  if (!Array.isArray(items) || items.length !== keys.size ||
+    !items.every(item => item && keys.has(item.key) &&
+      typeof item.title === "string" && item.title.trim().length > 0 && item.title.length <= 120 &&
+      typeof item.subtitle === "string" && item.subtitle.length <= 240 &&
+      typeof item.enabled === "boolean" && ["auto", "manual"].includes(item.mode) &&
+      Number.isSafeInteger(item.limit) && item.limit >= 1 && item.limit <= 12 &&
+      Array.isArray(item.productIds) && item.productIds.length <= 12 &&
+      item.productIds.every(id => Number.isSafeInteger(id) && id > 0) &&
+      new Set(item.productIds).size === item.productIds.length &&
+      (item.mode !== "auto" || item.productIds.length === 0)) ||
+    new Set(items.map(item => item.key)).size !== items.length) {
+    throw new Error("Cấu hình sản phẩm trang chủ chưa hợp lệ.");
+  }
+  return new Map(items.map(item => [item.key, item]));
+}
+
+function updateHomeProductPresentation() {
+  for (const section of homeProductSections) {
+    const settings = homeProductSettings?.get(section.kind);
+    const panel = section.list.closest("section");
+    const band = section.list.closest("[data-home-product-section]");
+    const divider = document.querySelector('[data-home-product-divider="' + section.kind + '"]');
+    if (band) band.hidden = !settings?.enabled;
+    if (divider) divider.hidden = !settings?.enabled;
+    if (!settings) continue;
+    const heading = panel?.querySelector("h2");
+    const subtitle = panel?.querySelector(".home-panel-subtitle");
+    if (heading) heading.textContent = settings.title;
+    if (subtitle) {
+      subtitle.textContent = settings.subtitle;
+      subtitle.hidden = settings.subtitle.trim() === "";
+    }
+  }
+}
+
 async function loadCatalog() {
   if (catalogLoading || orderPending || isSubmitting) return;
   catalogLoading = true;
   catalogReady = false;
+  homeProductSettings = null;
+  updateHomeProductPresentation();
   productMessage.textContent = productList || featuredProductList || checkoutForm ? "Đang tải sản phẩm..." : "";
   for (const section of homeProductSections) {
     if (section.message) section.message.textContent = "Đang tải sản phẩm...";
@@ -1765,11 +1815,17 @@ async function loadCatalog() {
   if (empty) empty.hidden = true;
   updateControls();
   try {
-    const [response, categories] = await Promise.all([
+    const [response, categories, sectionsResponse] = await Promise.all([
       fetch("/api/products", { cache: "no-store", signal: AbortSignal.timeout(15000) }),
-      (productList || featuredProductList) && window.ShopCategories ? window.ShopCategories.load({ refresh: catalogCategories !== null }) : null
+      (productList || featuredProductList) && window.ShopCategories ? window.ShopCategories.load({ refresh: catalogCategories !== null }) : null,
+      homeProductSections.length > 0 ? fetch("/api/home-sections", { cache: "no-store", signal: AbortSignal.timeout(15000) }) : null
     ]);
     const result = await response.json();
+    let sectionSettings = null;
+    if (sectionsResponse) {
+      if (!sectionsResponse.ok) throw new Error("Chưa tải được cấu hình trang chủ.");
+      sectionSettings = validateHomeProductSettings(await sectionsResponse.json());
+    }
     if (!storefrontActive || orderPending || isSubmitting) return;
     if (!response.ok || !Array.isArray(result) ||
       !result.every(item => item && Number.isSafeInteger(item.id) && item.id > 0 &&
@@ -1789,6 +1845,8 @@ async function loadCatalog() {
       stockTracked: false, stockQuantity: 0, categoryId: 1, categoryName: "Kem đánh răng", brand: "", soldCount: 0, ...item
     }]));
     catalogCategories = categories;
+    homeProductSettings = sectionSettings;
+    updateHomeProductPresentation();
     renderBrandOptions();
     catalogReady = true;
     cartMessage.textContent = "";

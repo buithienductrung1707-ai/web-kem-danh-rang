@@ -14,6 +14,9 @@ function initializeSchema() {
   const bannersExist = db.prepare(`
     SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'home_banners'
   `).get();
+  const homeSectionsExist = db.prepare(`
+    SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'home_sections'
+  `).get();
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS product_categories (
@@ -175,6 +178,19 @@ function initializeSchema() {
       creation_key TEXT PRIMARY KEY
     ) STRICT;
 
+    CREATE TABLE IF NOT EXISTS home_sections (
+      key TEXT PRIMARY KEY CHECK (key IN ('best-selling', 'latest', 'featured')),
+      title TEXT NOT NULL CHECK (length(title) BETWEEN 1 AND 120),
+      subtitle TEXT NOT NULL DEFAULT '' CHECK (length(subtitle) <= 240),
+      enabled INTEGER NOT NULL DEFAULT 1 CHECK (enabled IN (0, 1)),
+      mode TEXT NOT NULL DEFAULT 'auto' CHECK (mode IN ('auto', 'manual')),
+      product_limit INTEGER NOT NULL DEFAULT 4 CHECK (product_limit BETWEEN 1 AND 12),
+      product_ids TEXT NOT NULL DEFAULT '[]' CHECK (
+        json_valid(product_ids) AND json_type(product_ids) = 'array' AND json_array_length(product_ids) <= 12
+      ),
+      revision INTEGER NOT NULL DEFAULT 0 CHECK (revision BETWEEN 0 AND 9007199254740991)
+    ) STRICT;
+
     CREATE TABLE IF NOT EXISTS support_conversations (
       id TEXT PRIMARY KEY,
       token_hash TEXT NOT NULL UNIQUE,
@@ -195,6 +211,14 @@ function initializeSchema() {
     CREATE INDEX IF NOT EXISTS support_messages_conversation
       ON support_messages(conversation_id, id);
   `);
+
+  if (!homeSectionsExist) {
+    const seedHomeSection = db.prepare("INSERT INTO home_sections (key, title, subtitle) VALUES (?, ?, ?)");
+    seedHomeSection.run("best-selling", "Sản phẩm bán chạy", "Những lựa chọn được khách hàng mua nhiều nhất.");
+    seedHomeSection.run("latest", "Sản phẩm mới nhất", "Cập nhật những sản phẩm vừa có mặt tại cửa hàng.");
+    seedHomeSection.run("featured", "Sản phẩm nổi bật", "Lựa chọn sản phẩm nổi bật và thêm vào giỏ hàng.");
+    seedHomeSection.close();
+  }
 
   if (!categoriesExist) {
     const seedCategory = db.prepare(`

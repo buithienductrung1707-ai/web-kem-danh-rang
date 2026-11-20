@@ -9,8 +9,10 @@
     <link rel="stylesheet" href="admin-support.css">
     <link rel="stylesheet" href="admin-categories.css">
     <link rel="stylesheet" href="admin-products.css">
+    <link rel="stylesheet" href="admin-home-sections.css">
     <script src="admin-categories.js" defer></script>
     <script src="admin-products.js" defer></script>
+    <script src="admin-home-sections.js" defer></script>
     <script src="admin.js" defer></script>
     <script src="admin-support.js" defer></script>
   </head>
@@ -85,6 +87,7 @@
             <a href="#support-title">Chăm sóc khách hàng</a>
             <a href="#banner-editor-title">Quảng cáo</a>
             <a href="#category-editor-title">Danh mục</a>
+            <a href="#home-sections-title">Sản phẩm trang chủ</a>
             <a href="#product-editor-title">Sản phẩm</a>
             <a href="#orders-title">Đơn hàng</a>
           </nav>
@@ -285,6 +288,81 @@
               </div>
             </form>
             <p id="category-editor-message" role="status" aria-atomic="true"></p>
+          </section>
+
+          <section id="admin-home-sections" class="panel admin-home-sections" aria-labelledby="home-sections-title">
+            <div class="panel-heading">
+              <div>
+                <h2 id="home-sections-title">Sản phẩm trang chủ</h2>
+                <p class="field-help">Chọn cách hiển thị cho từng khu vực sản phẩm trên trang chủ.</p>
+              </div>
+              <button id="home-sections-reload" type="button" class="button-secondary" disabled>Tải lại các mục</button>
+            </div>
+            <div class="home-sections-toolbar">
+              <div class="field">
+                <label for="home-section-picker">Khu vực đang chỉnh sửa</label>
+                <select id="home-section-picker" disabled>
+                  <option value="best-selling">Sản phẩm bán chạy</option>
+                  <option value="latest">Sản phẩm mới nhất</option>
+                  <option value="featured">Sản phẩm nổi bật</option>
+                </select>
+              </div>
+              <p class="home-sections-note">Các thay đổi chỉ áp dụng sau khi bấm <strong>Lưu mục</strong>.</p>
+            </div>
+            <p id="home-sections-message" role="status" aria-atomic="true"></p>
+            <form id="home-section-form" hidden>
+              <div class="home-section-settings">
+                <div class="field home-section-field-wide">
+                  <label for="home-section-title">Tiêu đề khu vực</label>
+                  <input id="home-section-title" type="text" maxlength="120" required disabled>
+                </div>
+                <div class="field home-section-field-wide">
+                  <label for="home-section-subtitle">Mô tả ngắn</label>
+                  <textarea id="home-section-subtitle" rows="2" maxlength="240" disabled></textarea>
+                </div>
+                <div class="field">
+                  <label for="home-section-mode">Cách chọn sản phẩm</label>
+                  <select id="home-section-mode" aria-describedby="home-section-mode-help" disabled>
+                    <option value="auto">Tự động</option>
+                    <option value="manual">Tự chọn sản phẩm</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="home-section-limit">Số sản phẩm hiển thị</label>
+                  <input id="home-section-limit" type="number" min="1" max="12" step="1" required disabled>
+                </div>
+                <div class="home-section-field-wide">
+                  <label class="checkbox-field home-section-visibility" for="home-section-enabled">
+                    <input id="home-section-enabled" type="checkbox" disabled>
+                    Hiển thị khu vực này trên trang chủ
+                  </label>
+                  <p id="home-section-mode-help" class="field-help"></p>
+                </div>
+              </div>
+              <section id="home-section-manual" class="home-section-manual" aria-labelledby="home-section-manual-title" hidden>
+                <div class="home-section-manual-heading">
+                  <div>
+                    <h3 id="home-section-manual-title">Danh sách sản phẩm tự chọn</h3>
+                    <p class="field-help">Sắp xếp theo thứ tự xuất hiện. Danh sách được giữ lại khi chuyển về chế độ tự động.</p>
+                  </div>
+                  <span id="home-section-count" class="home-section-count">0 / 12</span>
+                </div>
+                <div class="home-section-add-row">
+                  <div class="field">
+                    <label for="home-section-product-picker">Thêm sản phẩm có sẵn</label>
+                    <select id="home-section-product-picker" disabled></select>
+                  </div>
+                  <button id="home-section-add" type="button" class="button-secondary" disabled>Thêm vào mục</button>
+                </div>
+                <p id="home-section-empty" class="home-section-empty">Chưa chọn sản phẩm. Khu vực này sẽ không có sản phẩm khi lưu ở chế độ tự chọn.</p>
+                <ol id="home-section-products" class="home-section-products" aria-label="Thứ tự sản phẩm trên trang chủ"></ol>
+                <p id="home-section-list-help" class="field-help">Tối đa 12 sản phẩm. Xóa khỏi mục chỉ gỡ sản phẩm khỏi khu vực này, không xóa sản phẩm của cửa hàng.</p>
+              </section>
+              <div class="home-section-save-row">
+                <button id="home-section-save" type="submit" disabled>Lưu mục</button>
+                <p id="home-section-draft-status" class="field-help" aria-live="polite"></p>
+              </div>
+            </form>
           </section>
 
           <section class="panel admin-product" aria-labelledby="product-editor-title">

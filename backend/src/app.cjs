@@ -8,6 +8,7 @@ const { customerSupportRouter } = require("./routes/support.cjs");
 const { createOrder, getOrderItems, getOrderHistory } = require("./services/orders.cjs");
 const { getPublicBanners } = require("./services/banners.cjs");
 const { getPublicCategories } = require("./services/categories.cjs");
+const { getPublicHomeSections } = require("./services/home-sections.cjs");
 const { productDetailsResponse, productBrand } = require("./services/product-details.cjs");
 const { productId, getProductReviewStats, getPublicReviews } = require("./services/product-reviews.cjs");
 const { getRuntime } = require("./runtime.cjs");
@@ -82,6 +83,11 @@ app.get("/api/products/:id/reviews", (req, res) => {
 app.get("/api/categories", (req, res) => {
   res.set("Cache-Control", "no-store");
   res.json(getPublicCategories());
+});
+
+app.get("/api/home-sections", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json(getPublicHomeSections());
 });
 
 app.get("/api/banners", (req, res) => {

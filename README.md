@@ -300,6 +300,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | [backend/src/services/customer-addresses.cjs](backend/src/services/customer-addresses.cjs) | Sổ địa chỉ cá nhân, địa chỉ mặc định và dữ liệu hồ sơ |
 | [backend/src/routes/support.cjs](backend/src/routes/support.cjs), [backend/src/services/support.cjs](backend/src/services/support.cjs) | API và lưu trữ tin nhắn chăm sóc khách hàng |
 | [backend/src/services/categories.cjs](backend/src/services/categories.cjs) | Danh mục dùng chung cho trang chủ, menu và sản phẩm |
+| [backend/src/services/home-sections.cjs](backend/src/services/home-sections.cjs) | Cấu hình và danh sách sản phẩm cho ba mục trang chủ |
 | [backend/src/db/database.cjs](backend/src/db/database.cjs) | Schema, nâng cấp cấu trúc và dữ liệu mẫu |
 | [backend/src/services/](backend/src/services/) | Xử lý đơn, ảnh, quảng cáo và email |
 | [backend/src/utils/](backend/src/utils/) | Lọc đơn và xuất CSV |
@@ -329,6 +330,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Trang danh mục và sản phẩm theo danh mục | [danh-muc.html](backend/public/danh-muc.html), [catalog-page.css](backend/public/catalog-page.css), [catalog-page.js](backend/public/catalog-page.js) |
 | Danh mục nổi bật, menu và dữ liệu danh mục dùng chung | [catalog-categories.js](backend/public/catalog-categories.js), [catalog-categories.css](backend/public/catalog-categories.css) |
 | Quản lý danh mục trong trang admin | [admin-categories.js](backend/public/admin-categories.js), [admin-categories.css](backend/public/admin-categories.css) |
+| Quản lý ba mục sản phẩm trang chủ | [admin-home-sections.js](backend/public/admin-home-sections.js), [admin-home-sections.css](backend/public/admin-home-sections.css) |
 | Ảnh logo dùng chung | [shop-logo.png](backend/public/assets/shop-logo.png) |
 | Danh mục sản phẩm, giỏ hàng và đặt hàng | [app.js](backend/public/app.js) |
 | Trình chiếu quảng cáo trang chủ | [carousel.js](backend/public/carousel.js) |
@@ -344,7 +346,15 @@ Header dùng nền xanh ngọc đậm, viền sáng và bóng đổ để tách 
 
 Trang chủ mở đầu bằng dòng chữ lớn **Kem đánh răng số 1 tại Mỹ** được căn giữa, với **số 1** được tô nền vàng bo góc và phần mô tả nhỏ, màu dịu bên dưới. Dòng này luôn hiển thị độc lập với quảng cáo do admin quản lý. Mỗi khu vực có nền kéo hết bề ngang trang, xen kẽ nền trắng và xanh nhạt, cùng đường phân cách mảnh; nội dung vẫn giữ lề phù hợp khi có banner hai bên và tự điều chỉnh theo chế độ sáng/tối. Tiêu đề các mục dùng chữ in hoa và gạch ngắn phía dưới. **Danh mục nổi bật** có nền xanh chuyển sắc, thẻ nhỏ bo góc, ảnh tròn và tên căn giữa; danh mục vẫn được quản lý tại trang quản trị. Kiểu trình bày này được giới hạn ở trang chủ trong [home-sections.css](backend/public/home-sections.css).
 
-Phía trên **Danh mục nổi bật** có hai khu vực **Sản phẩm bán chạy** và **Sản phẩm mới nhất**, mỗi khu vực hiển thị tối đa 4 sản phẩm. Bán chạy xếp theo tổng số lượng trong các đơn đã **Hoàn thành** và chỉ hiển thị sản phẩm đã có lượt mua thực tế; đơn mới, đang xử lý hoặc đã huỷ không được cộng. Nếu chưa có lượt mua hoàn thành, khu vực có hướng dẫn thay cho số bán minh hoạ. Mới nhất lấy thứ tự sản phẩm vừa được thêm vào cửa hàng (ID giảm dần). Sản phẩm ngừng bán hoặc thuộc danh mục bị ẩn không xuất hiện. Cả ba khu vực bán chạy, mới nhất và nổi bật dùng chung thao tác yêu thích, thêm giỏ và bảo vệ tồn kho. Thẻ sản phẩm dùng thanh **Đã bán** nền xanh nhạt, dải đỏ–cam và biểu tượng ngọn lửa, hiển thị số lượng thực từ đơn hoàn thành, kể cả 0. Dải màu là trang trí, không biểu thị phần trăm tồn kho; số lượng tồn không còn hiện riêng trên thẻ. Bấm tên hoặc ảnh để xem thông tin chi tiết.
+Phía trên **Danh mục nổi bật** có hai khu vực **Sản phẩm bán chạy** và **Sản phẩm mới nhất**. Mặc định, mỗi khu vực hiển thị tối đa 4 sản phẩm theo chế độ tự động. Bán chạy xếp theo tổng số lượng trong các đơn đã **Hoàn thành** và chỉ hiển thị sản phẩm đã có lượt mua thực tế; đơn mới, đang xử lý hoặc đã huỷ không được cộng. Nếu chưa có lượt mua hoàn thành, khu vực có hướng dẫn thay cho số bán minh hoạ. Mới nhất lấy thứ tự sản phẩm vừa được thêm vào cửa hàng (ID giảm dần). Sản phẩm ngừng bán hoặc thuộc danh mục bị ẩn không xuất hiện. Cả ba khu vực bán chạy, mới nhất và nổi bật dùng chung thao tác yêu thích, thêm giỏ và bảo vệ tồn kho. Thẻ sản phẩm dùng thanh **Đã bán** nền xanh nhạt, dải đỏ–cam và biểu tượng ngọn lửa, hiển thị số lượng thực từ đơn hoàn thành, kể cả 0. Dải màu là trang trí, không biểu thị phần trăm tồn kho; số lượng tồn không còn hiện riêng trên thẻ. Bấm tên hoặc ảnh để xem thông tin chi tiết.
+
+Trong trang quản trị, mở **Sản phẩm trang chủ** để quản lý riêng ba mục trên:
+
+1. Chọn mục cần sửa, nhập tiêu đề, mô tả, số sản phẩm hiển thị (1–12) và bật/tắt hiển thị.
+2. Chọn **Tự động** để dùng quy tắc mặc định, hoặc **Tự chọn** để quản lý danh sách riêng. Chế độ tự chọn cho phép thêm tối đa 12 sản phẩm, dùng **Sửa** để thay sản phẩm, nút lên/xuống để đổi thứ tự và **Xoá khỏi mục** để gỡ một sản phẩm. Chỉ số lượng đầu danh sách theo giới hạn đã chọn được hiển thị.
+3. Bấm **Lưu mục**, sau đó tải lại trang chủ để xem kết quả. Danh sách tự chọn được giữ khi chuyển qua chế độ tự động. Xoá hết danh sách tự chọn sẽ để mục trống, không tự bổ sung sản phẩm.
+
+Gỡ sản phẩm khỏi mục trang chủ không xoá sản phẩm trong kho hay các mục khác. Số đã bán luôn lấy từ đơn hoàn thành, kể cả khi admin tự chọn sản phẩm. Nếu có người khác chỉnh cùng mục, giao diện giữ bản đang sửa và yêu cầu tải lại trước khi lưu tiếp. Cấu hình được lưu trong bảng `home_sections`, tự khởi tạo khi cập nhật phiên bản; khởi động lại không ghi đè các thay đổi đã lưu. Nếu chưa tải được cấu hình, trang chủ có thông báo và nút thử lại thay vì hiển thị danh sách cũ.
 
 Trên điện thoại, header sắp xếp logo, tài khoản, giỏ hàng và nút đổi giao diện ở hàng đầu. Ô tìm kiếm nằm ở hàng riêng, tiếp theo là nút **Danh mục** với biểu tượng menu và mũi tên. Bấm chữ để mở trang danh mục, bấm mũi tên để chọn nhanh một danh mục. Mặt trăng/mặt trời đổi giao diện sáng/tối.
 

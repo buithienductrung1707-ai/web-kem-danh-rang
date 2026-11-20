@@ -10,6 +10,7 @@ const { validProductImageUrl, productDetailsData, productDetailsResponse } = req
 const { parseOrderFilters, orderFilterSql, orderFilterParameters } = require("../utils/order-filters.cjs");
 const { ordersToCsv } = require("../utils/order-export.cjs");
 const { getAdminBanners, createBanner, updateBanner, deleteBanner } = require("../services/banners.cjs");
+const { getAdminHomeSections, updateHomeSection } = require("../services/home-sections.cjs");
 const {
   DEFAULT_CATEGORY_ID, getAdminCategories, createCategory, updateCategory, deleteCategory, categoryExists
 } = require("../services/categories.cjs");
@@ -184,6 +185,15 @@ router.post("/product-images", requireAdmin, ...createProductImageUpload());
 
 router.get("/banners", requireAdmin, (req, res) => {
   res.json(getAdminBanners());
+});
+
+router.get("/home-sections", requireAdmin, (req, res) => {
+  res.json(getAdminHomeSections());
+});
+
+router.put("/home-sections/:key", requireAdmin, (req, res) => {
+  const result = updateHomeSection(req.params.key, req.body);
+  res.status(result.status).json(result.body);
 });
 
 router.post("/banners", requireAdmin, (req, res) => {

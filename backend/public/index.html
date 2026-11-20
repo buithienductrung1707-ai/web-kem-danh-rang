@@ -124,8 +124,13 @@
       </div>
       </div>
 
-      <hr class="home-section-divider" aria-hidden="true">
-      <div class="home-band" data-home-band="plain">
+      <div class="home-products-feedback home-band-inner">
+        <p id="product-message" role="status" aria-atomic="true">Đang tải sản phẩm...</p>
+        <p id="featured-products-message" role="status" aria-atomic="true"></p>
+        <button class="button-secondary" type="button" data-home-products-retry hidden>Thử tải lại sản phẩm</button>
+      </div>
+      <hr class="home-section-divider" data-home-product-divider="best-selling" aria-hidden="true" hidden>
+      <div class="home-band" data-home-band="plain" data-home-product-section="best-selling" hidden>
       <section id="best-selling-products" class="home-band-inner home-panel home-panel--products" aria-labelledby="best-selling-title">
         <div class="section-heading home-panel-heading">
           <div class="home-panel-title"><div>
@@ -139,8 +144,8 @@
         <button class="button-secondary" type="button" data-home-products-retry hidden>Thử tải lại sản phẩm</button>
       </section>
       </div>
-      <hr class="home-section-divider" aria-hidden="true">
-      <div class="home-band" data-home-band="tinted">
+      <hr class="home-section-divider" data-home-product-divider="latest" aria-hidden="true" hidden>
+      <div class="home-band" data-home-band="tinted" data-home-product-section="latest" hidden>
       <section id="latest-products" class="home-band-inner home-panel home-panel--products" aria-labelledby="latest-products-title">
         <div class="section-heading home-panel-heading">
           <div class="home-panel-title"><div>
@@ -189,31 +194,30 @@
         <button id="categories-retry" type="button" class="button-secondary" hidden>Tải lại danh mục</button>
       </section>
       </div>
-      <hr class="home-section-divider" aria-hidden="true">
-      <div class="home-band" data-home-band="plain">
+      <hr class="home-section-divider" data-home-product-divider="featured" aria-hidden="true" hidden>
+      <div class="home-band" data-home-band="plain" data-home-product-section="featured" hidden>
       <section id="featured-products" class="featured-products-section home-band-inner home-panel home-panel--products" aria-labelledby="featured-products-title">
         <div class="section-heading home-panel-heading">
           <div class="home-panel-title">
             <span class="home-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></span>
             <div>
               <h2 id="featured-products-title" tabindex="-1">Sản phẩm nổi bật</h2>
-              <p class="home-panel-subtitle">Xem nhanh sản phẩm và thêm vào giỏ hàng.</p>
+              <p class="home-panel-subtitle">Lựa chọn sản phẩm nổi bật và thêm vào giỏ hàng.</p>
             </div>
           </div>
           <a class="section-view-all" href="/danh-muc.html">Xem tất cả sản phẩm <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a>
         </div>
-        <p id="product-message" role="status" aria-atomic="true"></p>
         <div id="featured-product-list" class="product-grid" aria-busy="true"></div>
-        <p id="featured-products-message" role="status" aria-atomic="true"></p>
+        <p id="featured-products-empty-message" role="status" aria-atomic="true"></p>
         <button id="featured-products-retry" class="button-secondary" type="button" hidden>Tải lại sản phẩm</button>
       </section>
+      </div>
       <div class="storefront-feedback home-commerce-feedback home-band-inner">
         <p id="cart-message" role="status" aria-atomic="true"></p>
         <p id="storage-message" role="status"></p>
         <p id="reorder-message" role="status" aria-atomic="true"></p>
         <p id="pending-order-message" role="status" aria-atomic="true"></p>
         <a id="pending-cart-link" class="navigation-link cart-navigation" href="/dang-nhap.html?view=cart" hidden>Đi đến giỏ hàng</a>
-      </div>
       </div>
       <hr class="home-section-divider" aria-hidden="true">
       <div class="home-band" data-home-band="tinted">

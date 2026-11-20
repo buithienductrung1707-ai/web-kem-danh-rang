@@ -309,6 +309,20 @@
     display: none;
   }
 
+  .home-page .home-products-feedback {
+    padding-block: 16px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .home-page .home-products-feedback:not(:has(> :not([hidden]):not(:empty))) {
+    display: none;
+  }
+
+  .home-page .home-products-feedback p:empty {
+    display: none;
+  }
+
   .home-page .home-band--categories {
     --home-section-background: linear-gradient(110deg, var(--home-category-start), var(--home-category-end));
     position: relative;
