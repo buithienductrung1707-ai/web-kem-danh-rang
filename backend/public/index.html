@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="favorite-buttons.css">
     <link rel="stylesheet" href="home-sections.css">
     <link rel="stylesheet" href="product-cards.css">
+    <link rel="stylesheet" href="section-decorations.css">
     <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
     <script src="cart-feedback.js" defer></script>
@@ -184,11 +185,24 @@
       <div class="home-band" data-home-band="plain" data-home-product-section="best-selling" hidden>
       <section id="best-selling-products" class="home-band-inner home-panel home-panel--products" aria-labelledby="best-selling-title">
         <div class="section-heading home-panel-heading">
-          <div class="home-panel-title"><div>
+          <div class="home-panel-title">
+            <span class="home-product-mark home-product-mark--bestsellers" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path class="home-product-mark-fill" d="m7 13 7 5 6-10 6 10 7-5-3 17H10L7 13Z"/><path d="M11 34h18M14 24h12"/><path class="home-product-mark-spark" d="M5 5v5M2.5 7.5h5M34 4v5M31.5 6.5h5"/><circle cx="20" cy="6" r="2"/></svg></span>
+            <div>
+            <p class="home-section-kicker">Gợi ý từ cửa hàng</p>
             <h2 id="best-selling-title" tabindex="-1">Sản phẩm bán chạy</h2>
             <p class="home-panel-subtitle">Những lựa chọn được khách hàng mua nhiều nhất.</p>
+            <ul class="home-section-chips" aria-label="Gợi ý lựa chọn"><li>Chăm sóc hằng ngày</li><li>Tìm hiểu trước khi mua</li></ul>
           </div></div>
           <a class="section-view-all" href="/danh-muc.html">Xem tất cả <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="home-section-banner home-section-banner--bestsellers">
+          <img class="home-section-banner-image" src="/assets/section-bestsellers-v1.png" width="2172" height="724" alt="" loading="lazy" decoding="async">
+          <div class="home-section-banner-copy">
+            <span class="home-section-banner-badge">Một chút chăm sóc, mỗi ngày</span>
+            <h3>Lựa chọn cho <span>nụ cười mỗi ngày</span></h3>
+            <p>Khám phá kem đánh răng và bàn chải phù hợp với bạn.</p>
+            <a class="home-section-banner-link" href="/danh-muc.html">Khám phá ngay <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a>
+          </div>
         </div>
         <div id="best-selling-product-list" class="product-grid" aria-busy="true"></div>
         <p id="best-selling-message" role="status" aria-atomic="true"></p>
@@ -199,11 +213,24 @@
       <div class="home-band" data-home-band="tinted" data-home-product-section="latest" hidden>
       <section id="latest-products" class="home-band-inner home-panel home-panel--products" aria-labelledby="latest-products-title">
         <div class="section-heading home-panel-heading">
-          <div class="home-panel-title"><div>
+          <div class="home-panel-title">
+            <span class="home-product-mark home-product-mark--new-arrivals" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path class="home-product-mark-fill" d="m8 15 12-6 12 6v16l-12 6-12-6V15Z"/><path d="m8 15 12 6 12-6M20 21v16M14 12l12 6"/><path class="home-product-mark-spark" d="m32 3 1.4 3.6L37 8l-3.6 1.4L32 13l-1.4-3.6L27 8l3.6-1.4L32 3ZM6 4v5M3.5 6.5h5"/></svg></span>
+            <div>
+            <p class="home-section-kicker">Khám phá điều mới</p>
             <h2 id="latest-products-title" tabindex="-1">Sản phẩm mới nhất</h2>
             <p class="home-panel-subtitle">Cập nhật những sản phẩm vừa có mặt tại cửa hàng.</p>
+            <ul class="home-section-chips" aria-label="Gợi ý khám phá"><li>Thêm lựa chọn mỗi ngày</li><li>Chọn theo nhu cầu</li></ul>
           </div></div>
           <a class="section-view-all" href="/danh-muc.html?sort=default">Xem tất cả <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="home-section-banner home-section-banner--new-arrivals">
+          <img class="home-section-banner-image" src="/assets/section-new-arrivals-v1.png" width="2172" height="724" alt="" loading="lazy" decoding="async">
+          <div class="home-section-banner-copy">
+            <span class="home-section-banner-badge">Góc khám phá sản phẩm</span>
+            <h3>Thêm lựa chọn, <span>thêm nụ cười</span></h3>
+            <p>Tìm cảm hứng mới cho thói quen chăm sóc răng miệng.</p>
+            <a class="home-section-banner-link" href="/danh-muc.html?sort=default">Xem sản phẩm <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a>
+          </div>
         </div>
         <div id="latest-product-list" class="product-grid" aria-busy="true"></div>
         <p id="latest-products-message" role="status" aria-atomic="true"></p>
@@ -250,13 +277,24 @@
       <section id="featured-products" class="featured-products-section home-band-inner home-panel home-panel--products" aria-labelledby="featured-products-title">
         <div class="section-heading home-panel-heading">
           <div class="home-panel-title">
-            <span class="home-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg></span>
+            <span class="home-product-mark home-product-mark--featured" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path class="home-product-mark-fill" d="M20 10c-3-4-11-4-12 3-1 5 2 9 3 14 1 5 2 8 4 8s2-9 5-9 3 9 5 9 3-3 4-8c1-5 4-9 3-14-1-7-9-7-12-3Z"/><path d="M15 12c2 1 4 2 6 1"/><path class="home-product-mark-spark" d="m31 2 1.4 3.6L36 7l-3.6 1.4L31 12l-1.4-3.6L26 7l3.6-1.4L31 2ZM5 26v5M2.5 28.5h5"/></svg></span>
             <div>
+              <p class="home-section-kicker">Góc chăm sóc nụ cười</p>
               <h2 id="featured-products-title" tabindex="-1">Sản phẩm nổi bật</h2>
               <p class="home-panel-subtitle">Lựa chọn sản phẩm nổi bật và thêm vào giỏ hàng.</p>
+              <ul class="home-section-chips" aria-label="Gợi ý chăm sóc"><li>Chăm sóc hằng ngày</li><li>Khám phá sản phẩm</li></ul>
             </div>
           </div>
           <a class="section-view-all" href="/danh-muc.html">Xem tất cả sản phẩm <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a>
+        </div>
+        <div class="home-section-banner home-section-banner--featured">
+          <img class="home-section-banner-image" src="/assets/section-featured-v1.png" width="2172" height="724" alt="" loading="lazy" decoding="async">
+          <div class="home-section-banner-copy">
+            <span class="home-section-banner-badge">Chăm sóc theo cách của bạn</span>
+            <h3>Chăm chút từ <span>những điều nhỏ</span></h3>
+            <p>Bắt đầu từ những sản phẩm quen thuộc cho mỗi ngày.</p>
+            <a class="home-section-banner-link" href="/danh-muc.html">Tìm lựa chọn phù hợp <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></a>
+          </div>
         </div>
         <div id="featured-product-list" class="product-grid" aria-busy="true"></div>
         <p id="featured-products-empty-message" role="status" aria-atomic="true"></p>

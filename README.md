@@ -316,6 +316,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | --- | --- |
 | Màu sắc, header, menu và banner hai bên | [style.css](backend/public/style.css) |
 | Thẻ tiện ích và thanh số đã bán trên thẻ sản phẩm | [storefront-widgets.css](backend/public/storefront-widgets.css), [product-cards.css](backend/public/product-cards.css) |
+| Biểu tượng, chữ nhấn và banner trang trí ba mục sản phẩm | [section-decorations.css](backend/public/section-decorations.css) |
 | Hiệu ứng thêm sản phẩm vào giỏ hàng | [cart-feedback.js](backend/public/cart-feedback.js), [cart-feedback.css](backend/public/cart-feedback.css) |
 | Trang thông tin từng sản phẩm | [chi-tiet-san-pham.html](backend/public/chi-tiet-san-pham.html), [product-detail.js](backend/public/product-detail.js), [product-detail.css](backend/public/product-detail.css) |
 | Đánh giá sản phẩm | [product-reviews.js](backend/public/product-reviews.js), [product-reviews.css](backend/public/product-reviews.css), [product-reviews.cjs](backend/src/services/product-reviews.cjs) |
@@ -341,6 +342,8 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải lại. Sau khi sửa mã backend hoặc biến môi trường, dừng và chạy lại máy chủ.
 
 Ảnh [danh mục bàn chải](backend/public/assets/category-toothbrush.png) được tạo bằng công cụ imagegen tích hợp. [Prompt tạo ảnh](backend/public/assets/category-toothbrush.prompt.txt) được lưu cùng ảnh để có thể tạo lại theo cùng phong cách.
+
+Ba mục sản phẩm có bộ trang trí riêng: vương miện và tông coral cho **Bán chạy**, hộp quà và tông xanh dương cho **Mới nhất**, viên ngọc và tông xanh ngọc cho **Nổi bật**. Mỗi mục có dòng chữ nhấn, nhãn nhỏ và một banner 3D về kem đánh răng, bàn chải. Các banner được tạo bằng công cụ **image_gen tích hợp**, lưu tại [section-bestsellers-v1.png](backend/public/assets/section-bestsellers-v1.png), [section-new-arrivals-v1.png](backend/public/assets/section-new-arrivals-v1.png) và [section-featured-v1.png](backend/public/assets/section-featured-v1.png). [Bộ prompt](backend/public/assets/section-banners.prompts.txt) ghi đầy đủ cách tạo và kích thước ảnh. Chữ và liên kết trên banner dùng HTML để dễ đọc trên điện thoại; ảnh được tải khi cuộn tới và chỉ dùng để trang trí. Tiêu đề, mô tả, danh sách sản phẩm cùng trạng thái ẩn/hiện của từng mục vẫn chỉnh trong **Sản phẩm trang chủ** ở admin.
 
 Header dùng nền xanh ngọc đậm, viền sáng và bóng đổ để tách khỏi nền trang trong cả chế độ sáng và tối. Thanh menu có nền xanh đậm riêng, cùng bo góc với header.
 
