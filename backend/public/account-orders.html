@@ -35,7 +35,7 @@
           <label class="visually-hidden" for="orders-search">Tìm theo mã đơn hoặc tên sản phẩm</label>
           <div class="workspace-orders-search-control">
             <svg class="workspace-orders-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg>
-            <input id="orders-search" name="q" type="search" maxlength="120" placeholder="Mã đơn hoặc tên sản phẩm" autocomplete="off">
+            <input id="orders-search" name="q" type="search" maxlength="120" placeholder="Tìm theo mã đơn hoặc tên sản phẩm" autocomplete="off">
           </div>
         </div>
         <div class="field workspace-orders-sort">
@@ -50,16 +50,22 @@
         </div>
       </div>
       <div class="workspace-orders-secondary-filters">
-        <div class="field workspace-orders-status">
-          <label for="orders-status-filter">Trạng thái</label>
-          <select id="orders-status-filter" name="status">
-            <option value="all">Tất cả trạng thái</option>
-            <option value="NEW">Mới nhận</option>
-            <option value="CONFIRMED">Đã xác nhận</option>
-            <option value="SHIPPING">Đang giao</option>
-            <option value="COMPLETED">Hoàn thành</option>
-            <option value="CANCELLED">Đã hủy</option>
-          </select>
+        <div class="workspace-orders-scope">
+          <p id="orders-summary" role="status" aria-atomic="true"></p>
+          <div class="field workspace-orders-status">
+            <label class="visually-hidden" for="orders-status-filter">Trạng thái đơn hàng</label>
+            <div class="workspace-orders-status-control">
+              <select id="orders-status-filter" name="status">
+                <option value="all">Tất cả</option>
+                <option value="NEW">Mới nhận</option>
+                <option value="CONFIRMED">Đã xác nhận</option>
+                <option value="SHIPPING">Đang giao</option>
+                <option value="COMPLETED">Hoàn thành</option>
+                <option value="CANCELLED">Đã hủy</option>
+              </select>
+              <svg class="workspace-orders-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"></path></svg>
+            </div>
+          </div>
         </div>
         <div class="workspace-orders-filter-actions">
           <button type="submit">Tìm kiếm</button>
@@ -69,7 +75,6 @@
       </div>
     </form>
     <div class="workspace-orders-results">
-      <p id="orders-summary" role="status" aria-atomic="true"></p>
       <div id="orders-list" aria-busy="false"></div>
       <nav class="orders-pagination" aria-label="Phân trang đơn hàng">
         <button id="orders-previous" class="button-secondary" type="button" disabled>Trang trước</button>
