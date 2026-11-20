@@ -193,6 +193,9 @@
   }
 
   .home-page .hero.hero-carousel {
+    --home-hero-gutter: 0px;
+    width: calc(var(--home-content-width) - 2 * var(--home-hero-gutter));
+    margin-inline: auto;
     border: 1px solid var(--line);
     background: var(--surface);
     box-shadow: var(--shadow);
@@ -223,6 +226,26 @@
   .home-page .home-panel--products {
     --home-section-accent: var(--primary);
     container: home-products / inline-size;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .home-page [data-home-product-section="best-selling"] .home-panel--products {
+    --home-section-accent: var(--danger);
+    --home-heading-color: var(--danger);
+  }
+
+  .home-page [data-home-product-section="latest"] .home-panel--products {
+    --home-section-accent: var(--info);
+    --home-heading-color: var(--info);
+  }
+
+  .home-page [data-home-product-section="featured"] .home-panel--products {
+    --home-section-accent: var(--primary-dark);
+    --home-heading-color: var(--primary-dark);
   }
 
   .home-page .home-panel--help {
@@ -277,10 +300,10 @@
     margin: 0;
     color: var(--home-heading-color, var(--primary-dark));
     font-family: var(--home-heading-font);
-    font-size: clamp(21px, 2vw, 24px);
+    font-size: clamp(28px, 3.4vw, 42px);
     font-weight: 700;
-    line-height: 1.35;
-    letter-spacing: -0.015em;
+    line-height: 1.22;
+    letter-spacing: -0.025em;
     text-transform: uppercase;
     overflow-wrap: anywhere;
   }
@@ -290,8 +313,8 @@
     display: block;
     width: 120px;
     max-width: 50%;
-    height: 2px;
-    margin-top: 10px;
+    height: 3px;
+    margin-top: 14px;
     border-radius: 2px;
     background: currentColor;
   }
@@ -320,6 +343,10 @@
   .home-page .home-panel-heading > a:hover {
     border-color: var(--home-section-accent);
     background: var(--soft);
+  }
+
+  .home-page .home-panel--products .home-panel-heading > a {
+    color: var(--home-heading-color, var(--primary-dark));
   }
 
   .home-page .home-panel :is(.featured-category-grid, .product-grid) {
@@ -598,6 +625,16 @@
     margin-left: calc(var(--side-banner-left-width) + 16px + max(0px, (var(--commerce-content-width) - var(--main-max-width)) / 2) + var(--home-content-gutter));
     margin-right: auto;
   }
+
+  body.home-page.has-side-banners > .storefront #hero-carousel {
+    margin-left: calc(var(--side-banner-left-width) + 16px + max(0px, (var(--commerce-content-width) - var(--main-max-width)) / 2) + var(--home-hero-gutter));
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .home-page .hero.hero-carousel {
+    --home-hero-gutter: 16px;
+  }
 }
 
 @media screen and (max-width: 800px) {
@@ -619,6 +656,15 @@
   .home-page .home-panel {
     padding: 18px 16px;
     border-radius: 18px;
+  }
+
+  .home-page .hero.hero-carousel {
+    --home-hero-gutter: 12px;
+  }
+
+  .home-page .home-panel--products {
+    padding: 0;
+    border-radius: 0;
   }
 
   .home-page .home-panel--categories {
