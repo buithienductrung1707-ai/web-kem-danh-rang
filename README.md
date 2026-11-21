@@ -125,6 +125,8 @@ Thông tin nhận hàng cũ được chuyển thành địa chỉ đầu tiên k
 
 **Danh mục nổi bật**, menu **Danh mục** và các thẻ trên trang danh mục dùng chung danh sách do quản trị quản lý. Thẻ hiển thị số sản phẩm đang bán thực tế của từng danh mục. Bấm tên danh mục để xem phần giới thiệu cùng các sản phẩm thuộc danh mục đó. Danh mục chưa có sản phẩm hiển thị thông báo đang cập nhật. Nút mũi tên giúp cuộn khi có nhiều danh mục.
 
+Trang **Danh mục sản phẩm** có tiêu đề lớn chuyển sắc xanh ngọc–xanh dương–tím, biểu tượng răng miệng và các nhãn mô tả ngắn. Màu chữ được điều chỉnh theo chế độ sáng/tối và có màu dự phòng cho chế độ tương phản cao. Khi mở một danh mục riêng, tên và mô tả do admin quản lý xuất hiện ở phần giới thiệu; tiêu đề phía trên bộ lọc thu gọn để giữ thao tác tìm sản phẩm thuận tiện. Bộ lọc, số lượng sản phẩm thực tế và thanh số đã bán vẫn hoạt động như trước.
+
 Bộ lọc trên trang danh mục được giữ trong URL khi tải lại hoặc chuyển danh mục. Các khoảng giá gồm dưới 50.000 ₫, từ 50.000 đến 100.000 ₫ và trên 100.000 ₫. **Mới nhất** sắp xếp theo mã sản phẩm mới được tạo. Thương hiệu lấy từ thông số **Thương hiệu** hoặc **Brand** trong trình chỉnh sửa sản phẩm của admin. Những sản phẩm chưa nhập thông số này vẫn xuất hiện khi chọn **Tất cả thương hiệu**.
 
 Hai lựa chọn **Còn hàng** và **Yêu thích** xếp theo chiều dọc, bên phải **Thương hiệu** và nằm chung khung bộ lọc. Dùng **Xóa bộ lọc** để trở về toàn bộ sản phẩm.
@@ -329,6 +331,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Giỏ hàng và bước xác nhận mua hàng | [account-cart.html](backend/public/account-cart.html), [account-cart.css](backend/public/account-cart.css), [app.js](backend/public/app.js) |
 | Lịch sử đơn hàng và tiến trình xử lý | [account-orders.html](backend/public/account-orders.html), [order-history.js](backend/public/order-history.js), [account-orders.css](backend/public/account-orders.css) |
 | Trang danh mục và sản phẩm theo danh mục | [danh-muc.html](backend/public/danh-muc.html), [catalog-page.css](backend/public/catalog-page.css), [catalog-page.js](backend/public/catalog-page.js) |
+| Tiêu đề chuyển sắc, biểu tượng và trang trí đầu trang danh mục | [catalog-decorations.css](backend/public/catalog-decorations.css) |
 | Danh mục nổi bật, menu và dữ liệu danh mục dùng chung | [catalog-categories.js](backend/public/catalog-categories.js), [catalog-categories.css](backend/public/catalog-categories.css) |
 | Quản lý danh mục trong trang admin | [admin-categories.js](backend/public/admin-categories.js), [admin-categories.css](backend/public/admin-categories.css) |
 | Quản lý ba mục sản phẩm trang chủ | [admin-home-sections.js](backend/public/admin-home-sections.js), [admin-home-sections.css](backend/public/admin-home-sections.css) |

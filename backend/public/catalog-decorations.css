@@ -1,0 +1,401 @@
+@media screen {
+  .catalog-page {
+    --catalog-title-start: #08645a;
+    --catalog-title-middle: #28579e;
+    --catalog-title-end: #744595;
+    --catalog-decor-line: color-mix(in srgb, var(--primary) 18%, var(--line));
+    --catalog-decor-tint: color-mix(in srgb, var(--primary) 7%, var(--surface));
+    --catalog-art-ink: #0b665d;
+    --catalog-art-mint: #b8eedc;
+    --catalog-art-blue: #c9ddff;
+    --catalog-art-gold: #f9df8f;
+    --catalog-art-tooth: #ffffff;
+  }
+
+  [data-theme="dark"] .catalog-page {
+    --catalog-title-start: #8fe5cf;
+    --catalog-title-middle: #9dbaff;
+    --catalog-title-end: #d7adf4;
+  }
+
+  .catalog-page .catalog-page-breadcrumb,
+  .catalog-page .catalog-page-breadcrumb :is(ol, li, a) {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .catalog-page .catalog-discovery-heading {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, .42fr);
+    grid-template-areas: "copy art" "count art";
+    align-items: center;
+    gap: 20px 28px;
+    margin-bottom: 30px;
+    padding: clamp(26px, 3.8vw, 44px);
+    border: 1px solid var(--catalog-decor-line);
+    border-radius: 26px;
+    background: radial-gradient(ellipse at 92% 0,
+      color-mix(in srgb, var(--info) 11%, transparent), transparent 58%),
+      linear-gradient(135deg, var(--surface), var(--catalog-decor-tint));
+  }
+
+  .catalog-page .catalog-discovery-copy {
+    grid-area: copy;
+    min-width: 0;
+  }
+
+  .catalog-page #catalog-title,
+  .catalog-page #category-title {
+    max-width: 20ch;
+    margin: 0;
+    color: var(--catalog-title-start);
+    font-family: "Segoe UI Variable Display", "Segoe UI Variable", "Inter", "Segoe UI", system-ui, sans-serif;
+    font-size: clamp(40px, 5.3vw, 64px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -.045em;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  .catalog-page .catalog-discovery-kicker,
+  .catalog-page .catalog-page-heading .catalog-discovery-kicker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+    margin: 0 0 14px;
+    color: var(--primary-dark);
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.6;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: normal;
+  }
+
+  .catalog-page .catalog-discovery-kicker svg {
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .catalog-page .catalog-page-heading .catalog-discovery-description {
+    max-width: 58ch;
+    margin: 18px 0 0;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.75;
+    text-wrap: pretty;
+  }
+
+  .catalog-page .catalog-discovery-chips,
+  .catalog-page .catalog-category-notes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .catalog-page .catalog-discovery-chips li,
+  .catalog-page .catalog-category-notes li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 5px 10px;
+    border: 1px solid var(--catalog-decor-line);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .catalog-page .catalog-discovery-chips svg {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--primary-dark);
+  }
+
+  .catalog-page .catalog-discovery-heading #catalog-total {
+    grid-area: count;
+    justify-self: start;
+    max-width: 100%;
+    margin: 0;
+    padding: 8px 14px;
+    border-color: var(--catalog-decor-line);
+    background: var(--surface);
+    color: var(--primary-dark);
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.6;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .catalog-page .catalog-discovery-art {
+    grid-area: art;
+    justify-self: center;
+    width: min(100%, 320px);
+    pointer-events: none;
+  }
+
+  .catalog-page .catalog-discovery-art > svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .catalog-page .catalog-art-cloud {
+    fill: color-mix(in srgb, var(--catalog-art-mint) 35%, var(--surface));
+  }
+
+  .catalog-page .catalog-art-gold,
+  .catalog-page .catalog-art-spark {
+    fill: var(--catalog-art-gold);
+  }
+
+  .catalog-page .catalog-art-blue,
+  .catalog-page .catalog-art-search {
+    fill: var(--catalog-art-blue);
+  }
+
+  .catalog-page .catalog-art-card {
+    fill: var(--catalog-art-mint);
+    stroke: color-mix(in srgb, var(--catalog-art-ink) 22%, var(--catalog-art-mint));
+    stroke-width: 1.5;
+  }
+
+  .catalog-page .catalog-art-tooth {
+    fill: var(--catalog-art-tooth);
+    stroke: var(--catalog-art-ink);
+    stroke-width: 2;
+  }
+
+  .catalog-page .catalog-art-brush {
+    fill: var(--catalog-art-ink);
+  }
+
+  .catalog-page .catalog-art-line,
+  .catalog-page .catalog-art-search-line {
+    stroke: var(--catalog-art-ink);
+    stroke-width: 2.5;
+  }
+
+  .catalog-page .catalog-category-intro {
+    padding: clamp(24px, 3vw, 36px);
+    margin-bottom: 24px;
+    border: 1px solid var(--catalog-decor-line);
+    border-radius: 24px;
+    background: radial-gradient(ellipse at 100% 0,
+      color-mix(in srgb, var(--info) 9%, transparent), transparent 58%),
+      linear-gradient(135deg, var(--surface), var(--catalog-decor-tint));
+  }
+
+  .catalog-page .catalog-category-heading {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-width: 0;
+  }
+
+  .catalog-page .catalog-category-heading > div {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .catalog-page .catalog-category-mark {
+    display: grid;
+    flex: 0 0 70px;
+    place-items: center;
+    width: 70px;
+    height: 70px;
+    border: 1px solid var(--catalog-decor-line);
+    border-radius: 22px 22px 22px 8px;
+    background: var(--surface);
+    color: var(--primary-dark);
+  }
+
+  .catalog-page .catalog-category-mark svg {
+    display: block;
+    width: 44px;
+    height: 44px;
+  }
+
+  .catalog-page .catalog-category-heading .catalog-discovery-kicker {
+    margin-bottom: 8px;
+  }
+
+  .catalog-page #category-title {
+    max-width: 28ch;
+    font-size: clamp(36px, 4.7vw, 56px);
+  }
+
+  .catalog-page #category-description {
+    max-width: 82ch;
+    margin: 20px 0 0;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+
+  .catalog-page .catalog-category-notes {
+    margin-top: 16px;
+  }
+
+  .catalog-page .catalog-category-notes li::before {
+    content: "";
+    flex: 0 0 5px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+
+  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "copy count";
+    gap: 20px;
+    padding: 20px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-heading :is(.catalog-discovery-kicker, .catalog-discovery-chips, .catalog-discovery-art) {
+    display: none;
+  }
+
+  .catalog-page:has(#category-intro:not([hidden])) #catalog-title {
+    max-width: none;
+    font-size: clamp(28px, 3vw, 34px);
+    line-height: 1.2;
+  }
+
+  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-description {
+    max-width: 64ch;
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  @supports ((background-clip: text) or (-webkit-background-clip: text)) {
+    .catalog-page #catalog-title,
+    .catalog-page #category-title {
+      background: linear-gradient(110deg, var(--catalog-title-start) 8%, var(--catalog-title-middle) 58%, var(--catalog-title-end) 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+}
+
+@container catalog-page (max-width: 760px) {
+  .catalog-page .catalog-discovery-heading {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "copy" "count";
+    padding: 28px;
+  }
+
+  .catalog-page .catalog-discovery-art {
+    display: none;
+  }
+
+  .catalog-page #catalog-title {
+    max-width: 22ch;
+    font-size: clamp(40px, 7cqw, 56px);
+  }
+
+  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-heading {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "copy" "count";
+    padding: 12px 0;
+  }
+
+  .catalog-page:has(#category-intro:not([hidden])) #catalog-title {
+    font-size: 28px;
+  }
+
+  .catalog-page .catalog-category-intro {
+    padding: 26px;
+  }
+}
+
+@container catalog-page (max-width: 420px) {
+  .catalog-page .catalog-discovery-heading {
+    padding: 24px 20px;
+    border-radius: 20px;
+  }
+
+  .catalog-page .catalog-page-heading .catalog-discovery-description {
+    margin-top: 16px;
+    font-size: 15px;
+  }
+
+  .catalog-page .catalog-discovery-chips {
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .catalog-page .catalog-category-intro {
+    padding: 22px 18px;
+    border-radius: 20px;
+  }
+
+  .catalog-page .catalog-category-heading {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .catalog-page .catalog-category-mark {
+    flex-basis: 46px;
+    width: 46px;
+    height: 46px;
+    border-radius: 16px 16px 16px 6px;
+  }
+
+  .catalog-page .catalog-category-mark svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .catalog-page #category-title {
+    font-size: 36px;
+  }
+
+  .catalog-page #category-description {
+    font-size: 15px;
+  }
+
+  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-heading {
+    padding: 10px 0;
+    border-radius: 0;
+  }
+
+  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-description {
+    margin-top: 8px;
+    font-size: 14px;
+  }
+}
+
+@media (forced-colors: active) {
+  .catalog-page #catalog-title,
+  .catalog-page #category-title {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+    forced-color-adjust: auto;
+  }
+}

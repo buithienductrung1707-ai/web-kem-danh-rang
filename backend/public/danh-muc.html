@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="catalog-page.css">
     <link rel="stylesheet" href="favorite-buttons.css">
     <link rel="stylesheet" href="product-cards.css">
+    <link rel="stylesheet" href="catalog-decorations.css">
     <script src="catalog-categories.js" defer></script>
     <script src="catalog-page.js" defer></script>
     <script src="shop-memory.js" defer></script>
@@ -90,15 +91,49 @@
       </nav>
 
       <section id="category-intro" class="catalog-category-intro" aria-labelledby="category-title" hidden>
-        <h1 id="category-title">Danh mục sản phẩm</h1>
+        <div class="catalog-category-heading">
+          <span class="catalog-category-mark" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M20 10c-3-4-11-4-12 3-1 5 2 9 3 14 1 5 2 8 4 8s2-9 5-9 3 9 5 9 3-3 4-8c1-5 4-9 3-14-1-7-9-7-12-3Z"/><path d="M15 12c2 1 4 2 6 1m10-10 1.4 3.6L36 8l-3.6 1.4L31 13l-1.4-3.6L26 8l3.6-1.4L31 3Z"/></svg></span>
+          <div>
+            <p class="catalog-discovery-kicker">Khám phá theo danh mục</p>
+            <h1 id="category-title">Danh mục sản phẩm</h1>
+          </div>
+        </div>
         <p id="category-description" hidden></p>
+        <ul class="catalog-category-notes" aria-label="Gợi ý lựa chọn"><li>Chọn theo nhu cầu</li><li>Tìm hiểu trước khi mua</li></ul>
       </section>
 
       <section id="catalog" class="catalog-section catalog-directory" aria-labelledby="catalog-title">
-        <div class="catalog-page-heading">
-          <div>
+        <div class="catalog-page-heading catalog-discovery-heading">
+          <div class="catalog-discovery-copy">
+            <p class="catalog-discovery-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><path d="m17.5 13 1.2 3.3 3.3 1.2-3.3 1.2-1.2 3.3-1.2-3.3-3.3-1.2 3.3-1.2 1.2-3.3Z"/></svg>Góc chăm sóc nụ cười</p>
             <h1 id="catalog-title" tabindex="-1">Danh mục sản phẩm</h1>
-            <p>Lọc theo nhu cầu, mức giá và độ sẵn hàng để tìm sản phẩm phù hợp.</p>
+            <p class="catalog-discovery-description">Khám phá kem đánh răng và bàn chải cho mỗi ngày. Lọc theo nhu cầu, mức giá và độ sẵn hàng để tìm lựa chọn phù hợp.</p>
+            <ul class="catalog-discovery-chips" aria-label="Tiện ích lựa chọn sản phẩm">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m4 12 5 5L20 6"/></svg>Chọn theo nhu cầu</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg>Lọc nhanh, dễ tìm</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 21-8-7C-3 8 6 0 12 7c6-7 15 1 8 7l-8 7Z"/></svg>Lưu sản phẩm yêu thích</li>
+            </ul>
+          </div>
+          <div class="catalog-discovery-art" aria-hidden="true">
+            <svg viewBox="0 0 360 270" fill="none" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+              <ellipse class="catalog-art-cloud" cx="183" cy="139" rx="139" ry="105"/>
+              <circle class="catalog-art-gold" cx="103" cy="90" r="54"/>
+              <rect class="catalog-art-card" x="82" y="59" width="185" height="160" rx="28" transform="rotate(-8 174.5 139)"/>
+              <path class="catalog-art-tooth" d="M176 86c-14-15-48-12-53 14-5 24 8 42 12 66 5 24 10 35 19 35 11 0 8-42 22-42s11 42 22 42c9 0 14-11 19-35 4-24 17-42 12-66-5-26-39-29-53-14Z"/>
+              <path class="catalog-art-line" d="M155 94c8 5 16 7 24 5M144 108c-2 6-1 13 2 19"/>
+              <g transform="rotate(18 270 137)">
+                <rect class="catalog-art-brush" x="262" y="103" width="15" height="106" rx="7.5"/>
+                <rect class="catalog-art-tooth" x="257" y="62" width="25" height="54" rx="11"/>
+                <path class="catalog-art-line" d="M258 71h22m-22 9h22m-22 9h22m-22 9h22"/>
+              </g>
+              <circle class="catalog-art-search" cx="89" cy="193" r="29"/>
+              <circle class="catalog-art-search-line" cx="85" cy="189" r="11"/>
+              <path class="catalog-art-search-line" d="m93 197 10 10"/>
+              <path class="catalog-art-spark" d="m288 27 4 11 11 4-11 4-4 11-4-11-11-4 11-4 4-11ZM62 121l3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8Z"/>
+              <path class="catalog-art-line" d="M228 26v12m-6-6h12M305 184v12m-6-6h12"/>
+              <circle class="catalog-art-blue" cx="308" cy="116" r="6"/>
+              <circle class="catalog-art-gold" cx="134" cy="239" r="5"/>
+            </svg>
           </div>
           <p id="catalog-total" class="catalog-total-badge">Đang tải sản phẩm…</p>
         </div>
