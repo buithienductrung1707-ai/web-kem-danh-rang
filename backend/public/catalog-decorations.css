@@ -30,7 +30,7 @@
     isolation: isolate;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(180px, .42fr);
-    grid-template-areas: "copy art" "count art";
+    grid-template-areas: "copy art";
     align-items: center;
     gap: 20px 28px;
     margin-bottom: 30px;
@@ -124,22 +124,6 @@
     width: 16px;
     height: 16px;
     color: var(--primary-dark);
-  }
-
-  .catalog-page .catalog-discovery-heading #catalog-total {
-    grid-area: count;
-    justify-self: start;
-    max-width: 100%;
-    margin: 0;
-    padding: 8px 14px;
-    border-color: var(--catalog-decor-line);
-    background: var(--surface);
-    color: var(--primary-dark);
-    font-size: 13px;
-    font-weight: 650;
-    line-height: 1.6;
-    white-space: normal;
-    overflow-wrap: anywhere;
   }
 
   .catalog-page .catalog-discovery-art {
@@ -263,33 +247,6 @@
     background: var(--primary);
   }
 
-  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-heading {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "copy count";
-    gap: 20px;
-    padding: 20px 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-  }
-
-  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-heading :is(.catalog-discovery-kicker, .catalog-discovery-chips, .catalog-discovery-art) {
-    display: none;
-  }
-
-  .catalog-page:has(#category-intro:not([hidden])) #catalog-title {
-    max-width: none;
-    font-size: clamp(28px, 3vw, 34px);
-    line-height: 1.2;
-  }
-
-  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-description {
-    max-width: 64ch;
-    margin-top: 8px;
-    font-size: 14px;
-    line-height: 1.7;
-  }
-
   @supports ((background-clip: text) or (-webkit-background-clip: text)) {
     .catalog-page #catalog-title,
     .catalog-page #category-title {
@@ -305,7 +262,7 @@
 @container catalog-page (max-width: 760px) {
   .catalog-page .catalog-discovery-heading {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "copy" "count";
+    grid-template-areas: "copy";
     padding: 28px;
   }
 
@@ -316,16 +273,6 @@
   .catalog-page #catalog-title {
     max-width: 22ch;
     font-size: clamp(40px, 7cqw, 56px);
-  }
-
-  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-heading {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "copy" "count";
-    padding: 12px 0;
-  }
-
-  .catalog-page:has(#category-intro:not([hidden])) #catalog-title {
-    font-size: 28px;
   }
 
   .catalog-page .catalog-category-intro {
@@ -379,15 +326,6 @@
     font-size: 15px;
   }
 
-  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-heading {
-    padding: 10px 0;
-    border-radius: 0;
-  }
-
-  .catalog-page:has(#category-intro:not([hidden])) .catalog-discovery-description {
-    margin-top: 8px;
-    font-size: 14px;
-  }
 }
 
 @media (forced-colors: active) {

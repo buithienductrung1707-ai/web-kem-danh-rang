@@ -8,6 +8,8 @@
   const slugs = new URLSearchParams(window.location.search).getAll("danh-muc");
   const slug = slugs.length === 1 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slugs[0]) ? slugs[0] : null;
   const isCategoryPage = categoryId !== null || (document.body.classList.contains("category-page") && slugs.length > 0);
+  const directoryHeading = document.querySelector(".catalog-page .catalog-discovery-heading");
+  if (directoryHeading) directoryHeading.hidden = isCategoryPage;
   let request = null;
   let categories = null;
   let active = true;
@@ -131,18 +133,8 @@
       if (isCategoryPage) directoryCrumb.removeAttribute("aria-current");
       else directoryCrumb.setAttribute("aria-current", "page");
     }
-    let catalogTitle = document.getElementById("catalog-title");
-    if (catalogTitle) {
-      const tag = isCategoryPage ? "H2" : "H1";
-      if (catalogTitle.tagName !== tag) {
-        const replacement = document.createElement(tag.toLowerCase());
-        replacement.id = "catalog-title";
-        replacement.tabIndex = -1;
-        catalogTitle.replaceWith(replacement);
-        catalogTitle = replacement;
-      }
-      catalogTitle.textContent = "Danh mục sản phẩm";
-    }
+    const directory = document.querySelector(".catalog-page .catalog-directory");
+    if (directory) directory.setAttribute("aria-labelledby", isCategoryPage ? "category-title" : "catalog-title");
     const description = document.getElementById("category-description");
     if (description) {
       description.textContent = category ? category.description || (category.id === 1
@@ -174,8 +166,6 @@
     });
     tabs.replaceChildren(...entries);
     tabs.setAttribute("aria-busy", "false");
-    const totalLabel = document.getElementById("catalog-total");
-    if (totalLabel) totalLabel.textContent = "Tổng " + items.reduce((sum, item) => sum + (item.productCount || 0), 0) + " sản phẩm";
   }
 
   function renderCatalogCounts(products) {
@@ -192,8 +182,6 @@
       if (count) count.textContent = String(all ? total : counts.get(category?.id) ?? 0);
       link.href = href(category);
     }
-    const totalLabel = document.getElementById("catalog-total");
-    if (totalLabel) totalLabel.textContent = "Tổng " + total + " sản phẩm";
     for (const menu of menus) {
       for (const link of menu.querySelectorAll("[data-category-id]")) {
         const category = categories.find(item => item.id === Number(link.dataset.categoryId));
