@@ -92,6 +92,8 @@ Lần gửi đang chờ giữ nguyên mã yêu cầu khi đổi phiên đăng nh
 
 Khi thêm sản phẩm thành công, ảnh sản phẩm bay tới biểu tượng giỏ hàng trên header và số lượng trên giỏ nhấn sáng nhẹ. Nếu thiết bị bật chế độ giảm chuyển động, phản hồi được rút gọn để hạn chế hiệu ứng.
 
+Trang chi tiết sản phẩm có khung giá nền tối, giá bán lớn chuyển sắc đỏ–cam và nút **Thêm vào giỏ hàng →** cùng tông màu. Nút **Mua ngay** nằm bên cạnh trên máy tính, xếp xuống dưới trên điện thoại. Giá bán vẫn lấy từ sản phẩm do admin quản lý; mục **Tạm tính** cập nhật theo số lượng đã chọn và các nút mua bị vô hiệu hóa khi không còn số lượng khả dụng.
+
 Nút yêu thích dùng biểu tượng trái tim đỏ trong hình tròn. Bấm để lưu hoặc bỏ yêu thích, trái tim được tô đầy và sáng lên khi đã chọn. Danh sách được lưu trên trình duyệt đang dùng, đồng bộ giữa trang chủ, danh mục và chi tiết sản phẩm trên cùng trình duyệt.
 
 Khách có thể đăng ký bằng email, mật khẩu, họ tên, số điện thoại và địa chỉ. Mật khẩu khách hàng dài từ 8 đến 128 ký tự. Khi đã đăng nhập, đơn hàng sử dụng địa chỉ nhận hàng mặc định trong tài khoản.

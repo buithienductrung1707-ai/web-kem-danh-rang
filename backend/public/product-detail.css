@@ -445,37 +445,69 @@
   overflow-wrap: anywhere;
 }
 
-.detail-price-card {
-  display: grid;
-  gap: 8px;
-  padding: 24px;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  background: var(--soft);
+.detail-purchase {
+  --purchase-price-start: #ff565d;
+  --purchase-price-end: #ffa25f;
+  --purchase-price-fallback: #ff7868;
+  --purchase-card-start: #131d35;
+  --purchase-card-end: #1a1b29;
+  --purchase-card-glow: #b37b5c;
+  --purchase-card-line: #3a3d50;
+  --purchase-card-copy: #cbd4e6;
+  --purchase-card-alert: #ff9b91;
+  --purchase-action-start: #ed3947;
+  --purchase-action-end: #f79b57;
+  --purchase-action-ink: #ffffff;
+  --purchase-action-shadow: #7b1929;
 }
 
-.detail-price-card > span {
-  color: var(--muted);
-  font-size: 13px;
+.detail-price-card {
+  display: grid;
+  gap: 0;
+  padding: 20px;
+  border: 1px solid var(--purchase-card-line);
+  border-radius: 20px;
+  background: radial-gradient(ellipse at 100% 0,
+    color-mix(in srgb, var(--purchase-card-glow) 23%, transparent), transparent 75%),
+    linear-gradient(135deg, var(--purchase-card-start), var(--purchase-card-end));
 }
 
 .detail-price-card > strong {
-  color: var(--primary-dark);
-  font-size: clamp(30px, 4vw, 38px);
-  line-height: 1.25;
+  justify-self: start;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--purchase-price-fallback);
+  font-size: clamp(32px, 3.5vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -.025em;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
 
 .detail-price-card > p {
-  margin: 0;
-  color: var(--muted);
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--purchase-card-line);
+  color: var(--purchase-card-copy);
   font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .detail-price-card > p[data-sold-out="true"] {
-  color: var(--danger);
+  color: var(--purchase-card-alert);
   font-weight: 650;
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .detail-price-card > strong {
+    background: linear-gradient(100deg, var(--purchase-price-start), var(--purchase-price-end));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 #detail-purchase-form {
@@ -586,7 +618,7 @@
 
 .detail-purchase-actions {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   gap: 12px;
 }
 
@@ -597,6 +629,54 @@
   border-radius: 28px;
   font-size: 14px;
   gap: 8px;
+}
+
+.product-detail-page #detail-add-cart {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(100deg, var(--purchase-action-start), var(--purchase-action-end));
+  color: var(--purchase-action-ink);
+  font-size: 16px;
+  font-weight: 800;
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--purchase-action-shadow) 80%, transparent);
+  box-shadow: 0 9px 24px color-mix(in srgb, var(--purchase-action-start) 24%, transparent);
+  transition: transform 180ms ease-out, opacity 180ms ease-out;
+}
+
+.product-detail-page #detail-add-cart svg {
+  flex: 0 0 17px;
+  width: 17px;
+  height: 17px;
+}
+
+.product-detail-page #detail-add-cart:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.product-detail-page #detail-add-cart:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.product-detail-page #detail-add-cart:focus-visible {
+  outline: 3px solid var(--primary-dark);
+  outline-offset: 4px;
+}
+
+.product-detail-page #detail-add-cart:disabled {
+  box-shadow: none;
+  transform: none;
+}
+
+.product-detail-page #detail-buy-now {
+  border-color: var(--control-border);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: none;
+}
+
+.product-detail-page #detail-buy-now:hover:not(:disabled) {
+  background: var(--soft);
+  color: var(--primary-dark);
 }
 
 .detail-purchase-notice,
@@ -894,5 +974,29 @@
   .detail-loading-grid > span,
   .detail-loading-grid > div > span {
     animation: none;
+  }
+
+  .product-detail-page #detail-add-cart {
+    transition: none;
+  }
+
+  .product-detail-page #detail-add-cart:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .detail-price-card > strong {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+  }
+
+  .product-detail-page #detail-add-cart {
+    border-color: ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+    text-shadow: none;
+    box-shadow: none;
   }
 }
