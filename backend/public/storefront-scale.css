@@ -1,0 +1,35 @@
+@import url("compact-header.css");
+
+@media screen {
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) {
+    --storefront-content-scale: 1.25;
+  }
+
+  /* Keep viewport-positioned menus and cart feedback in their original coordinates. */
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) > main,
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) > .store-footer {
+    zoom: var(--storefront-content-scale);
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) > main dialog {
+    max-width: calc((100vw - 32px) / var(--storefront-content-scale));
+    max-height: calc((100dvh - 32px) / var(--storefront-content-scale));
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .support-chat-bubble,
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .support-chat-panel {
+    zoom: var(--storefront-content-scale);
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .support-chat-panel {
+    width: min(380px, calc((100vw - 40px) / var(--storefront-content-scale)));
+    max-height: min(610px, calc((100dvh - 148px - env(safe-area-inset-bottom)) / var(--storefront-content-scale)));
+  }
+}
+
+@media screen and (max-width: 600px) {
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .support-chat-panel {
+    width: calc((100vw - 24px - env(safe-area-inset-right) - env(safe-area-inset-left)) / var(--storefront-content-scale));
+    max-height: calc((100dvh - 126px - env(safe-area-inset-bottom)) / var(--storefront-content-scale));
+  }
+}

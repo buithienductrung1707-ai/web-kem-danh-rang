@@ -1,0 +1,124 @@
+@media screen {
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) > .site-header.commerce-header {
+    border-radius: 24px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-header-inner {
+    min-height: 64px;
+    gap: 8px 18px;
+    padding: 6px 18px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .header-actions {
+    gap: 12px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-nav {
+    gap: 12px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-nav a {
+    min-height: 44px;
+    gap: 8px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .theme-toggle {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
+
+  .commerce-header .catalog-nav {
+    border-radius: 0 0 22px 22px;
+  }
+
+  .commerce-header .catalog-nav-inner {
+    padding: 4px 18px;
+  }
+
+  .commerce-header .catalog-nav .catalog-nav-link,
+  .commerce-header .catalog-nav-products > .catalog-nav-toggle {
+    min-height: 44px;
+  }
+}
+
+@media screen and (min-width: 651px) {
+  .commerce-header .header-brand {
+    min-height: 44px;
+    gap: 8px;
+  }
+
+  .commerce-header .header-brand img {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .commerce-header .header-brand-name {
+    max-width: 132px;
+    font-size: 16px;
+  }
+
+  .commerce-header .header-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .commerce-header .header-link-label {
+    font-size: 12px;
+  }
+
+  .commerce-header .header-link-copy strong {
+    font-size: 14px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .header-search-button {
+    min-width: 80px;
+    padding-inline: 12px;
+  }
+}
+
+@media screen and (min-width: 651px) and (max-width: 1100px) {
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-header-inner {
+    padding: 8px 18px;
+    gap: 8px;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) > .site-header.commerce-header {
+    border-radius: 20px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-header-inner {
+    min-height: 0;
+    padding: 6px 10px 8px;
+    gap: 6px 8px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .header-actions,
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-nav {
+    gap: 8px;
+  }
+
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-nav a {
+    gap: 0;
+  }
+
+  .commerce-header .catalog-nav {
+    border-radius: 0 0 18px 18px;
+  }
+
+  .commerce-header .catalog-nav-inner {
+    padding: 4px 10px;
+  }
+}
+
+@media screen and (max-width: 359px) {
+  body:is(.storefront-page, .cart-page, .tracking-page, .account-page) .commerce-header .site-header-inner:has(.has-account-avatar) :is(.header-actions, .site-nav) {
+    gap: 2px;
+  }
+}

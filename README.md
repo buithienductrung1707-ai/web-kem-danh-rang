@@ -78,6 +78,8 @@ npm.cmd start
 
 ## Mua hàng và xem đơn
 
+Giao diện cửa hàng dùng tỷ lệ nội dung **125%** trên trang chủ, danh mục, chi tiết sản phẩm và khu vực tài khoản/giỏ hàng/đơn hàng. Footer và cửa sổ hỗ trợ được phóng tương ứng; nội dung tự xuống dòng theo chiều rộng màn hình. Header và thanh danh mục có bố cục riêng gọn hơn, các nút vẫn giữ vùng bấm tối thiểu 44px. Menu tài khoản và hiệu ứng thêm giỏ dùng tọa độ màn hình gốc để tiếp tục mở đúng vị trí. Thay đổi này chỉ áp dụng khi xem trên màn hình, không thay đổi tỷ lệ trang in đơn hàng hoặc trang quản trị.
+
 1. Bấm **Danh mục** trên menu để mở trang danh mục sản phẩm. Chọn **Tất cả**, **Kem đánh răng**, **Bàn chải đánh răng** hoặc danh mục khác được quản trị thêm vào. Có thể tìm theo tên, mô tả, lọc mức giá, thương hiệu, còn hàng, yêu thích và sắp xếp. Ô tìm kiếm trên header tìm trong toàn bộ sản phẩm của các danh mục đang hiển thị.
 2. Bấm ảnh hoặc tên sản phẩm để mở trang chi tiết. Ảnh thu nhỏ nằm bên trái ảnh lớn trên máy tính. Rê chuột lên ảnh lớn để phóng to, dùng ảnh thu nhỏ hoặc mũi tên để chuyển ảnh. Xem mô tả, thông số, tình trạng hàng và đánh giá trước khi chọn số lượng. Dùng **Thêm vào giỏ** hoặc **Mua ngay** để tiếp tục mua hàng. Các thẻ sản phẩm ở trang chủ và danh mục có một nút **Thêm vào giỏ**, nút yêu thích và thanh **Đã bán**; sản phẩm hết kho có nút **Hết hàng** bị vô hiệu hoá.
 3. Mở **Giỏ hàng** trong khu vực tài khoản. Chọn từng sản phẩm hoặc **Chọn tất cả**, điều chỉnh số lượng và kiểm tra tiền của các sản phẩm đã chọn. Dùng biểu tượng thùng rác để xóa riêng hoặc **Xóa đã chọn** để xóa nhiều sản phẩm.
@@ -334,6 +336,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Lịch sử đơn hàng và tiến trình xử lý | [account-orders.html](backend/public/account-orders.html), [order-history.js](backend/public/order-history.js), [account-orders.css](backend/public/account-orders.css) |
 | Trang danh mục và sản phẩm theo danh mục | [danh-muc.html](backend/public/danh-muc.html), [catalog-page.css](backend/public/catalog-page.css), [catalog-page.js](backend/public/catalog-page.js) |
 | Tiêu đề chuyển sắc, biểu tượng và trang trí đầu trang danh mục | [catalog-decorations.css](backend/public/catalog-decorations.css) |
+| Tỷ lệ giao diện cửa hàng 125% và header gọn | [storefront-scale.css](backend/public/storefront-scale.css), [compact-header.css](backend/public/compact-header.css) |
 | Danh mục nổi bật, menu và dữ liệu danh mục dùng chung | [catalog-categories.js](backend/public/catalog-categories.js), [catalog-categories.css](backend/public/catalog-categories.css) |
 | Quản lý danh mục trong trang admin | [admin-categories.js](backend/public/admin-categories.js), [admin-categories.css](backend/public/admin-categories.css) |
 | Quản lý ba mục sản phẩm trang chủ | [admin-home-sections.js](backend/public/admin-home-sections.js), [admin-home-sections.css](backend/public/admin-home-sections.css) |
