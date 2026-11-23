@@ -75,11 +75,9 @@ const bankTransferTotal = document.getElementById("bank-transfer-total");
 const bankTransferRetry = document.getElementById("bank-transfer-retry");
 const confirmButton = document.getElementById("confirm-order");
 const orderMessage = document.getElementById("order-message");
-const receiptTracking = document.getElementById("receipt-tracking");
 const receiptActions = document.getElementById("receipt-actions");
 const receiptCode = document.getElementById("receipt-code");
-const copyReceiptButton = document.getElementById("copy-receipt");
-const receiptCopyMessage = document.getElementById("receipt-copy-message");
+const receiptOrdersLink = document.getElementById("receipt-orders");
 const recentOrdersList = document.getElementById("recent-orders-list");
 const recentOrdersMessage = document.getElementById("recent-orders-message");
 const reorderMessage = document.getElementById("reorder-message");
@@ -388,14 +386,6 @@ function renderRecentOrders() {
   recentOrdersList.replaceChildren(fragment);
   recentOrdersMessage.textContent = error;
 }
-
-copyReceiptButton?.addEventListener("click", () => {
-  if (currentReceipt) copyOrderCode(orderCode(currentReceipt), copyReceiptButton, receiptCopyMessage);
-});
-
-receiptTracking?.addEventListener("click", () => {
-  if (currentReceipt) window.ShopMemory?.prepareTracking?.(orderCode(currentReceipt), currentReceiptPhone);
-});
 
 window.addEventListener("pagehide", () => {
   storefrontActive = false;
@@ -831,7 +821,7 @@ function applyCheckoutAccount(account) {
   if (changed && reviewedOrder && !orderPending && !isSubmitting) {
     clearOrderReview();
     orderMessage.textContent = cartWorkspace
-      ? "Tài khoản hoặc thông tin nhận hàng đã thay đổi. Kiểm tra thông tin rồi bấm Tạo đơn hàng."
+      ? "Tài khoản hoặc thông tin nhận hàng đã thay đổi. Kiểm tra thông tin rồi bấm Xác nhận đơn hàng."
       : "Tài khoản hoặc thông tin nhận hàng đã thay đổi. Hãy bấm Xem lại đơn hàng.";
   }
   renderCheckoutAccount();
@@ -1069,11 +1059,8 @@ function updateControls() {
       document.getElementById("cart-selected-lines").textContent = String(selected.size);
       document.getElementById("cart-lines").textContent = String(cart.size);
       cartContinueButton.disabled = orderPending ? isSubmitting || checkoutAccountChecking : locked || !selectionValid;
-      cartContinueButton.textContent = orderPending ? "Kiểm tra lần đặt hàng đang chờ →" : "Tiếp tục đặt hàng →";
+      cartContinueButton.textContent = orderPending ? "Kiểm tra lần đặt hàng đang chờ →" : "Tạo đơn hàng →";
       for (const checkbox of cartItems.querySelectorAll('input[type="checkbox"]')) checkbox.disabled = locked;
-      const editCart = document.getElementById("checkout-edit-cart");
-      editCart.disabled = isSubmitting;
-      editCart.textContent = orderPending ? "← Về giỏ hàng" : "← Sửa giỏ hàng";
       reviewButton.hidden = reviewedOrder !== null || currentReceipt !== null;
       renderCheckoutVisuals();
     }
@@ -1336,6 +1323,9 @@ function renderCart() {
 
 function renderCheckoutVisuals() {
   if (!checkoutReviewItems) return;
+  document.getElementById("checkout-total-title").textContent = currentReceipt && !reviewedOrder
+    ? currentReceipt.status === "CANCELLED" ? "Đơn hàng đã hủy" : "Đặt hàng thành công"
+    : "Tổng thanh toán";
   const items = reviewedOrder?.items ?? currentReceiptItems ?? [...selectedCart()].map(([productId, quantity]) => ({
     productId, quantity, expectedUnitPrice: products.get(productId)?.price,
     expectedProductName: products.get(productId)?.name ?? "Sản phẩm #" + productId
@@ -1393,7 +1383,7 @@ function renderCheckoutVisuals() {
     : validTotal && (catalogReady || orderPending || items.length === 0) ? money.format(total) : "—";
   document.getElementById("checkout-subtotal").textContent = shownTotal;
   document.getElementById("checkout-total").textContent = shownTotal;
-  document.getElementById("checkout-payment-label").textContent = paymentLabel(reviewedOrder?.paymentMethod ?? paymentMethodField.value);
+  document.getElementById("checkout-payment-label").textContent = paymentLabel(reviewedOrder?.paymentMethod ?? currentReceipt?.paymentMethod ?? paymentMethodField.value);
 }
 
 function rememberCatalogFilters() {
@@ -1935,10 +1925,6 @@ cartContinueButton?.addEventListener("click", () => {
   window.ShopAccountWorkspace?.open("checkout");
 });
 
-document.getElementById("checkout-edit-cart")?.addEventListener("click", () => {
-  if (!isSubmitting) window.ShopAccountWorkspace?.open("cart");
-});
-
 checkoutForm?.addEventListener("input", () => {
   if (orderPending || isSubmitting) return;
   clearOrderReview();
@@ -1993,7 +1979,7 @@ checkoutForm?.addEventListener("submit", async event => {
   reviewedCustomerContext = checkoutAccount ? String(checkoutAccount.id) : "guest";
   reviewedCartSnapshot = new Map(cart);
   renderOrderReview();
-  confirmButton.textContent = cartWorkspace ? "Tạo đơn hàng" : "Xác nhận đặt hàng";
+  confirmButton.textContent = cartWorkspace ? "Xác nhận đơn hàng" : "Xác nhận đặt hàng";
   updateControls();
   if (cartWorkspace) await submitReviewedOrder();
 });
@@ -2095,7 +2081,7 @@ async function submitReviewedOrder() {
     clearOrderReview();
     checkoutForm.reset();
     cartMessage.textContent = "";
-    currentReceipt = { orderId: result.orderId, total: result.total };
+    currentReceipt = { orderId: result.orderId, total: result.total, paymentMethod: result.paymentMethod, status: result.status };
     if (typeof result.orderNumber === "string") currentReceipt.orderNumber = result.orderNumber;
     currentReceiptPhone = receiptPhone;
     const savedReceipt = window.ShopMemory?.saveReceipt?.(currentReceipt, receiptPhone) ?? {
@@ -2107,13 +2093,11 @@ async function submitReviewedOrder() {
     if (result.paymentMethod === "BANK_TRANSFER" && result.status !== "CANCELLED") {
       bankTransferReceipt = currentReceipt;
     }
-    orderMessage.textContent = [result.status === "CANCELLED" ? "Đơn hàng đã được hủy." : "Đặt hàng thành công.", "Mã đơn " + displayCode,
+    orderMessage.textContent = cartWorkspace ? cartNotice : [result.status === "CANCELLED" ? "Đơn hàng đã được hủy." : "Đặt hàng thành công.", "Mã đơn " + displayCode,
       "Tiền sản phẩm " + money.format(result.total), paymentLabel(result.paymentMethod) + ".", cartNotice].filter(Boolean).join("\n");
     renderPaymentDetails();
     receiptCode.textContent = displayCode;
-    receiptTracking.href = trackingHref(displayCode);
     receiptActions.hidden = false;
-    receiptCopyMessage.textContent = "";
     renderRecentOrders();
     if (savedReceipt.error && recentOrdersMessage) recentOrdersMessage.textContent = savedReceipt.error;
     orderSucceeded = true;
@@ -2121,11 +2105,11 @@ async function submitReviewedOrder() {
     orderMessage.textContent = "Chưa nhận được kết quả đặt hàng. Giữ trang đang mở và bấm Thử gửi lại.";
   } finally {
     isSubmitting = false;
-    confirmButton.textContent = orderPending ? "Thử gửi lại" : cartWorkspace ? "Tạo đơn hàng" : "Xác nhận đặt hàng";
+    confirmButton.textContent = orderPending ? "Thử gửi lại" : cartWorkspace ? "Xác nhận đơn hàng" : "Xác nhận đặt hàng";
     if (!orderPending && (orderSucceeded || !catalogReady)) await loadCatalog();
     renderCart();
     if (orderPending) confirmButton.focus();
-    else if (!receiptActions.hidden) receiptTracking.focus();
+    else if (!receiptActions.hidden) receiptOrdersLink?.focus();
   }
 }
 

@@ -1,4 +1,9 @@
 .account-cart-workspace {
+  --cart-action-start: #c44f15;
+  --cart-action-end: #b63f13;
+  --cart-action-hover-start: #af4110;
+  --cart-action-hover-end: #98300d;
+  --cart-action-text: #ffffff;
   min-width: 0;
 }
 
@@ -311,7 +316,8 @@
   line-height: 1.6;
 }
 
-.account-cart-workspace .account-cart-primary {
+.account-cart-workspace .account-cart-primary,
+.account-cart-workspace .account-cart-primary:disabled:hover {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -319,8 +325,30 @@
   width: 100%;
   min-height: 48px;
   margin: 18px 0 0;
-  border-radius: 28px;
-  font-size: 14px;
+  padding: 12px 20px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(110deg, var(--cart-action-start), var(--cart-action-end));
+  color: var(--cart-action-text);
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.4;
+  text-decoration: none;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--cart-action-start) 18%, transparent);
+}
+
+.account-cart-workspace .account-cart-primary:hover:not(:disabled) {
+  background: linear-gradient(110deg, var(--cart-action-hover-start), var(--cart-action-hover-end));
+  color: var(--cart-action-text);
+}
+
+.account-cart-workspace .account-cart-primary:focus-visible {
+  outline: 3px solid var(--primary-dark);
+  outline-offset: 3px;
+}
+
+.account-cart-workspace .account-cart-primary:disabled {
+  box-shadow: none;
 }
 
 .account-cart-empty {
@@ -541,14 +569,6 @@
 .account-checkout-side #checkout-account-status {
   margin: 0;
   font-size: 12px;
-}
-
-.account-cart-edit {
-  width: 100%;
-  min-height: 44px;
-  margin: 20px 0 0;
-  border-radius: 24px;
-  font-size: 13px;
 }
 
 .account-checkout-side :is(.bank-transfer-guide, .receipt-actions) {

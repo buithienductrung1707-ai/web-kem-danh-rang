@@ -50,7 +50,7 @@
             </div>
           </dl>
           <p class="account-cart-summary-note">Kiểm tra thông tin nhận hàng và phương thức thanh toán ở bước tiếp theo.</p>
-          <button id="cart-continue" class="account-cart-primary" type="button" disabled>Tiếp tục đặt hàng <span aria-hidden="true">→</span></button>
+          <button id="cart-continue" class="account-cart-primary" type="button" disabled>Tạo đơn hàng <span aria-hidden="true">→</span></button>
         </div>
       </aside>
     </div>
@@ -125,17 +125,13 @@
               </div>
             </dl>
             <p id="order-preview" class="visually-hidden" role="status"></p>
-            <button id="checkout-edit-cart" type="button" class="button-secondary account-cart-edit">← Sửa giỏ hàng</button>
-            <button id="review-order" class="account-cart-primary" form="checkout-form" type="submit" disabled>Tạo đơn hàng</button>
-            <button id="confirm-order" class="account-cart-primary" type="button" hidden disabled>Tạo đơn hàng</button>
+            <button id="review-order" class="account-cart-primary" form="checkout-form" type="submit" disabled>Xác nhận đơn hàng</button>
+            <button id="confirm-order" class="account-cart-primary" type="button" hidden disabled>Xác nhận đơn hàng</button>
             <p id="order-message" class="account-cart-order-message" role="status" aria-atomic="true"></p>
             <div id="receipt-actions" class="receipt-actions" hidden>
               <p>Mã đơn <strong id="receipt-code"></strong></p>
-              <button id="copy-receipt" class="button-secondary" type="button">Sao chép mã đơn</button>
-              <a id="receipt-tracking" class="navigation-link" href="/tra-cuu.html">Tra cứu đơn đã nhận mã</a>
-              <a class="navigation-link" href="/dang-nhap.html?view=orders" data-workspace-view="orders">Xem đơn hàng của tôi →</a>
+              <a id="receipt-orders" class="button-link account-cart-primary" href="/dang-nhap.html?view=orders" data-workspace-view="orders" aria-describedby="checkout-total-title receipt-code">Xem đơn hàng của tôi <span aria-hidden="true">→</span></a>
             </div>
-            <p id="receipt-copy-message" role="status" aria-atomic="true"></p>
           </div>
         </section>
         <section id="bank-transfer-guide" class="bank-transfer-guide" aria-labelledby="bank-transfer-title" hidden>
