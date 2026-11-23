@@ -11,7 +11,7 @@ const catalogTargets = [productList, ...homeProductSections.map(section => secti
 const homeProductsRetryButtons = [...document.querySelectorAll("[data-home-products-retry]")];
 let homeProductSettings = null;
 const productMessage = document.getElementById("product-message");
-const reloadCatalogButton = document.getElementById("reload-catalog") ?? document.getElementById("featured-products-retry");
+const reloadCatalogButton = document.getElementById("featured-products-retry");
 const productSearchField = document.getElementById("product-search")
   ?? (productList ? document.querySelector("[data-header-search-input]") : null);
 const productSortField = document.getElementById("product-sort");
@@ -78,6 +78,7 @@ const orderMessage = document.getElementById("order-message");
 const receiptActions = document.getElementById("receipt-actions");
 const receiptCode = document.getElementById("receipt-code");
 const receiptOrdersLink = document.getElementById("receipt-orders");
+const checkoutBackLink = document.getElementById("checkout-back-cart");
 const recentOrdersList = document.getElementById("recent-orders-list");
 const recentOrdersMessage = document.getElementById("recent-orders-message");
 const reorderMessage = document.getElementById("reorder-message");
@@ -1061,6 +1062,11 @@ function updateControls() {
       cartContinueButton.disabled = orderPending ? isSubmitting || checkoutAccountChecking : locked || !selectionValid;
       cartContinueButton.textContent = orderPending ? "Kiểm tra lần đặt hàng đang chờ →" : "Tạo đơn hàng →";
       for (const checkbox of cartItems.querySelectorAll('input[type="checkbox"]')) checkbox.disabled = locked;
+      if (checkoutBackLink) {
+        checkoutBackLink.hidden = currentReceipt !== null;
+        checkoutBackLink.setAttribute("aria-disabled", String(isSubmitting));
+        checkoutBackLink.tabIndex = isSubmitting ? -1 : 0;
+      }
       reviewButton.hidden = reviewedOrder !== null || currentReceipt !== null;
       renderCheckoutVisuals();
     }
@@ -1846,7 +1852,7 @@ async function loadCatalog() {
       ? "Cửa hàng đang cập nhật sản phẩm. Bạn hãy quay lại sau." : "";
   } catch {
     if (!storefrontActive || orderPending || isSubmitting) return;
-    if (checkoutForm) productMessage.textContent = "Tải sản phẩm gặp lỗi. Kiểm tra máy chủ rồi bấm Cập nhật sản phẩm.";
+    if (checkoutForm) productMessage.textContent = "Chưa tải được sản phẩm. Hãy kiểm tra kết nối rồi tải lại trang để thử lại.";
     else if (catalogPage) productMessage.textContent = "Tải sản phẩm gặp lỗi. Kiểm tra kết nối rồi tải lại trang để thử lại.";
     else if (productList || featuredProductList) productMessage.textContent = "Tải sản phẩm gặp lỗi. Kiểm tra máy chủ rồi bấm Tải lại sản phẩm.";
     else {
@@ -1923,6 +1929,10 @@ removeSelectedButton?.addEventListener("click", () => {
 cartContinueButton?.addEventListener("click", () => {
   if (isSubmitting || !saveCartSelection()) return;
   window.ShopAccountWorkspace?.open("checkout");
+});
+
+checkoutBackLink?.addEventListener("click", event => {
+  if (isSubmitting) event.preventDefault();
 });
 
 checkoutForm?.addEventListener("input", () => {

@@ -54,10 +54,6 @@
         </div>
       </aside>
     </div>
-    <div class="account-cart-refresh">
-      <p id="product-message" role="status" aria-atomic="true"></p>
-      <button id="reload-catalog" type="button" class="button-secondary">Cập nhật sản phẩm</button>
-    </div>
   </div>
 
   <div data-cart-step="checkout" hidden>
@@ -125,6 +121,7 @@
               </div>
             </dl>
             <p id="order-preview" class="visually-hidden" role="status"></p>
+            <a id="checkout-back-cart" class="checkout-back-link" href="/dang-nhap.html?view=cart"><span aria-hidden="true">←</span> Quay lại giỏ hàng</a>
             <button id="review-order" class="account-cart-primary" form="checkout-form" type="submit" disabled>Xác nhận đơn hàng</button>
             <button id="confirm-order" class="account-cart-primary" type="button" hidden disabled>Xác nhận đơn hàng</button>
             <p id="order-message" class="account-cart-order-message" role="status" aria-atomic="true"></p>
@@ -153,6 +150,7 @@
     </div>
   </div>
   <div class="account-cart-messages">
+    <p id="product-message" role="status" aria-atomic="true"></p>
     <p id="cart-message" role="status" aria-atomic="true"></p>
     <p id="storage-message" role="status"></p>
     <p id="reorder-message" role="status" aria-atomic="true"></p>

@@ -1,0 +1,36 @@
+.tracking-page .tracking-shell {
+  --main-max-width: 760px;
+  max-width: var(--main-max-width);
+}
+
+.tracking-page .tracking-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tracking-page .tracking-main {
+  gap: 20px;
+}
+
+.tracking-page .tracking-result {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.tracking-page .order-history {
+  overflow-wrap: anywhere;
+}
+
+.tracking-page #tracking-history-empty {
+  margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .tracking-page .tracking-shell {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .tracking-page .tracking-main > .panel {
+    padding: 20px;
+  }
+}

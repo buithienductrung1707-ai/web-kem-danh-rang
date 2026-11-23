@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="support-chat.css">
     <link rel="stylesheet" href="catalog-categories.css">
     <link rel="stylesheet" href="account-header.css">
+    <link rel="stylesheet" href="tracking-page.css">
     <link rel="stylesheet" href="storefront-scale.css">
     <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
@@ -78,7 +79,7 @@
     <main id="main-content" class="tracking-shell">
       <header class="page-heading">
         <h1 id="tracking-title">Tra cứu đơn hàng</h1>
-        <p>Xem thông tin và trạng thái mới nhất của đơn hàng.</p>
+        <p>Theo dõi lịch sử trạng thái của đơn hàng bằng mã đơn và số điện thoại nhận hàng.</p>
       </header>
 
       <div class="tracking-layout">
@@ -111,28 +112,12 @@
 
           <p id="tracking-message" class="order-preview tracking-result" role="status" aria-atomic="true"></p>
 
-          <section id="tracking-actions" class="panel" aria-label="Thao tác với đơn đã tra cứu" hidden>
-            <div class="receipt-actions">
-              <button id="copy-tracked-order" class="button-secondary" type="button">Sao chép mã đơn</button>
-              <button id="reorder-button" type="button" disabled>Thêm lại sản phẩm vào giỏ</button>
-            </div>
-            <p id="reorder-note" class="field-help">Giỏ hàng sẽ dùng giá và tình trạng còn hàng hiện tại. Bạn xem lại giỏ và thông tin nhận hàng trước khi xác nhận đơn mới.</p>
-            <p id="tracking-actions-message" role="status" aria-atomic="true"></p>
-          </section>
-
           <section id="tracking-history-panel" class="panel" aria-labelledby="tracking-history-title" hidden>
             <h2 id="tracking-history-title">Lịch sử trạng thái</h2>
+            <p id="tracking-history-empty" class="field-help" hidden>Đơn hàng chưa có lịch sử trạng thái.</p>
             <ol id="tracking-history" class="order-history"></ol>
           </section>
         </div>
-
-        <aside class="panel recent-orders" aria-labelledby="recent-orders-title">
-          <h2 id="recent-orders-title">Mã đơn đã lưu trên trình duyệt này</h2>
-          <p class="field-help">Hiển thị tối đa 10 mã đơn gần nhất được lưu sau khi đặt hàng hoặc tra cứu thành công. Chọn mã đơn rồi dùng số điện thoại nhận hàng để tra cứu.</p>
-          <div id="recent-orders-list"></div>
-          <button id="forget-recent-orders" class="button-quiet" type="button" disabled>Xóa danh sách mã đơn trên trình duyệt</button>
-          <p id="recent-orders-message" role="status" aria-atomic="true"></p>
-        </aside>
       </div>
     </main>
 

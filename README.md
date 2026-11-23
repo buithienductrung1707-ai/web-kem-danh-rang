@@ -86,7 +86,7 @@ Giao diện cửa hàng dùng tỷ lệ nội dung **125%** trên trang chủ, d
 4. Bấm **Tạo đơn hàng** để mở bước xác nhận. Kiểm tra sản phẩm, địa chỉ nhận hàng, phương thức thanh toán và tổng tiền. Khách chưa đăng nhập điền thông tin nhận hàng ở bước này.
 5. Bấm **Xác nhận đơn hàng** để gửi đơn. Khi máy chủ xác nhận đã nhận đơn, khung tổng tiền đổi tiêu đề thành **Đặt hàng thành công**, hiển thị mã đơn và nút **Xem đơn hàng của tôi** ngay bên dưới. Ba nút trong luồng này dùng nền gradient cam và chữ trắng. Các sản phẩm chưa chọn tiếp tục nằm trong giỏ hàng.
 
-Bước xác nhận không còn nút **Sửa giỏ hàng**; dùng liên kết **Giỏ hàng** trong breadcrumb hoặc thanh điều hướng tài khoản để quay lại. Phần nhận mã không còn nút sao chép mã hoặc liên kết tra cứu; bấm **Xem đơn hàng của tôi** để mở trang đơn hàng hiện có. Khách chưa đăng nhập được hướng dẫn đăng nhập ở trang này. Khi kết quả gửi đơn chưa rõ, trang giữ nút **Thử gửi lại**, chưa hiển thị trạng thái thành công.
+Bước xác nhận có liên kết nhỏ **Quay lại giỏ hàng** ngay trên nút **Xác nhận đơn hàng**. Liên kết giữ nguyên lựa chọn sản phẩm và tạm khóa trong lúc đang gửi đơn; sau khi nhận mã, phần thành công chỉ hiện nút **Xem đơn hàng của tôi**. Khách chưa đăng nhập được hướng dẫn đăng nhập ở trang đơn hàng. Khi kết quả gửi đơn chưa rõ, trang giữ nút **Thử gửi lại**, chưa hiển thị trạng thái thành công. Giỏ hàng không còn nút **Cập nhật sản phẩm**; nếu tải sản phẩm gặp lỗi, thông báo hướng dẫn kiểm tra kết nối và tải lại trang.
 
 **Tài khoản**, **Giỏ hàng** và **Đơn hàng** dùng chung bố cục có thanh điều hướng bên trái. Có thể mở trực tiếp [hồ sơ](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html), [giỏ hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=cart), [xác nhận mua hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=checkout) và [đơn hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=orders). Giỏ rỗng hiển thị nút **Tiếp tục mua sắm** để mở trang danh mục và nút xem đơn hàng. Các đường dẫn giỏ hàng, đơn hàng cũ tự chuyển về khu vực tương ứng.
 
@@ -143,7 +143,7 @@ Khách mua bằng thông tin nhận hàng nhập tại giỏ có thể điền t
 
 ### Theo dõi đơn hàng
 
-- Mở **Tra cứu đơn hàng** ở cuối trang, nhập mã đơn và số điện thoại nhận hàng để xem trạng thái.
+- Mở **Tra cứu đơn hàng** ở cuối trang, nhập mã đơn và số điện thoại nhận hàng để xem **Lịch sử trạng thái** trong bố cục một cột. Trang không hiển thị danh sách mã lưu trên trình duyệt, phần tóm tắt đơn, nút sao chép mã hoặc thêm lại sản phẩm vào giỏ; dữ liệu mã đã lưu trước đó vẫn được giữ nguyên.
 - Mở **Đơn hàng** trên thanh bên tài khoản sau khi đăng nhập để xem lịch sử. Có thể lọc theo khoảng ngày, mã đơn hoặc tên sản phẩm, trạng thái và sắp xếp mới nhất hoặc cũ nhất.
 - Hàng lọc chính gồm **Từ ngày**, **Đến ngày**, ô tìm mã đơn/tên sản phẩm dạng bo tròn và lựa chọn sắp xếp. Hàng dưới hiển thị số đơn thực tế đang khớp bộ lọc và lựa chọn trạng thái. Kết quả tự cập nhật khi đổi ngày, trạng thái hoặc sắp xếp; ô tìm kiếm cập nhật sau khi dừng gõ một chút và hỗ trợ **Enter** để tìm ngay. Xoá nội dung từng ô hoặc chọn **Tất cả** để bỏ điều kiện tương ứng. Các ô tự xuống hàng theo chiều rộng khu vực đơn hàng để phù hợp với điện thoại, thanh bên tài khoản và banner.
 - Khi chưa có đơn hoặc không có kết quả phù hợp, giao diện hiển thị biểu tượng kiện hàng, thông báo **Không có đơn ở mục này** và hướng dẫn phù hợp. Trạng thái trống không có nút danh mục hoặc phân trang. Khi kết nối gặp lỗi, dùng **Kiểm tra lại tài khoản** để thử lại.
@@ -336,6 +336,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Điều hướng chung tài khoản, giỏ hàng và đơn hàng | [account-workspace.js](backend/public/account-workspace.js), [account-workspace.css](backend/public/account-workspace.css) |
 | Giỏ hàng và bước xác nhận mua hàng | [account-cart.html](backend/public/account-cart.html), [account-cart.css](backend/public/account-cart.css), [app.js](backend/public/app.js) |
 | Lịch sử đơn hàng và tiến trình xử lý | [account-orders.html](backend/public/account-orders.html), [order-history.js](backend/public/order-history.js), [account-orders.css](backend/public/account-orders.css) |
+| Tra cứu lịch sử trạng thái bằng mã đơn và số điện thoại | [tra-cuu.html](backend/public/tra-cuu.html), [tracking.js](backend/public/tracking.js), [tracking-page.css](backend/public/tracking-page.css) |
 | Trang danh mục và sản phẩm theo danh mục | [danh-muc.html](backend/public/danh-muc.html), [catalog-page.css](backend/public/catalog-page.css), [catalog-page.js](backend/public/catalog-page.js) |
 | Tiêu đề chuyển sắc, biểu tượng và trang trí đầu trang danh mục | [catalog-decorations.css](backend/public/catalog-decorations.css) |
 | Tỷ lệ giao diện cửa hàng 125% và header gọn | [storefront-scale.css](backend/public/storefront-scale.css), [compact-header.css](backend/public/compact-header.css) |
