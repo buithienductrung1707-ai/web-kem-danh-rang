@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Coupon shop — Cửa hàng kem đánh răng</title>
+    <meta name="description" content="Khám phá coupon của cửa hàng và kiểm tra mã giảm giá trước khi đặt hàng.">
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="support-chat.css">
+    <link rel="stylesheet" href="catalog-categories.css">
+    <link rel="stylesheet" href="account-header.css">
+    <link rel="stylesheet" href="coupon-shop.css">
+    <link rel="stylesheet" href="storefront-scale.css">
+    <script src="catalog-categories.js" defer></script>
+    <script src="shop-memory.js" defer></script>
+    <script src="account-menu.js" defer></script>
+    <script src="account.js" defer></script>
+    <script src="header.js" defer></script>
+    <script src="support-chat.js" defer></script>
+    <script src="coupon-shop.js" defer></script>
+  </head>
+  <body class="storefront-page coupon-page">
+    <a class="skip-link" href="#main-content">Đến nội dung chính</a>
+    <header class="site-header commerce-header">
+      <div class="site-header-inner">
+        <a class="header-brand" href="/" aria-label="Trang chủ cửa hàng kem đánh răng">
+          <img src="/assets/shop-logo.png" width="48" height="48" alt="">
+          <span class="header-brand-name">Kem đánh răng</span>
+        </a>
+        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/danh-muc.html#catalog" method="get">
+          <label class="visually-hidden" for="header-search-input">Tìm sản phẩm</label>
+          <input id="header-search-input" data-header-search-input name="q" type="search" autocomplete="off" placeholder="Tìm tên hoặc mô tả sản phẩm...">
+          <button class="header-search-button" type="submit">
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg>
+            <span>Tìm</span>
+          </button>
+        </form>
+        <div class="header-actions">
+          <nav class="site-nav" aria-label="Điều hướng chính">
+            <a class="header-action-link" href="/tra-cuu.html" data-temporary-hidden="order-tracking" hidden>
+              <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 17h4V6H3v11h2m9-8h4l3 4v4h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+              <span class="header-link-copy"><span class="header-link-label">Tra cứu</span><strong>Đơn hàng</strong></span>
+            </a>
+            <a class="header-action-link" href="/dang-nhap.html" data-account-link>
+              <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+              <span class="header-link-copy"><span class="header-link-label">Tài khoản</span><strong data-account-label>Đăng nhập</strong></span>
+            </a>
+            <a class="header-action-link header-cart cart-navigation" href="/dang-nhap.html?view=cart">
+              <span class="header-link-icon" aria-hidden="true"><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m3 3 2 2 2.4 11.5h11.2L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span id="header-cart-count" class="cart-count" hidden>0</span></span>
+              <span class="header-link-copy"><span class="header-link-label">Giỏ hàng</span><strong id="header-cart-total" data-header-cart-total>0 ₫</strong></span>
+            </a>
+          </nav>
+          <button class="theme-toggle button-secondary" type="button" data-theme-toggle aria-label="Chế độ tối" aria-pressed="false" title="Bật chế độ tối">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>
+          </button>
+        </div>
+        <p id="theme-message" role="status" aria-atomic="true"></p>
+        <p id="header-message" role="status" aria-atomic="true"></p>
+      </div>
+      <nav class="catalog-nav" aria-label="Điều hướng cửa hàng">
+        <div class="catalog-nav-inner">
+          <div class="catalog-nav-products" data-products-menu>
+            <a class="catalog-nav-link" data-products-link href="/danh-muc.html"><svg class="catalog-nav-category-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Danh mục</span></a>
+            <button class="catalog-nav-toggle" type="button" data-products-toggle aria-expanded="false" aria-controls="products-menu" aria-label="Mở danh sách danh mục">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <ul class="catalog-nav-menu" id="products-menu" hidden>
+              <li><a href="/danh-muc.html?danh-muc=kem-danh-rang">Kem đánh răng</a></li>
+              <li><a href="/danh-muc.html?danh-muc=ban-chai-danh-rang">Bàn chải đánh răng</a></li>
+            </ul>
+          </div>
+          <a class="catalog-nav-link" href="/dang-nhap.html?view=orders" data-temporary-hidden="my-orders" hidden><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>
+          <a class="catalog-nav-link" href="/cskh.html" aria-label="Chăm sóc khách hàng" title="Chăm sóc khách hàng"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 11h.01M12 11h.01M16 11h.01"/></svg><span>CSKH</span></a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main-content" class="coupon-shell">
+      <nav class="coupon-breadcrumb" aria-label="Đường dẫn trang">
+        <ol><li><a href="/">Trang chủ</a></li><li aria-current="page">Coupon shop</li></ol>
+      </nav>
+      <section class="coupon-hero" aria-labelledby="coupon-page-title">
+        <div class="coupon-hero-copy">
+          <p class="coupon-eyebrow">Coupon shop</p>
+          <h1 id="coupon-page-title">Một chút ưu đãi.<br><span>Thêm nhiều nụ cười.</span></h1>
+          <p>Khám phá coupon của cửa hàng, xem điều kiện và kiểm tra mã trước khi đặt mua sản phẩm chăm sóc răng miệng.</p>
+          <div class="coupon-hero-actions">
+            <a class="button-link" href="#coupon-collection">Khám phá coupon <span aria-hidden="true">↓</span></a>
+            <a class="coupon-text-link" href="#coupon-check-title">Tôi đã có mã <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <div class="coupon-hero-art" aria-hidden="true">
+          <div class="coupon-gift-card coupon-gift-card--back"><span>Dành cho bạn</span></div>
+          <div class="coupon-gift-card coupon-gift-card--front">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h34v22H7zM4 13h40v9H4zM24 13v29"/><path d="M24 13C8 15 9 2 15 4c5 1 9 9 9 9Zm0 0C40 15 39 2 33 4c-5 1-9 9-9 9Z"/></svg>
+            <strong>Coupon shop</strong><span>Chăm sóc nụ cười mỗi ngày</span>
+            <div class="coupon-gift-card-line"></div>
+          </div>
+          <span class="coupon-art-spark coupon-art-spark--one">+</span><span class="coupon-art-spark coupon-art-spark--two">+</span>
+        </div>
+      </section>
+      <nav class="coupon-quick-links" aria-label="Khám phá coupon">
+        <a href="#coupon-collection"><span class="coupon-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v4a2 2 0 0 0 0 4v4H3v-4a2 2 0 0 0 0-4V7Zm12 0v2m0 3v2m0 3v2"/></svg></span><span><strong>Coupon của shop</strong><small>Xem các ưu đãi hiện có</small></span><span aria-hidden="true">→</span></a>
+        <a href="#coupon-check-title"><span class="coupon-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5m-13-10 2 2 4-4"/></svg></span><span><strong>Kiểm tra mã</strong><small>Kiểm tra trước khi đặt hàng</small></span><span aria-hidden="true">→</span></a>
+        <a href="#coupon-how-title"><span class="coupon-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18H5zM9 7h6M9 11h6m-6 4h3"/></svg></span><span><strong>Dùng coupon thế nào?</strong><small>Ba bước đơn giản</small></span><span aria-hidden="true">→</span></a>
+      </nav>
+      <div class="coupon-shop-layout">
+        <aside class="coupon-sidebar">
+          <section class="coupon-check-card" aria-labelledby="coupon-check-title">
+            <p class="coupon-eyebrow">Bạn đã có coupon?</p>
+            <h2 id="coupon-check-title" tabindex="-1">Kiểm tra mã của bạn</h2>
+            <p>Nhập mã để kiểm tra tình trạng khả dụng.</p>
+            <form id="coupon-check-form" novalidate>
+              <label for="coupon-check-code">Mã giảm giá</label>
+              <input id="coupon-check-code" name="code" type="text" maxlength="64" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="coupon-check-message" placeholder="Nhập mã của bạn" required>
+              <button id="coupon-check-button" type="submit">Kiểm tra mã</button>
+              <p id="coupon-check-message" class="coupon-form-message" role="status" aria-atomic="true"></p>
+            </form>
+            <a class="coupon-text-link" href="/dang-nhap.html?view=cart">Mở giỏ hàng <span aria-hidden="true">→</span></a>
+          </section>
+          <section class="coupon-how-card" aria-labelledby="coupon-how-title">
+            <h2 id="coupon-how-title" tabindex="-1">Cách sử dụng coupon</h2>
+            <ol>
+              <li><strong>Chọn ưu đãi</strong><span>Đọc điều kiện và thời hạn của coupon đang khả dụng.</span></li>
+              <li><strong>Nhập mã trong giỏ</strong><span>Thêm sản phẩm, nhập mã và bấm Áp dụng.</span></li>
+              <li><strong>Kiểm tra tổng tiền</strong><span>Chỉ xác nhận đơn sau khi đã kiểm tra kết quả áp dụng mã.</span></li>
+            </ol>
+          </section>
+        </aside>
+        <section id="coupon-collection" class="coupon-collection" aria-labelledby="coupon-collection-title">
+          <header class="coupon-collection-heading"><div><p class="coupon-eyebrow">Ưu đãi từ cửa hàng</p><h2 id="coupon-collection-title" tabindex="-1">Tìm coupon phù hợp</h2></div><span id="coupon-count" class="coupon-count" aria-live="polite">Đang tải…</span></header>
+          <div class="coupon-filters" role="search" aria-label="Lọc coupon">
+            <div class="coupon-search-field"><label for="coupon-search">Tìm coupon</label><input id="coupon-search" type="search" autocomplete="off" placeholder="Tìm theo tên hoặc mã" disabled></div>
+            <fieldset class="coupon-filter-options"><legend>Tình trạng coupon</legend><label><input type="radio" name="coupon-filter" value="all" checked disabled><span>Tất cả</span></label><label><input type="radio" name="coupon-filter" value="available" disabled><span>Đang khả dụng</span></label></fieldset>
+          </div>
+          <p id="coupon-load-message" class="coupon-load-message" role="status" aria-atomic="true">Đang tải coupon của cửa hàng…</p>
+          <div id="coupon-list" class="coupon-grid" aria-busy="true"></div>
+          <div id="coupon-empty" class="coupon-empty" hidden>
+            <span class="coupon-empty-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16h34v7a4 4 0 0 0 0 8v7H7v-7a4 4 0 0 0 0-8v-7Zm23 0v4m0 5v4m0 5v4M15 10l3-5m7 4 1-5m7 8 4-4"/></svg></span>
+            <h3 id="coupon-empty-title">Chưa có coupon khả dụng</h3><p id="coupon-empty-description">Ưu đãi của cửa hàng sẽ được hiển thị tại đây. Bạn vẫn có thể khám phá các sản phẩm và kiểm tra mã nếu đã có.</p>
+            <a class="button-link button-secondary" href="/danh-muc.html">Tiếp tục mua sắm <span aria-hidden="true">→</span></a>
+          </div>
+          <button id="coupon-reload" class="button-secondary" type="button" hidden>Thử tải lại coupon</button>
+          <p class="coupon-collection-note">Điều kiện và mức giảm được hiển thị theo từng coupon. Hãy kiểm tra thông tin trước khi đặt hàng.</p>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer store-footer">
+      <div class="site-footer-inner">
+        <div class="footer-brand">
+          <a class="brand-name" href="/">Kem đánh răng</a>
+          <p>Lựa chọn kem đánh răng cho nhu cầu chăm sóc răng miệng hằng ngày.</p>
+        </div>
+        <section class="footer-column" aria-labelledby="footer-shop-title">
+          <h2 id="footer-shop-title">Mua sắm</h2>
+          <nav aria-label="Mua sắm cuối trang">
+            <a href="/">Trang chủ</a>
+            <a href="/danh-muc.html?danh-muc=kem-danh-rang">Kem đánh răng</a>
+            <a class="cart-navigation" href="/dang-nhap.html?view=cart">Giỏ hàng</a>
+          </nav>
+        </section>
+        <section class="footer-column" aria-labelledby="footer-account-title">
+          <h2 id="footer-account-title">Tài khoản &amp; hỗ trợ</h2>
+          <nav aria-label="Tài khoản và hỗ trợ cuối trang">
+            <a href="/dang-nhap.html?view=orders">Đơn hàng của tôi</a>
+            <a href="/tra-cuu.html">Tra cứu đơn hàng</a>
+            <a href="/dang-nhap.html">Tài khoản của bạn</a>
+            <a href="/dang-ky.html">Đăng ký tài khoản</a>
+            <a href="/cskh.html">Chăm sóc khách hàng</a>
+            <a href="/dieu-khoan.html">Điều khoản sử dụng</a>
+          </nav>
+        </section>
+        <section class="footer-column" aria-labelledby="footer-payment-title">
+          <h2 id="footer-payment-title">Thanh toán</h2>
+          <ul class="footer-payment-list">
+            <li><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9h.01M18 15h.01"/></svg><span>Thanh toán khi nhận hàng</span></li>
+            <li><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m3 9 9-6 9 6H3Zm2 3v6m7-6v6m7-6v6M3 21h18"/></svg><span>Chuyển khoản ngân hàng</span></li>
+          </ul>
+        </section>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Cửa hàng kem đánh răng</p>
+        <a href="/admin.html">Quản trị cửa hàng</a>
+      </div>
+    </footer>
+  </body>
+</html>

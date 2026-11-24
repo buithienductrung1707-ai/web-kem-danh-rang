@@ -23,6 +23,10 @@
   const deleteMessage = document.getElementById("orders-delete-message");
   const deleteCancel = document.getElementById("orders-delete-cancel");
   const deleteConfirm = document.getElementById("orders-delete-confirm");
+  const placedNotice = document.getElementById("orders-placed-notice");
+  const placedTitle = document.getElementById("orders-placed-title");
+  const placedDescription = document.getElementById("orders-placed-description");
+  const placedDetail = document.getElementById("orders-placed-detail");
   const statuses = {
     NEW: "Mới nhận", CONFIRMED: "Đã xác nhận", SHIPPING: "Đang giao",
     COMPLETED: "Hoàn thành", CANCELLED: "Đã hủy"
@@ -31,10 +35,6 @@
   const money = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" });
   const dateFormat = new Intl.DateTimeFormat("vi-VN", {
     dateStyle: "short", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh"
-  });
-  const milestoneFormat = new Intl.DateTimeFormat("vi-VN", {
-    day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit",
-    timeZone: "Asia/Ho_Chi_Minh"
   });
   let active = !root;
   let pageActive = true;
@@ -47,6 +47,7 @@
   let deleteTrigger = null;
   let filterTimer = null;
   let searchComposing = false;
+  let placedOrder = null;
   if (root) {
     const savedFilters = new URLSearchParams(window.location.search);
     for (const [key, control] of [["status", statusFilter], ["sort", sortField],
@@ -104,7 +105,45 @@
     });
   }
 
-  function clearPrivateContent(keepFilters = false, keepNotice = false) {
+  function clearPlacedOrder(keepSnapshot = false) {
+    if (!keepSnapshot) placedOrder = null;
+    if (!placedNotice) return;
+    placedNotice.hidden = true;
+    placedNotice.removeAttribute("data-status");
+    placedTitle.textContent = "";
+    placedDescription.textContent = "";
+    placedDetail.href = "/tra-cuu.html";
+  }
+
+  function renderPlacedOrder(scope) {
+    if (!placedNotice) return;
+    if (placedOrder && placedOrder.scope !== scope) clearPlacedOrder();
+    const saved = window.ShopMemory?.takePlacedOrder?.(scope);
+    if (saved?.receipt) placedOrder = { scope, receipt: saved.receipt };
+    if (!placedOrder) return;
+    const receipt = placedOrder.receipt;
+    const code = receipt.orderNumber ?? receipt.orderId;
+    placedTitle.textContent = receipt.status === "CANCELLED"
+      ? "Đơn #" + code + " đã hủy" : "Đã nhận đơn #" + code;
+    placedDescription.textContent = (receipt.status === "CANCELLED"
+      ? "Đơn của lần đặt hàng này hiện đã hủy. "
+      : "Cửa hàng đã ghi nhận đơn hàng của bạn. ")
+      + "Tiền sản phẩm: " + money.format(receipt.total) + ". "
+      + (scope === null ? "Dùng Xem chi tiết để theo dõi đơn, hoặc đăng nhập để xem các đơn trong tài khoản."
+        : "Bạn có thể theo dõi trạng thái và xem chi tiết đơn ở bên dưới.");
+    placedDetail.href = "/tra-cuu.html?orderId=" + encodeURIComponent(code);
+    placedNotice.dataset.status = receipt.status;
+    placedNotice.hidden = false;
+  }
+
+  placedDetail?.addEventListener("click", () => {
+    if (!placedOrder || !active || !pageActive) return;
+    const receipt = placedOrder.receipt;
+    window.ShopMemory?.prepareTracking?.(receipt.orderNumber ?? receipt.orderId);
+  });
+
+  function clearPrivateContent(keepFilters = false, keepNotice = false, keepPlaced = false) {
+    clearPlacedOrder(keepPlaced);
     if (!deleteController) closeDeleteDialog(false);
     customerId = null;
     panel.hidden = !keepFilters;
@@ -147,66 +186,6 @@
       const supported = (value.startsWith("/") && !value.startsWith("//")) || /^https?:\/\//i.test(value);
       return supported && ["http:", "https:"].includes(url.protocol) ? url.href : fallback;
     } catch { return fallback; }
-  }
-
-  function renderProgress(order) {
-    if (order.status === "CANCELLED") {
-      const cancelled = document.createElement("p");
-      cancelled.className = "customer-order-cancelled";
-      cancelled.textContent = "Đơn hàng đã hủy. Bạn có thể thêm lại sản phẩm vào giỏ để đặt đơn mới.";
-      return cancelled;
-    }
-    const progress = document.createElement("ol");
-    progress.className = "customer-order-progress";
-    progress.setAttribute("aria-label", "Tiến trình đơn hàng");
-    const history = new Map();
-    for (const entry of Array.isArray(order.statusHistory) ? order.statusHistory : []) {
-      if (!entry || typeof entry.status !== "string" || typeof entry.changedAt !== "string") continue;
-      const changedAt = orderDate(entry.changedAt);
-      if (Number.isFinite(changedAt.getTime())) history.set(entry.status, changedAt);
-    }
-    const stages = ["NEW", "CONFIRMED", "SHIPPING", "COMPLETED"];
-    for (const [index, stage] of stages.entries()) {
-      const item = document.createElement("li");
-      item.dataset.status = stage;
-      const recorded = history.has(stage);
-      const current = order.status === stage;
-      const marker = document.createElement("span");
-      marker.className = "customer-order-stage-marker";
-      marker.setAttribute("aria-hidden", "true");
-      if (recorded) {
-        const check = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        check.setAttribute("viewBox", "0 0 24 24");
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", "m6 12 4 4 8-8");
-        check.append(path);
-        marker.append(check);
-      }
-      const label = document.createElement("span");
-      label.className = "customer-order-stage-label";
-      label.textContent = statuses[stage];
-      const state = document.createElement("span");
-      state.className = "visually-hidden";
-      state.textContent = current ? "Hiện tại. " : recorded ? "Đã ghi nhận. " : "Chưa ghi nhận. ";
-      item.append(marker, state, label);
-      if (recorded) item.classList.add("is-complete");
-      if (current) item.setAttribute("aria-current", "step");
-      if (index > 0 && (recorded || current) && history.has(stages[index - 1])) {
-        item.classList.add("is-connected");
-      }
-      const changedAt = history.get(stage);
-      if (changedAt) {
-        const timestamp = document.createElement("time");
-        timestamp.dateTime = changedAt.toISOString();
-        const parts = Object.fromEntries(milestoneFormat.formatToParts(changedAt)
-          .map(part => [part.type, part.value]));
-        timestamp.textContent = parts.day + "/" + parts.month + " " + parts.hour + ":" + parts.minute;
-        timestamp.title = dateFormat.format(changedAt);
-        item.append(timestamp);
-      }
-      progress.append(item);
-    }
-    return progress;
   }
 
   function renderOrders(orders) {
@@ -316,7 +295,7 @@
       rightActions.className = "customer-order-actions-right";
       rightActions.append(detail, reorder);
       actions.append(rightActions);
-      card.append(header, items, paymentRow, renderProgress(order), actions, actionMessage);
+      card.append(header, items, paymentRow, actions, actionMessage);
       fragment.append(card);
     }
     if (orders.length === 0) {
@@ -357,7 +336,7 @@
     if (dateTo?.value) params.set("dateTo", dateTo.value);
     if (searchField?.value.trim()) params.set("q", searchField.value.trim());
     if (sortField) params.set("sort", sortField.value);
-    clearPrivateContent(!panel.hidden, keepNotice);
+    clearPrivateContent(!panel.hidden, keepNotice, true);
     prompt.hidden = true;
     retryButton.hidden = true;
     message.textContent = "Đang tải đơn hàng...";
@@ -370,7 +349,8 @@
       const accountResponse = await fetch("/api/account/me", options);
       if (!active || listController !== controller) return;
       if (accountResponse.status === 401) {
-        clearPrivateContent();
+        clearPrivateContent(false, false, true);
+        renderPlacedOrder(null);
         prompt.hidden = false;
         message.textContent = "";
         return;
@@ -379,6 +359,7 @@
       if (!active || listController !== controller) return;
       if (!accountResponse.ok || !account || !Number.isSafeInteger(account.id) || account.id < 1 ||
         typeof account.phone !== "string") throw new Error("Phiên tài khoản chưa hợp lệ");
+      renderPlacedOrder(account.id);
       const response = await fetch("/api/account/orders?" + params, {
         ...options, headers: { "X-Customer-Id": String(account.id) }
       });
@@ -462,7 +443,10 @@
       }
       if (response.status === 409) notice = (typeof result?.error === "string" ? result.error
         : "Đơn #" + target.code + " đã thay đổi trạng thái.") + " Hãy kiểm tra danh sách hiện tại.";
-      else if (response.status === 404) notice = "Không còn tìm thấy đơn #" + target.code + " trong tài khoản. Hãy kiểm tra danh sách hiện tại.";
+      else if (response.status === 404) {
+        if (placedOrder?.receipt.orderId === target.id) clearPlacedOrder();
+        notice = "Không còn tìm thấy đơn #" + target.code + " trong tài khoản. Hãy kiểm tra danh sách hiện tại.";
+      }
       else if (!response.ok) {
         deleteMessage.textContent = typeof result?.error === "string" ? result.error : "Chưa xóa được đơn. Hãy thử lại.";
         return;
@@ -470,6 +454,7 @@
         if (response.status !== 200 || result?.id !== target.id || result.deleted !== true) {
           throw new Error("Kết quả xóa đơn chưa hợp lệ");
         }
+        if (placedOrder?.receipt.orderId === target.id) clearPlacedOrder();
         notice = "Đã xóa đơn #" + target.code + ".";
       }
     } catch {
@@ -501,7 +486,7 @@
   function prepareSearch() {
     if (!active || !pageActive || panel.hidden) return false;
     stopRequests();
-    clearPrivateContent(true);
+    clearPrivateContent(true, false, true);
     retryButton.hidden = true;
     message.textContent = "Đang cập nhật bộ lọc...";
     return true;
@@ -578,11 +563,13 @@
   window.addEventListener("shop-account-change", event => {
     stopRequests();
     searchComposing = false;
-    clearPrivateContent();
+    const confirmedGuest = event.detail?.account === null;
+    clearPrivateContent(false, false, confirmedGuest && placedOrder?.scope === null);
     message.textContent = "";
     retryButton.hidden = true;
-    if (event.detail?.account === null) {
+    if (confirmedGuest) {
       if (active) prompt.hidden = false;
+      if (active) renderPlacedOrder(null);
       setControls();
       return;
     }

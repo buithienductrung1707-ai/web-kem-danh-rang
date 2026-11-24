@@ -364,6 +364,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
+  margin: 0;
 }
 
 .account-cart-coupon input {
@@ -404,6 +405,19 @@
   color: var(--muted);
   font-size: 12px;
   line-height: 1.6;
+}
+
+.account-cart-coupon-help[data-error="true"] {
+  color: var(--danger);
+}
+
+.account-cart-coupon input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.account-cart-workspace .account-cart-coupon-apply:hover:not(:disabled) {
+  background: var(--text);
+  color: var(--surface);
 }
 
 .account-cart-coupon-panel > .account-cart-coupon {

@@ -113,8 +113,30 @@
 
           <p id="tracking-message" class="order-preview tracking-result" role="status" aria-atomic="true"></p>
 
+          <section id="tracking-detail-panel" class="panel tracking-detail-panel" aria-labelledby="tracking-detail-title" hidden>
+            <div class="tracking-detail-heading">
+              <div>
+                <p class="tracking-eyebrow">Chi tiết hành trình</p>
+                <h2 id="tracking-detail-title">Đơn hàng <span id="tracking-result-code"></span></h2>
+              </div>
+              <span id="tracking-current-status" class="tracking-status-badge"></span>
+            </div>
+            <p id="tracking-status-description" class="tracking-status-description"></p>
+            <dl class="tracking-order-facts">
+              <div><dt>Ngày đặt hàng</dt><dd id="tracking-created-at"></dd></div>
+              <div><dt>Cập nhật gần nhất</dt><dd id="tracking-updated-at"></dd></div>
+              <div><dt>Phương thức thanh toán</dt><dd id="tracking-payment"></dd></div>
+              <div><dt>Tiền sản phẩm</dt><dd id="tracking-order-total"></dd></div>
+            </dl>
+            <h3 id="tracking-progress-title">Tiến trình đơn hàng</h3>
+            <p id="tracking-progress-note" class="tracking-progress-note">Các mốc có thời gian là những lần cập nhật đã được ghi nhận. Thời gian hiển thị theo giờ Việt Nam.</p>
+            <p id="tracking-cancelled" class="tracking-cancelled" hidden>Đơn hàng đã hủy. Lịch sử bên dưới ghi lại các mốc đã được cửa hàng cập nhật.</p>
+            <ol id="tracking-progress" class="tracking-progress" aria-labelledby="tracking-progress-title" aria-describedby="tracking-progress-note"></ol>
+          </section>
+
           <section id="tracking-history-panel" class="panel" aria-labelledby="tracking-history-title" hidden>
             <h2 id="tracking-history-title">Lịch sử trạng thái</h2>
+            <p class="tracking-history-note">Xem thời điểm và ý nghĩa của từng lần cập nhật đơn hàng.</p>
             <p id="tracking-history-empty" class="field-help" hidden>Đơn hàng chưa có lịch sử trạng thái.</p>
             <ol id="tracking-history" class="order-history"></ol>
           </section>

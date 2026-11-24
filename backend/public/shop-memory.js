@@ -3,6 +3,7 @@
   const phoneKey = "toothpaste-order-phones";
   const trackingKey = "toothpaste-tracking-handoff";
   const reorderKey = "toothpaste-reorder";
+  const placedOrderKey = "toothpaste-placed-order";
   let memoryReceipts = [];
   let unsavedReceipts = false;
   let receiptReadFailed = false;
@@ -114,7 +115,7 @@
     } catch {
       messages.push("Xóa danh sách mã đơn đã lưu gặp lỗi. Hãy kiểm tra quyền lưu dữ liệu của trình duyệt.");
     }
-    for (const key of [phoneKey, trackingKey]) {
+    for (const key of [phoneKey, trackingKey, placedOrderKey]) {
       try { sessionStorage.removeItem(key); } catch {
         messages.push("Xóa thông tin tra cứu trong phiên gặp lỗi.");
       }
@@ -160,6 +161,56 @@
       };
     } catch {
       return { tracking: null, error: "Đọc thông tin tra cứu gặp lỗi. Hãy nhập lại mã đơn và số điện thoại." };
+    }
+  }
+
+  function validPlacedReceipt(receipt) {
+    return receipt && typeof receipt.orderId === "string" && receipt.orderId.length <= 128
+      && validText(receipt.orderId) && validOrderNumber(receipt.orderNumber)
+      && Number.isSafeInteger(receipt.total) && receipt.total >= 0
+      && ["COD", "BANK_TRANSFER"].includes(receipt.paymentMethod)
+      && ["NEW", "CONFIRMED", "SHIPPING", "COMPLETED", "CANCELLED"].includes(receipt.status);
+  }
+
+  function validPlacedContext(customerId) {
+    return customerId === null || (Number.isSafeInteger(customerId) && customerId > 0);
+  }
+
+  function preparePlacedOrder(receipt, customerId) {
+    if (!validPlacedReceipt(receipt) || !validPlacedContext(customerId)) {
+      return { error: "Chưa chuyển được thông tin đơn hàng. Mã đơn vẫn được giữ trên trang này." };
+    }
+    const clean = { orderId: receipt.orderId.trim(), total: receipt.total,
+      paymentMethod: receipt.paymentMethod, status: receipt.status };
+    if (receipt.orderNumber != null) clean.orderNumber = receipt.orderNumber;
+    try {
+      sessionStorage.setItem(placedOrderKey, JSON.stringify({
+        version: 1, receipt: clean, customerId, expiresAt: Date.now() + 5 * 60 * 1000
+      }));
+      return { error: "" };
+    } catch {
+      return { error: "Chưa chuyển được thông tin đơn hàng. Hãy giữ mã đơn đang hiển thị và bấm Xem đơn hàng của tôi để tiếp tục." };
+    }
+  }
+
+  function takePlacedOrder(customerId) {
+    try {
+      const raw = sessionStorage.getItem(placedOrderKey);
+      if (raw === null) return { receipt: null, error: "" };
+      sessionStorage.removeItem(placedOrderKey);
+      const value = JSON.parse(raw);
+      if (value?.version !== 1 || !validPlacedReceipt(value.receipt)
+          || !validPlacedContext(value.customerId) || !validPlacedContext(customerId)
+          || value.customerId !== customerId || !Number.isSafeInteger(value.expiresAt)
+          || value.expiresAt <= Date.now() || value.expiresAt > Date.now() + 5 * 60 * 1000) {
+        return { receipt: null, error: "" };
+      }
+      const receipt = { orderId: value.receipt.orderId.trim(), total: value.receipt.total,
+        paymentMethod: value.receipt.paymentMethod, status: value.receipt.status };
+      if (value.receipt.orderNumber != null) receipt.orderNumber = value.receipt.orderNumber;
+      return { receipt, error: "" };
+    } catch {
+      return { receipt: null, error: "Chưa đọc được thông báo nhận đơn. Bạn có thể mở Tra cứu đơn hàng bằng mã đã nhận." };
     }
   }
 
@@ -220,6 +271,6 @@
 
   window.ShopMemory = {
     readReceipts, saveReceipt, forgetReceipts, prepareTracking, takeTracking,
-    queueReorder, readReorder, clearReorder
+    queueReorder, readReorder, clearReorder, preparePlacedOrder, takePlacedOrder
   };
 })();

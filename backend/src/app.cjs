@@ -5,6 +5,7 @@ const db = require("./db/database.cjs");
 const adminRouter = require("./routes/admin.cjs");
 const accountRouter = require("./routes/account.cjs");
 const { customerSupportRouter } = require("./routes/support.cjs");
+const couponRouter = require("./routes/coupons.cjs");
 const { createOrder, getOrderItems, getOrderHistory } = require("./services/orders.cjs");
 const { getPublicBanners } = require("./services/banners.cjs");
 const { getPublicCategories } = require("./services/categories.cjs");
@@ -19,6 +20,7 @@ if (getRuntime()) app.set("trust proxy", 1);
 
 app.use("/api/account", accountRouter);
 app.use("/api/support", customerSupportRouter);
+app.use("/api/coupons", couponRouter);
 app.use(["/api/banners", "/api/admin/banners", "/api/orders"], (req, res, next) => {
   res.set("Cache-Control", "no-store");
   next();

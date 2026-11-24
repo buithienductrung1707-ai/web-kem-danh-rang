@@ -93,6 +93,10 @@ const cartSelectAll = document.getElementById("cart-select-all");
 const removeSelectedButton = document.getElementById("remove-selected-cart");
 const cartContinueButton = document.getElementById("cart-continue");
 const checkoutReviewItems = document.getElementById("checkout-review-items");
+const couponEditors = [...document.querySelectorAll("[data-cart-coupon-form]")].map(form => ({
+  form, input: form.querySelector("input"), button: form.querySelector("button"),
+  message: document.getElementById(form.querySelector("input").getAttribute("aria-describedby")), controller: null
+}));
 const cartSelectionStorageKey = "toothpaste-cart-unselected";
 const customerFields = [customerNameField, customerPhoneField, customerAddressField, customerEmailField].filter(Boolean);
 const storageKey = "toothpaste-cart-items";
@@ -392,6 +396,10 @@ function renderRecentOrders() {
 
 window.addEventListener("pagehide", () => {
   storefrontActive = false;
+  for (const editor of couponEditors) {
+    editor.controller?.abort();
+    editor.controller = null;
+  }
   removingCartProductId = null;
   if (cartRemoveDialog?.open) cartRemoveDialog.close();
   if (productPreviewDialog?.open) productPreviewDialog.close();
@@ -983,6 +991,13 @@ productPreviewAdd?.addEventListener("click", () => {
 
 function updateControls() {
   const locked = orderPending || isSubmitting || quickBuyNavigating || checkoutAccountChecking;
+  const checkingCoupon = couponEditors.some(editor => editor.controller !== null);
+  for (const editor of couponEditors) {
+    editor.input.disabled = locked || checkingCoupon || !storefrontActive;
+    editor.button.disabled = locked || checkingCoupon || !storefrontActive;
+    editor.button.textContent = editor.controller ? "Đang kiểm tra…" : "Áp dụng";
+    editor.form.setAttribute("aria-busy", String(editor.controller !== null));
+  }
   const totals = cartTotals();
   const quantityText = Number.isSafeInteger(totals.quantity) ? String(totals.quantity) : "—";
   if (headerCartCount) {
@@ -1050,7 +1065,7 @@ function updateControls() {
       (checkoutAccountState === "member" && completeCheckoutProfile(checkoutAccount));
     const selectedItems = [...selected].map(([productId, quantity]) => ({ productId, quantity }));
     const selectionValid = selectedTotals.valid && selected.size > 0 && stockIssue(selectedItems) === "";
-    reviewButton.disabled = locked || !recipientReady || !selectionValid;
+    reviewButton.disabled = locked || checkingCoupon || !recipientReady || !selectionValid;
     if (cartWorkspace) {
       cartEmptyState.hidden = cart.size !== 0;
       cartFilledState.hidden = cart.size === 0;
@@ -1062,7 +1077,7 @@ function updateControls() {
       document.getElementById("cart-selection-count").textContent = "· " + cart.size + " sản phẩm";
       document.getElementById("cart-selected-lines").textContent = String(selected.size);
       document.getElementById("cart-lines").textContent = String(cart.size);
-      cartContinueButton.disabled = orderPending ? isSubmitting || checkoutAccountChecking : locked || !selectionValid;
+      cartContinueButton.disabled = orderPending ? isSubmitting || checkoutAccountChecking : locked || checkingCoupon || !selectionValid;
       cartContinueButton.textContent = orderPending ? "Kiểm tra lần đặt hàng đang chờ →" : "Tạo đơn hàng →";
       for (const checkbox of cartItems.querySelectorAll('input[type="checkbox"]')) checkbox.disabled = locked;
       if (checkoutBackLink) {
@@ -1081,7 +1096,7 @@ function updateControls() {
     }
     if (cartRemoveConfirm) cartRemoveConfirm.disabled = locked;
     confirmButton.hidden = reviewedOrder === null;
-    confirmButton.disabled = reviewedOrder === null || isSubmitting ||
+    confirmButton.disabled = reviewedOrder === null || isSubmitting || checkingCoupon ||
       (orderPending ? !pendingContextMatches() : checkoutAccountChecking || !recipientReady);
     checkoutForm.setAttribute("aria-busy", String(isSubmitting || checkoutAccountChecking));
     renderCheckoutAccount();
@@ -1971,6 +1986,59 @@ checkoutBackLink?.addEventListener("click", event => {
   if (isSubmitting) event.preventDefault();
 });
 
+for (const editor of couponEditors) {
+  editor.input.addEventListener("input", () => {
+    editor.input.removeAttribute("aria-invalid");
+    editor.input.setCustomValidity("");
+    editor.message.textContent = "Nhập mã và bấm Áp dụng để kiểm tra.";
+    editor.message.dataset.error = "false";
+  });
+  editor.form.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (!storefrontActive || isSubmitting || orderPending || checkoutAccountChecking
+        || couponEditors.some(item => item.controller !== null)) return;
+    editor.input.value = editor.input.value.trim();
+    if (!editor.input.value) {
+      editor.input.setCustomValidity("Vui lòng nhập mã giảm giá.");
+      editor.input.reportValidity();
+      return;
+    }
+    const controller = new AbortController();
+    editor.controller = controller;
+    editor.message.textContent = "Đang kiểm tra mã giảm giá…";
+    editor.message.dataset.error = "false";
+    updateControls();
+    try {
+      const response = await fetch("/api/coupons/validate", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: editor.input.value }), cache: "no-store",
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(12000)])
+      });
+      const result = await response.json();
+      if (!storefrontActive || editor.controller !== controller) return;
+      if ([200, 400].includes(response.status) && result?.available === false
+          && typeof result.message === "string") {
+        editor.message.textContent = "Mã không khả dụng.";
+        editor.message.dataset.error = "true";
+        editor.input.setAttribute("aria-invalid", "true");
+      } else if (response.status === 429) {
+        editor.message.textContent = "Bạn đang kiểm tra quá nhiều lần. Hãy đợi một phút rồi thử lại.";
+        editor.message.dataset.error = "true";
+      } else throw new Error("Kết quả kiểm tra mã chưa hợp lệ.");
+    } catch {
+      if (!storefrontActive || editor.controller !== controller) return;
+      editor.message.textContent = "Chưa kiểm tra được mã. Kiểm tra kết nối và bấm Áp dụng để thử lại.";
+      editor.message.dataset.error = "true";
+    } finally {
+      if (editor.controller === controller) {
+        editor.controller = null;
+        updateControls();
+        if (storefrontActive) editor.input.focus({ preventScroll: true });
+      }
+    }
+  });
+}
+
 checkoutForm?.addEventListener("input", () => {
   if (orderPending || isSubmitting) return;
   clearOrderReview();
@@ -1985,7 +2053,7 @@ paymentMethodField?.addEventListener("change", () => {
 
 checkoutForm?.addEventListener("submit", async event => {
   event.preventDefault();
-  if (orderPending || isSubmitting || checkoutAccountChecking) return;
+  if (orderPending || isSubmitting || checkoutAccountChecking || couponEditors.some(editor => editor.controller !== null)) return;
   if (!await refreshCheckoutAccount()) return;
   if (checkoutAccount && !completeCheckoutProfile(checkoutAccount)) return;
   refreshPersistedCart();
@@ -2050,7 +2118,8 @@ function renderOrderReview() {
 }
 
 async function submitReviewedOrder() {
-  if (!reviewedOrder || isSubmitting || (!orderPending && checkoutAccountChecking)) return;
+  if (!reviewedOrder || isSubmitting || couponEditors.some(editor => editor.controller !== null)
+      || (!orderPending && checkoutAccountChecking)) return;
   if (orderPending) {
     if (!await refreshCheckoutAccount() || !pendingContextMatches()) {
       orderMessage.textContent = "Lần gửi đơn đang được giữ lại. Kiểm tra tài khoản trước khi thử gửi lại.";
@@ -2081,6 +2150,7 @@ async function submitReviewedOrder() {
     }
   }
   let orderSucceeded = false;
+  let completedCustomerId;
   isSubmitting = true;
   orderPending = true;
   renderOrderReview();
@@ -2116,10 +2186,13 @@ async function submitReviewedOrder() {
     if (!response.ok || !result || typeof result.orderId !== "string" || result.orderId === "" ||
       !validOrderNumber(result.orderNumber) ||
       !Number.isSafeInteger(result.total) || result.total !== expectedTotal ||
-      result.paymentMethod !== (reviewedOrder.paymentMethod ?? "COD") || typeof result.status !== "string") {
+      result.paymentMethod !== (reviewedOrder.paymentMethod ?? "COD")
+      || !["NEW", "CONFIRMED", "SHIPPING", "COMPLETED", "CANCELLED"].includes(result.status)) {
       throw new Error("Kết quả đặt hàng chưa hợp lệ");
     }
     const receiptPhone = reviewedOrder.customerPhone;
+    completedCustomerId = reviewedCustomerContext === "guest" ? null
+      : reviewedCustomerContext === undefined ? undefined : Number(reviewedCustomerContext);
     currentReceiptItems = reviewedOrder.items.map(item => ({ ...item }));
     const cartNotice = finishSubmittedCart(reviewedOrder.items);
     orderPending = false;
@@ -2152,10 +2225,25 @@ async function submitReviewedOrder() {
   } finally {
     isSubmitting = false;
     confirmButton.textContent = orderPending ? "Thử gửi lại" : cartWorkspace ? "Xác nhận đơn hàng" : "Xác nhận đặt hàng";
-    if (!orderPending && (orderSucceeded || !catalogReady)) await loadCatalog();
-    renderCart();
-    if (orderPending) confirmButton.focus();
-    else if (!receiptActions.hidden) receiptOrdersLink?.focus();
+    let redirected = false;
+    if (orderSucceeded && cartWorkspace && storefrontActive) {
+      const target = "/dang-nhap.html?view=orders";
+      if (prepareNavigation({ preventDefault() {} }, target)) {
+        const handoff = window.ShopMemory?.preparePlacedOrder?.(currentReceipt, completedCustomerId)
+          ?? { error: "Chưa chuyển được thông tin đơn hàng. Hãy giữ mã đơn đang hiển thị và bấm Xem đơn hàng của tôi." };
+        if (handoff.error) orderMessage.textContent = [orderMessage.textContent, handoff.error].filter(Boolean).join(" ");
+        else {
+          redirected = true;
+          window.location.assign(target);
+        }
+      }
+    }
+    if (!redirected) {
+      if (!orderPending && (orderSucceeded || !catalogReady)) await loadCatalog();
+      renderCart();
+      if (orderPending) confirmButton.focus();
+      else if (!receiptActions.hidden) receiptOrdersLink?.focus();
+    }
   }
 }
 

@@ -143,6 +143,20 @@
   flex: 0 0 auto;
 }
 
+.commerce-header .catalog-support-shortcuts {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+}
+
+.commerce-header .catalog-nav .catalog-support-shortcuts .catalog-nav-link {
+  gap: 6px;
+  min-height: 44px;
+  padding-inline: 8px;
+  white-space: nowrap;
+}
+
 .commerce-header .catalog-category-shortcuts {
   display: flex;
   flex: 1 1 0;

@@ -58,11 +58,11 @@
           <section class="account-cart-coupon" aria-labelledby="cart-coupon-title">
             <h3 id="cart-coupon-title">Mã giảm giá</h3>
             <label for="cart-coupon-code">Nhập mã giảm giá của bạn</label>
-            <div class="account-cart-coupon-controls">
-              <input id="cart-coupon-code" type="text" autocomplete="off" placeholder="Nhập mã giảm giá" aria-describedby="cart-coupon-help" disabled>
-              <button type="button" class="account-cart-coupon-apply" disabled>Áp dụng</button>
-            </div>
-            <p id="cart-coupon-help" class="account-cart-coupon-help">Hiện chưa có mã giảm giá khả dụng.</p>
+            <form class="account-cart-coupon-controls" data-cart-coupon-form>
+              <input id="cart-coupon-code" name="code" type="text" maxlength="64" autocomplete="off" spellcheck="false" placeholder="Nhập mã giảm giá" aria-describedby="cart-coupon-help">
+              <button type="submit" class="account-cart-coupon-apply">Áp dụng</button>
+            </form>
+            <p id="cart-coupon-help" class="account-cart-coupon-help" role="status" aria-atomic="true">Nhập mã và bấm Áp dụng để kiểm tra.</p>
           </section>
           <p class="account-cart-summary-note">Vui lòng kiểm tra sản phẩm đã chọn trước khi đặt hàng.</p>
           <button id="cart-continue" class="account-cart-primary" type="button" disabled>Tạo đơn hàng <span aria-hidden="true">→</span></button>
@@ -124,11 +124,11 @@
           </div>
           <div class="account-cart-coupon">
             <label for="checkout-coupon-code">Nhập mã giảm giá của bạn</label>
-            <div class="account-cart-coupon-controls">
-              <input id="checkout-coupon-code" type="text" autocomplete="off" placeholder="Nhập mã giảm giá" aria-describedby="checkout-coupon-help" disabled>
-              <button type="button" class="account-cart-coupon-apply" disabled>Áp dụng</button>
-            </div>
-            <p id="checkout-coupon-help" class="account-cart-coupon-help">Hiện chưa có mã giảm giá khả dụng.</p>
+            <form class="account-cart-coupon-controls" data-cart-coupon-form>
+              <input id="checkout-coupon-code" name="code" type="text" maxlength="64" autocomplete="off" spellcheck="false" placeholder="Nhập mã giảm giá" aria-describedby="checkout-coupon-help">
+              <button type="submit" class="account-cart-coupon-apply">Áp dụng</button>
+            </form>
+            <p id="checkout-coupon-help" class="account-cart-coupon-help" role="status" aria-atomic="true">Nhập mã và bấm Áp dụng để kiểm tra.</p>
           </div>
         </section>
         <section class="account-cart-summary" aria-labelledby="checkout-total-title">

@@ -1,4 +1,27 @@
 (() => {
+  for (const nav of document.querySelectorAll(".catalog-nav-inner")) {
+    const support = nav.querySelector('a[href="/cskh.html"]');
+    if (!support || nav.querySelector('a[href="/coupon.html"]')) continue;
+    const group = document.createElement("div");
+    group.className = "catalog-support-shortcuts";
+    const coupon = document.createElement("a");
+    coupon.className = "catalog-nav-link catalog-nav-coupon";
+    coupon.href = "/coupon.html";
+    if (window.location.pathname === "/coupon.html") coupon.setAttribute("aria-current", "page");
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    for (const [name, value] of Object.entries({ viewBox: "0 0 24 24", width: "18", height: "18", fill: "none",
+      stroke: "currentColor", "stroke-width": "1.8", "stroke-linecap": "round", "stroke-linejoin": "round",
+      "aria-hidden": "true", focusable: "false" })) icon.setAttribute(name, value);
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", "M3 7h18v4a2 2 0 0 0 0 4v4H3v-4a2 2 0 0 0 0-4V7Zm12 0v2m0 3v2m0 3v2");
+    icon.append(path);
+    const label = document.createElement("span");
+    label.textContent = "Coupon";
+    coupon.append(icon, label);
+    coupon.addEventListener("click", event => window.ShopStorefront?.prepareNavigation(event, coupon));
+    support.before(group);
+    group.append(support, coupon);
+  }
   const grids = [...document.querySelectorAll("[data-featured-categories]")];
   const menus = [...document.querySelectorAll("[data-products-menu] .catalog-nav-menu")];
   const shortcuts = menus.map(menu => {
