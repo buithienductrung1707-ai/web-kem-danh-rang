@@ -152,7 +152,7 @@ Bộ lọc trên trang danh mục được giữ trong URL khi tải lại hoặ
 
 Hai lựa chọn **Còn hàng** và **Yêu thích** xếp theo chiều dọc, bên phải **Thương hiệu** và nằm chung khung bộ lọc. Dùng **Xóa bộ lọc** để trở về toàn bộ sản phẩm.
 
-Menu ngang có **Danh mục** và hai lối tắt **CSKH**, **Coupon** nằm cạnh nhau. Bấm logo cửa hàng hoặc liên kết trong breadcrumb để về trang chủ. Các đường dẫn cũ `/san-pham.html` và `/kem-danh-rang.html` tự chuyển sang giao diện danh mục mới, giữ từ khóa và các tham số lọc.
+Menu ngang có **Danh mục** và hai lối tắt **Coupon**, **CSKH** nằm cạnh nhau theo thứ tự này. Bấm logo cửa hàng hoặc liên kết trong breadcrumb để về trang chủ. Các đường dẫn cũ `/san-pham.html` và `/kem-danh-rang.html` tự chuyển sang giao diện danh mục mới, giữ từ khóa và các tham số lọc.
 
 Khách mua bằng thông tin nhận hàng nhập tại giỏ có thể điền thêm email để nhận thông báo. Tồn kho trên máy chủ được trừ khi đơn hàng được tạo thành công.
 
@@ -183,7 +183,11 @@ Trang **Điều khoản sử dụng** tại `/dieu-khoan.html` có mục lục v
 
 Bấm bong bóng chat ở góc phải dưới các trang cửa hàng để mở cửa sổ **Chăm sóc khách hàng**. Nhập nội dung rồi bấm **Gửi tin nhắn**. Có thể thêm tên trước tin nhắn đầu tiên. Khách có thể gửi tin khi chưa đăng nhập và dùng các liên kết trong cửa sổ để tra cứu đơn hoặc xem sản phẩm.
 
-Tin nhắn và phản hồi của cửa hàng được lưu trong database. Cuộc trò chuyện tự cập nhật mỗi **10 giây** khi cửa sổ chat đang mở và trang đang hiển thị. Bấm nút đóng hoặc phím **Escape** để thu gọn về bong bóng.
+Tin nhắn và phản hồi của cửa hàng được lưu trong database. Cuộc trò chuyện tự cập nhật mỗi **10 giây** khi cửa sổ chat đang mở và trang đang hiển thị. Khi thu gọn chat, cuộc trò chuyện đã bắt đầu vẫn được kiểm tra để hiện **huy hiệu đỏ chứa số phản hồi chưa đọc** trên bong bóng. Chỉ tin của cửa hàng được tính; tin khách gửi và những tin đã nhận trước đó không bị cộng trùng. Số lớn hơn 99 hiện **99+**, tên truy cập của nút vẫn đọc đầy đủ số tin. Bấm nút đóng hoặc phím **Escape** để thu gọn về bong bóng.
+
+Phản hồi được ghi nhận đã đọc khi cửa sổ chat đang mở trên tab đang được sử dụng và khách đã cuộn tới tin mới ở cuối cuộc trò chuyện. Nếu đang cuộn xem tin cũ, phản hồi mới tiếp tục được tính cho đến khi cuộn xuống đọc. Trạng thái đọc được giữ trên cùng trình duyệt khi tải lại hoặc chuyển trang và đồng bộ giữa các tab của cùng cuộc trò chuyện. Tab ẩn tạm ngừng kiểm tra; quay lại tab sẽ cập nhật. Lỗi mạng không xóa số chưa đọc đang hiện. Cuộc trò chuyện cũ chưa có mốc đã đọc sẽ tính các phản hồi là chưa đọc cho đến lần mở xem đầu tiên.
+
+API `GET /api/support/summary?readAfter=0` dùng cùng token riêng như API tin nhắn, trả mã cuộc trò chuyện, số phản hồi chưa đọc và ID tin gần nhất. API không trả nội dung tin nhắn và không ghi dữ liệu. Mốc đã đọc được lưu riêng theo token trong `localStorage`, không lưu thêm nội dung trò chuyện.
 
 Trình duyệt lưu mã truy cập riêng để mở lại cuộc trò chuyện trên cùng website. Dùng lại trình duyệt đó để xem phản hồi. Xóa dữ liệu website hoặc đổi trình duyệt sẽ tạo cuộc trò chuyện mới. Nếu trình duyệt chặn lưu dữ liệu, cửa sổ sẽ thông báo cần giữ trang để tiếp tục xem tin nhắn.
 

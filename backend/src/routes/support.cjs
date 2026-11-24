@@ -1,7 +1,7 @@
 const express = require("express");
 const { rateLimit } = require("express-rate-limit");
 const {
-  supportTokenHash, getCustomerMessages, sendCustomerMessage
+  supportTokenHash, getCustomerMessages, getCustomerSummary, sendCustomerMessage
 } = require("../services/support.cjs");
 
 function requireSupportOrigin(req, res, next) {
@@ -47,7 +47,14 @@ customerSupportRouter.use((req, res, next) => {
 });
 customerSupportRouter.use(express.json({ limit: "16kb" }));
 
-customerSupportRouter.get("/messages", createSupportLimiter(120), (req, res) => {
+const customerReadLimiter = createSupportLimiter(120);
+
+customerSupportRouter.get("/summary", customerReadLimiter, (req, res) => {
+  const result = getCustomerSummary(res.locals.supportTokenHash, req.query.readAfter);
+  res.status(result.status).json(result.body);
+});
+
+customerSupportRouter.get("/messages", customerReadLimiter, (req, res) => {
   const result = getCustomerMessages(res.locals.supportTokenHash, req.query.after);
   res.status(result.status).json(result.body);
 });

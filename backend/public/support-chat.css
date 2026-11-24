@@ -24,6 +24,7 @@
 }
 
 .support-chat .support-chat-bubble {
+  position: relative;
   display: grid;
   place-items: center;
   width: 58px;
@@ -37,6 +38,28 @@
   box-shadow: 0 8px 28px rgb(15 70 61 / 24%);
   cursor: pointer;
   transition: transform 180ms ease-out, background-color 180ms ease-out;
+}
+
+.support-chat-unread-badge {
+  --support-badge-background: #c5203b;
+  --support-badge-text: #ffffff;
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: grid;
+  place-items: center;
+  min-width: 23px;
+  height: 23px;
+  padding: 0 4px;
+  border: 2px solid var(--surface);
+  border-radius: 999px;
+  background: var(--support-badge-background);
+  color: var(--support-badge-text);
+  font-size: 12px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .support-chat .support-chat-bubble svg {

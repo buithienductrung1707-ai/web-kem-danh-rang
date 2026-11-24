@@ -17,6 +17,16 @@ const findMessages = db.prepare(`
   SELECT id, author, text, created_at AS createdAt, request_id AS requestId
   FROM support_messages WHERE conversation_id = ? AND id > ? ORDER BY id
 `);
+const findCustomerSummary = db.prepare(`
+  SELECT conversations.id AS conversationId,
+    (SELECT COUNT(*) FROM support_messages
+      WHERE conversation_id = conversations.id AND author = 'admin' AND id > ?) AS unreadCount,
+    COALESCE((SELECT MAX(id) FROM support_messages
+      WHERE conversation_id = conversations.id AND author = 'admin'), 0) AS lastAdminId,
+    COALESCE((SELECT MAX(id) FROM support_messages
+      WHERE conversation_id = conversations.id), 0) AS lastMessageId
+  FROM support_conversations AS conversations WHERE token_hash = ?
+`);
 const findMessageByRequest = db.prepare(`
   SELECT id, author, text, created_at AS createdAt, request_id AS requestId
   FROM support_messages WHERE conversation_id = ? AND author = ? AND request_id = ?
@@ -77,6 +87,17 @@ function getCustomerMessages(tokenHash, afterValue) {
     body: {
       conversationId: conversation?.id ?? null,
       messages: conversation ? findMessages.all(conversation.id, after) : []
+    }
+  };
+}
+
+function getCustomerSummary(tokenHash, readAfterValue) {
+  const readAfter = parseAfter(readAfterValue);
+  if (readAfter === null) return failure(400, "Vị trí đọc tin nhắn chưa hợp lệ.");
+  return {
+    status: 200,
+    body: findCustomerSummary.get(readAfter, tokenHash) ?? {
+      conversationId: null, unreadCount: 0, lastAdminId: 0, lastMessageId: 0
     }
   };
 }
@@ -151,6 +172,7 @@ function sendAdminMessage(conversationId, body) {
 module.exports = {
   supportTokenHash,
   getCustomerMessages,
+  getCustomerSummary,
   sendCustomerMessage,
   getSupportConversations,
   getAdminMessages,

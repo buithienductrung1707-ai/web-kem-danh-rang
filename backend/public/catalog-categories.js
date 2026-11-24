@@ -20,7 +20,7 @@
     coupon.append(icon, label);
     coupon.addEventListener("click", event => window.ShopStorefront?.prepareNavigation(event, coupon));
     support.before(group);
-    group.append(support, coupon);
+    group.append(coupon, support);
   }
   const grids = [...document.querySelectorAll("[data-featured-categories]")];
   const menus = [...document.querySelectorAll("[data-products-menu] .catalog-nav-menu")];

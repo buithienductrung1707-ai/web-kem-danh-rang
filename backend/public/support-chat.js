@@ -4,6 +4,7 @@
   const tokenKey = "toothpaste-support-token";
   const pendingKey = "toothpaste-support-pending";
   const api = "/api/support/messages";
+  const summaryApi = "/api/support/summary";
   const tokenPattern = /^[a-f0-9]{64}$/;
   const requestPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
   const timeFormat = new Intl.DateTimeFormat("vi-VN", {
@@ -21,6 +22,13 @@
   let loaded = false;
   let historyFailed = false;
   let conversationStarted = false;
+  let summaryController = null;
+  let chatGeneration = 0;
+  let probeSummary = false;
+  let lastReadAdminId = 0;
+  let readFrame = null;
+  let lastUnreadCount = 0;
+  let summary = { readAfter: 0, unreadCount: 0, lastAdminId: 0 };
   const messages = new Map();
 
   function element(tag, className, text) {
@@ -58,6 +66,14 @@
   bubble.setAttribute("aria-controls", "support-chat-panel");
   bubble.title = "Chăm sóc khách hàng";
   bubble.append(icon(["M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z", "M8 11h.01M12 11h.01M16 11h.01"]));
+  const unreadBadge = element("span", "support-chat-unread-badge");
+  unreadBadge.hidden = true;
+  unreadBadge.setAttribute("aria-hidden", "true");
+  bubble.append(unreadBadge);
+  const unreadAnnouncement = element("span", "support-chat-announcement visually-hidden");
+  unreadAnnouncement.setAttribute("role", "status");
+  unreadAnnouncement.setAttribute("aria-live", "polite");
+  unreadAnnouncement.setAttribute("aria-atomic", "true");
 
   const panel = element("section", "support-chat-panel");
   panel.id = "support-chat-panel";
@@ -130,7 +146,7 @@
   form.append(nameDetails, textLabel, textInput, send);
   body.append(intro, links, storageWarning, log, form, status, retry);
   panel.append(header, body);
-  widget.append(panel, bubble);
+  widget.append(panel, bubble, unreadAnnouncement);
   document.body.append(widget);
   document.body.classList.add("has-support-chat");
   const pageTriggers = [...document.querySelectorAll("[data-open-support-chat]")];
@@ -186,6 +202,7 @@
   }
 
   let token = readStorage(tokenKey);
+  probeSummary = tokenPattern.test(token ?? "");
   try {
     if (!tokenPattern.test(token ?? "")) {
       token = randomHex();
@@ -196,11 +213,79 @@
     status.textContent = "Trình duyệt chưa hỗ trợ kết nối trò chuyện an toàn. Hãy dùng phiên bản trình duyệt mới và mở website bằng HTTPS.";
   }
 
+  function readCursorKey() {
+    return token ? "toothpaste-support-read:" + token : null;
+  }
+
+  function parseReadCursor(raw) {
+    try {
+      const value = JSON.parse(raw);
+      return value?.version === 1 && Number.isSafeInteger(value.lastReadAdminId)
+        && value.lastReadAdminId >= 0 ? value.lastReadAdminId : 0;
+    } catch { return 0; }
+  }
+
+  function storedReadCursor() {
+    const key = readCursorKey();
+    return key ? parseReadCursor(readStorage(key)) : 0;
+  }
+
+  lastReadAdminId = storedReadCursor();
+
+  function unreadCount() {
+    const replies = [...messages.values()].filter(message => message.author === "admin");
+    const newlyRead = replies.filter(message => message.id > summary.readAfter
+      && message.id <= lastReadAdminId && message.id <= summary.lastAdminId).length;
+    const remaining = lastReadAdminId >= summary.lastAdminId ? 0
+      : Math.max(0, summary.unreadCount - newlyRead);
+    return remaining + replies.filter(message => message.id > Math.max(lastReadAdminId, summary.lastAdminId)).length;
+  }
+
+  function renderUnread() {
+    const count = unreadCount();
+    unreadBadge.hidden = count === 0;
+    unreadBadge.textContent = count > 99 ? "99+" : String(count);
+    const action = open ? "Đóng cửa sổ chăm sóc khách hàng" : "Mở cửa sổ chăm sóc khách hàng";
+    const detail = count ? ", " + count + " tin nhắn chưa đọc từ cửa hàng" : "";
+    bubble.setAttribute("aria-label", action + detail);
+    bubble.title = "Chăm sóc khách hàng" + (count ? " · " + count + " tin nhắn chưa đọc" : "");
+    if (count > lastUnreadCount && active && !document.hidden && document.hasFocus()) {
+      unreadAnnouncement.textContent = "Bạn có " + count + " tin nhắn chưa đọc từ cửa hàng.";
+    } else if (count === 0) unreadAnnouncement.textContent = "";
+    lastUnreadCount = count;
+  }
+
+  function markRenderedRead() {
+    readFrame = null;
+    if (!open || !active || document.hidden || !document.hasFocus() || !token
+      || body.scrollHeight - body.scrollTop - body.clientHeight >= 40) return;
+    const latest = [...messages.values()].filter(message => message.author === "admin")
+      .reduce((id, message) => Math.max(id, message.id), 0);
+    if (latest <= lastReadAdminId) return;
+    const latestNode = log.querySelector('[data-message-id="' + latest + '"]');
+    if (!latestNode) return;
+    const viewport = body.getBoundingClientRect();
+    const position = latestNode.getBoundingClientRect();
+    if (position.bottom <= viewport.top + 1 || position.top >= viewport.bottom - 1) return;
+    lastReadAdminId = Math.max(latest, lastReadAdminId, storedReadCursor());
+    writeStorage(readCursorKey(), JSON.stringify({ version: 1, lastReadAdminId }));
+    renderUnread();
+  }
+
+  function scheduleRead() {
+    if (readFrame === null) readFrame = requestAnimationFrame(markRenderedRead);
+  }
+
   function validPending(value) {
     return value && value.version === 1 && value.tokenTag === token?.slice(0, 12)
       && requestPattern.test(value.requestId ?? "")
       && typeof value.text === "string" && value.text.trim().length > 0 && value.text.length <= 2000
       && typeof value.name === "string" && value.name.length <= 120;
+  }
+
+  function hasStoredPending() {
+    if (!token || readStorage(tokenKey) !== token) return false;
+    try { return validPending(JSON.parse(readStorage(pendingKey))); } catch { return false; }
   }
 
   try {
@@ -239,6 +324,8 @@
   }
 
   async function fetchApi(method, payload) {
+    const version = chatGeneration;
+    const requestToken = token;
     const requestController = new AbortController();
     controller = requestController;
     let timedOut = false;
@@ -249,13 +336,14 @@
     try {
       const response = await fetch(method === "GET" ? `${api}?after=${lastId}` : api, {
         method,
-        headers: { Authorization: `Bearer ${token}`, ...(payload ? { "Content-Type": "application/json" } : {}) },
+        headers: { Authorization: `Bearer ${requestToken}`, ...(payload ? { "Content-Type": "application/json" } : {}) },
         body: payload ? JSON.stringify(payload) : undefined,
         cache: "no-store",
         credentials: "same-origin",
         signal: requestController.signal
       });
       const data = await response.json().catch(() => null);
+      if (version !== chatGeneration || requestToken !== token) throw new DOMException("Conversation changed", "AbortError");
       if (!response.ok) {
         const fallback = {
           400: "Nội dung gửi lên chưa hợp lệ. Hãy kiểm tra tin nhắn và tên của bạn.",
@@ -313,6 +401,8 @@
     }
     if ((nearBottom || !loaded) && incoming.length) body.scrollTop = body.scrollHeight;
     if (newReply && loaded) setStatus("Bạn có tin nhắn mới từ cửa hàng.");
+    renderUnread();
+    scheduleRead();
   }
 
   function recoverPending() {
@@ -329,8 +419,45 @@
 
   function schedulePoll() {
     clearTimeout(pollTimer);
-    if (open && active && !document.hidden && token) {
-      pollTimer = setTimeout(() => refreshMessages(), 10000);
+    if (active && !document.hidden && token && (open || conversationStarted || probeSummary)) {
+      pollTimer = setTimeout(() => open ? refreshMessages() : refreshSummary(), 10000);
+    }
+  }
+
+  async function refreshSummary() {
+    if (summaryController || busy || open || !active || document.hidden || !token
+        || (!conversationStarted && !probeSummary)) return;
+    const requestController = new AbortController();
+    const requestToken = token;
+    const version = chatGeneration;
+    const readAfter = lastReadAdminId;
+    summaryController = requestController;
+    try {
+      const response = await fetch(summaryApi + "?readAfter=" + readAfter, {
+        headers: { Authorization: "Bearer " + requestToken }, cache: "no-store", credentials: "same-origin",
+        signal: AbortSignal.any([requestController.signal, AbortSignal.timeout(15000)])
+      });
+      const data = await response.json().catch(() => null);
+      if (summaryController !== requestController || version !== chatGeneration || requestToken !== token
+          || !active || document.hidden || open || readAfter !== lastReadAdminId) return;
+      if (!response.ok || !data || !(data.conversationId === null || requestPattern.test(data.conversationId ?? ""))
+          || ![data.unreadCount, data.lastAdminId, data.lastMessageId].every(value => Number.isSafeInteger(value) && value >= 0)
+          || data.lastMessageId < data.lastAdminId || data.unreadCount > data.lastAdminId
+          || (data.lastAdminId <= readAfter && data.unreadCount !== 0)
+          || (data.conversationId === null && (data.unreadCount || data.lastAdminId || data.lastMessageId))) {
+        throw new Error("Unread summary unavailable");
+      }
+      conversationStarted = Boolean(data.conversationId);
+      probeSummary = !conversationStarted && (pending !== null || hasStoredPending());
+      summary = { readAfter, unreadCount: data.unreadCount, lastAdminId: data.lastAdminId };
+      renderUnread();
+    } catch {
+      // Keep the last confirmed count while the connection is unavailable.
+    } finally {
+      if (summaryController === requestController) {
+        summaryController = null;
+        schedulePoll();
+      }
     }
   }
 
@@ -350,21 +477,24 @@
   async function refreshMessages() {
     if (busy || !open || !active || document.hidden || !token) return;
     busy = true;
+    const version = chatGeneration;
     updateControls();
     if (!loaded) setStatus("Đang tải cuộc trò chuyện…");
     try {
       await loadMessages();
       if (!pending && status.textContent === "Đang tải cuộc trò chuyện…") setStatus("");
     } catch (error) {
-      if (open && active && !document.hidden) {
+      if (version === chatGeneration && open && active && !document.hidden) {
         historyFailed = true;
         retry.hidden = false;
         setStatus(pending ? pendingStatus() : error.message || "Chưa tải được cuộc trò chuyện. Hãy kiểm tra mạng và thử lại.", true);
       }
     } finally {
-      busy = false;
-      updateControls();
-      schedulePoll();
+      if (version === chatGeneration) {
+        busy = false;
+        updateControls();
+        schedulePoll();
+      }
     }
   }
 
@@ -393,9 +523,11 @@
       pending = { version: 1, tokenTag: token.slice(0, 12), requestId: requestId(), text, name };
       writeStorage(pendingKey, JSON.stringify(pending));
     }
+    probeSummary = true;
     clearTimeout(pollTimer);
     busy = true;
     sending = true;
+    const version = chatGeneration;
     updateControls();
     setStatus("Đang gửi tin nhắn…");
     try {
@@ -410,18 +542,20 @@
         textInput.focus({ preventScroll: true });
       }
     } catch (error) {
-      if (error.method === "POST" && [400, 413].includes(error.status)) {
+      if (version === chatGeneration && error.method === "POST" && [400, 413].includes(error.status)) {
         pending = null;
         writeStorage(pendingKey, null);
       }
-      if (open && active && !document.hidden) {
+      if (version === chatGeneration && open && active && !document.hidden) {
         setStatus(`${error.message || "Chưa gửi được tin nhắn. Hãy kiểm tra mạng."} ${pending ? pendingStatus() : ""}`.trim(), true);
       }
     } finally {
-      busy = false;
-      sending = false;
-      updateControls();
-      schedulePoll();
+      if (version === chatGeneration) {
+        busy = false;
+        sending = false;
+        updateControls();
+        schedulePoll();
+      }
     }
   });
 
@@ -430,15 +564,19 @@
     open = value;
     panel.hidden = !value;
     bubble.setAttribute("aria-expanded", String(value));
-    bubble.setAttribute("aria-label", value ? "Đóng cửa sổ chăm sóc khách hàng" : "Mở cửa sổ chăm sóc khách hàng");
+    renderUnread();
     for (const trigger of pageTriggers) trigger.setAttribute("aria-expanded", String(value));
     document.body.classList.toggle("has-support-chat-open", value);
     if (value) {
+      summaryController?.abort();
+      summaryController = null;
       close.focus({ preventScroll: true });
+      scheduleRead();
       refreshMessages();
     } else {
       clearTimeout(pollTimer);
       controller?.abort();
+      schedulePoll();
       if (restoreFocus) {
         const target = chatOpener?.isConnected && !chatOpener.disabled && !chatOpener.hidden ? chatOpener : bubble;
         target.focus({ preventScroll: true });
@@ -456,23 +594,107 @@
     }
   });
   retry.addEventListener("click", refreshMessages);
+  body.addEventListener("scroll", scheduleRead, { passive: true });
   document.addEventListener("visibilitychange", () => {
     clearTimeout(pollTimer);
-    if (document.hidden) controller?.abort();
-    else if (open) refreshMessages();
+    if (document.hidden) {
+      controller?.abort();
+      summaryController?.abort();
+      summaryController = null;
+    } else {
+      scheduleRead();
+      if (open) refreshMessages();
+      else refreshSummary();
+    }
   });
   window.addEventListener("pagehide", () => {
     active = false;
     clearTimeout(pollTimer);
     controller?.abort();
+    summaryController?.abort();
+    summaryController = null;
+    if (readFrame !== null) cancelAnimationFrame(readFrame);
+    readFrame = null;
   });
   window.addEventListener("pageshow", () => {
     active = true;
+    syncStoredConversation();
+    scheduleRead();
     if (open) refreshMessages();
+    else refreshSummary();
   });
   window.addEventListener("online", () => {
     if (open) refreshMessages();
+    else refreshSummary();
+  });
+  window.addEventListener("focus", () => {
+    scheduleRead();
+    if (open) refreshMessages();
+    else refreshSummary();
+  });
+
+  function syncStoredConversation() {
+    const savedToken = readStorage(tokenKey);
+    if (!storageAvailable) return;
+    const nextToken = tokenPattern.test(savedToken ?? "") ? savedToken : null;
+    if (nextToken === token) {
+      const currentRead = Math.max(lastReadAdminId, storedReadCursor());
+      if (currentRead !== lastReadAdminId) {
+        summaryController?.abort();
+        summaryController = null;
+        lastReadAdminId = currentRead;
+      }
+      renderUnread();
+      return;
+    }
+    chatGeneration += 1;
+    controller?.abort();
+    summaryController?.abort();
+    controller = summaryController = null;
+    clearTimeout(pollTimer);
+    token = nextToken;
+    pending = null;
+    lastId = 0;
+    loaded = busy = sending = historyFailed = conversationStarted = false;
+    probeSummary = Boolean(token);
+    messages.clear();
+    log.replaceChildren();
+    log.setAttribute("aria-live", "off");
+    textInput.value = nameInput.value = "";
+    lastReadAdminId = storedReadCursor();
+    summary = { readAfter: 0, unreadCount: 0, lastAdminId: 0 };
+    setStatus(token ? "" : "Phiên trò chuyện đã thay đổi. Hãy tải lại trang để bắt đầu cuộc trò chuyện mới.");
+    renderUnread();
+    updateControls();
+  }
+
+  window.addEventListener("storage", event => {
+    if (event.key === pendingKey) {
+      if (!token || readStorage(tokenKey) !== token) return;
+      const belongsToConversation = [event.newValue, event.oldValue].some(raw => {
+        try { return validPending(JSON.parse(raw)); } catch { return false; }
+      });
+      if (!belongsToConversation) return;
+      // A first send in another tab can create the conversation after our empty probe.
+      // Probe only our token; never restore or send the other tab's draft.
+      probeSummary = true;
+      summaryController?.abort();
+      summaryController = null;
+      if (open) refreshMessages();
+      else refreshSummary();
+      return;
+    }
+    if (event.key !== null && event.key !== tokenKey && event.key !== readCursorKey()) return;
+    syncStoredConversation();
+    if (event.key === readCursorKey() && parseReadCursor(event.newValue) < lastReadAdminId) {
+      writeStorage(readCursorKey(), JSON.stringify({ version: 1, lastReadAdminId }));
+    }
+    scheduleRead();
+    if (open) refreshMessages();
+    else refreshSummary();
   });
   if (!storageAvailable) showStorageWarning();
   updateControls();
+  renderUnread();
+  if (probeSummary) void refreshSummary();
 })();
