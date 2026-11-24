@@ -19,6 +19,10 @@ function initializeSchema() {
   `).get();
 
   db.exec(`
+    CREATE TABLE IF NOT EXISTS app_migrations (
+      key TEXT PRIMARY KEY
+    ) STRICT;
+
     CREATE TABLE IF NOT EXISTS product_categories (
       id INTEGER PRIMARY KEY AUTOINCREMENT CHECK (id BETWEEN 1 AND 9007199254740991),
       slug TEXT NOT NULL UNIQUE,
@@ -238,6 +242,37 @@ function initializeSchema() {
     seedCategory.run(2, "ban-chai-danh-rang", "Bàn chải đánh răng", "",
       "/assets/category-toothbrush.png", "Bàn chải đánh răng", 2);
     seedCategory.close();
+  }
+
+  const oralCareCategoriesMigration = "oral-care-categories-v1";
+  if (!db.prepare("SELECT key FROM app_migrations WHERE key = ?").get(oralCareCategoriesMigration)) {
+    const extraCategories = [
+      ["nuoc-suc-mieng", "Nước súc miệng",
+        "Tham khảo các loại nước súc miệng cho thói quen chăm sóc răng miệng hằng ngày. Xem thành phần và hướng dẫn sử dụng của từng sản phẩm.",
+        "/assets/category-mouthwash-v1.png", "Chai nước súc miệng minh họa"],
+      ["chi-nha-khoa", "Chỉ nha khoa",
+        "Khám phá chỉ nha khoa và dụng cụ làm sạch kẽ răng. Xem quy cách và hướng dẫn sử dụng trước khi lựa chọn.",
+        "/assets/category-dental-floss-v1.png", "Hộp chỉ nha khoa minh họa"],
+      ["keo-ngam", "Kẹo ngậm",
+        "Kẹo ngậm với nhiều hương vị và quy cách. Kiểm tra thành phần, đối tượng sử dụng và hướng dẫn trên bao bì.",
+        "/assets/category-lozenges-v1.png", "Kẹo ngậm chăm sóc hơi thở minh họa"],
+      ["xit-thom-mieng", "Xịt thơm miệng",
+        "Khám phá các sản phẩm xịt thơm miệng tiện mang theo. Xem dung tích, thành phần và hướng dẫn sử dụng của từng sản phẩm.",
+        "/assets/category-breath-spray-v1.png", "Chai xịt thơm miệng minh họa"],
+      ["thuoc-tay-trang-rang", "Thuốc tẩy trắng răng",
+        "Khám phá các sản phẩm tẩy trắng răng. Đọc kỹ thông tin, thành phần và hướng dẫn trên bao bì trước khi lựa chọn.",
+        "/assets/category-whitening-v1.png", "Bộ sản phẩm tẩy trắng răng minh họa"]
+    ];
+    const lastCategoryOrder = db.prepare("SELECT COALESCE(MAX(sort_order), 0) AS value FROM product_categories").get().value;
+    const addCategory = db.prepare(`
+      INSERT INTO product_categories (slug, name, description, image_url, image_alt, sort_order)
+      VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(slug) DO NOTHING
+    `);
+    for (const [index, category] of extraCategories.entries()) {
+      addCategory.run(...category, Math.min(999, lastCategoryOrder + index + 1));
+    }
+    addCategory.close();
+    db.prepare("INSERT INTO app_migrations (key) VALUES (?)").run(oralCareCategoriesMigration);
   }
 
   const bannerColumns = new Set(

@@ -82,7 +82,7 @@ npm.cmd start
 
 Giao diện cửa hàng dùng tỷ lệ nội dung **125%** trên trang chủ, danh mục, chi tiết sản phẩm và khu vực tài khoản/giỏ hàng/đơn hàng. Footer và cửa sổ hỗ trợ được phóng tương ứng; nội dung tự xuống dòng theo chiều rộng màn hình. Header và thanh danh mục có bố cục riêng gọn hơn, các nút vẫn giữ vùng bấm tối thiểu 44px. Menu tài khoản và hiệu ứng thêm giỏ dùng tọa độ màn hình gốc để tiếp tục mở đúng vị trí. Thay đổi này chỉ áp dụng khi xem trên màn hình, không thay đổi tỷ lệ trang in đơn hàng hoặc trang quản trị.
 
-1. Bấm **Danh mục** trên menu để mở trang danh mục sản phẩm. Chọn **Tất cả**, **Kem đánh răng**, **Bàn chải đánh răng** hoặc danh mục khác được quản trị thêm vào. Có thể tìm theo tên, mô tả, lọc mức giá, thương hiệu, còn hàng, yêu thích và sắp xếp. Ô tìm kiếm trên header tìm trong toàn bộ sản phẩm của các danh mục đang hiển thị.
+1. Bấm **Danh mục** trên menu để mở trang danh mục sản phẩm hoặc chọn trực tiếp tên danh mục trên thanh menu. Có **Kem đánh răng**, **Bàn chải đánh răng**, **Nước súc miệng**, **Chỉ nha khoa**, **Kẹo ngậm**, **Xịt thơm miệng**, **Thuốc tẩy trắng răng** và các danh mục được quản trị thêm sau này. Có thể tìm theo tên, mô tả, lọc mức giá, thương hiệu, còn hàng, yêu thích và sắp xếp. Ô tìm kiếm trên header tìm trong toàn bộ sản phẩm của các danh mục đang hiển thị.
 2. Bấm ảnh hoặc tên sản phẩm để mở trang chi tiết. Ảnh thu nhỏ nằm bên trái ảnh lớn trên máy tính. Rê chuột lên ảnh lớn để phóng to, dùng ảnh thu nhỏ hoặc mũi tên để chuyển ảnh. Xem mô tả, thông số, tình trạng hàng và đánh giá trước khi chọn số lượng. Dùng **Thêm vào giỏ** hoặc **Mua ngay** để tiếp tục mua hàng. Các thẻ sản phẩm ở trang chủ và danh mục có một nút **Thêm vào giỏ**, nút yêu thích và thanh **Đã bán**; sản phẩm hết kho có nút **Hết hàng** bị vô hiệu hoá.
 3. Mở **Giỏ hàng** trong khu vực tài khoản. Chọn từng sản phẩm hoặc **Chọn tất cả**, điều chỉnh số lượng và kiểm tra tiền của các sản phẩm đã chọn. Dùng biểu tượng thùng rác để xóa riêng hoặc **Xóa đã chọn** để xóa nhiều sản phẩm.
 4. Bấm **Tạo đơn hàng** để mở bước xác nhận. Kiểm tra sản phẩm, địa chỉ nhận hàng, phương thức thanh toán và tổng tiền. Khách chưa đăng nhập điền thông tin nhận hàng ở bước này.
@@ -363,6 +363,22 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 Sau khi sửa giao diện, bấm **Ctrl + F5** trong trình duyệt để tải lại. Sau khi sửa mã backend hoặc biến môi trường, dừng và chạy lại máy chủ.
 
 Ảnh [danh mục bàn chải](backend/public/assets/category-toothbrush.png) được tạo bằng công cụ imagegen tích hợp. [Prompt tạo ảnh](backend/public/assets/category-toothbrush.prompt.txt) được lưu cùng ảnh để có thể tạo lại theo cùng phong cách.
+
+Năm ảnh minh họa danh mục mới được tạo bằng **image_gen tích hợp**, đồng bộ nền trắng và xanh bạc hà, không gắn thương hiệu. File ảnh và prompt được lưu trong repo:
+
+| Danh mục | Ảnh minh họa |
+| --- | --- |
+| Nước súc miệng | [category-mouthwash-v1.png](backend/public/assets/category-mouthwash-v1.png) |
+| Chỉ nha khoa | [category-dental-floss-v1.png](backend/public/assets/category-dental-floss-v1.png) |
+| Kẹo ngậm | [category-lozenges-v1.png](backend/public/assets/category-lozenges-v1.png) |
+| Xịt thơm miệng | [category-breath-spray-v1.png](backend/public/assets/category-breath-spray-v1.png) |
+| Thuốc tẩy trắng răng | [category-whitening-v1.png](backend/public/assets/category-whitening-v1.png) |
+
+Prompt đầy đủ: [nước súc miệng và tẩy trắng răng](backend/public/assets/oral-categories-two.prompts.txt), [chỉ nha khoa, kẹo ngậm và xịt thơm miệng](backend/public/assets/oral-categories-three.prompts.txt). Các ảnh minh họa cho nhóm hàng, không thay thế ảnh của từng sản phẩm thực tế.
+
+Năm danh mục được thêm một lần khi backend khởi động sau cập nhật, gồm cả bản local và Cloudflare. Migration `oral-care-categories-v1` giữ danh mục trùng đường dẫn đang có, không ghi đè nội dung admin đã chỉnh và không tạo lại danh mục đã bị xóa ở những lần khởi động sau. Sản phẩm, giá và tồn kho hiện có được giữ nguyên; thêm sản phẩm bán cụ thể trong mục **Sản phẩm** của admin và chọn danh mục phù hợp.
+
+Menu và **Danh mục nổi bật** cùng lấy danh sách từ `GET /api/categories`, tự cập nhật tên, ảnh, thứ tự và trạng thái ẩn/hiện sau khi tải lại trang. Danh mục đang ẩn không xuất hiện. Trên điện thoại, các tên danh mục nằm trong một hàng có thể vuốt ngang; trên máy tính, chúng xuống dòng trong vùng menu khi cần. Các ô danh mục trên trang chủ tự chia cột và mỗi ô mở đúng trang sản phẩm của nhóm đó.
 
 Ba mục sản phẩm có bộ trang trí riêng: vương miện và tông coral cho **Bán chạy**, hộp quà và tông xanh dương cho **Mới nhất**, viên ngọc và tông xanh ngọc cho **Nổi bật**. Mỗi mục có dòng chữ nhấn, nhãn nhỏ và một banner 3D về kem đánh răng, bàn chải. Các banner được tạo bằng công cụ **image_gen tích hợp**, lưu tại [section-bestsellers-v1.png](backend/public/assets/section-bestsellers-v1.png), [section-new-arrivals-v1.png](backend/public/assets/section-new-arrivals-v1.png) và [section-featured-v1.png](backend/public/assets/section-featured-v1.png). [Bộ prompt](backend/public/assets/section-banners.prompts.txt) ghi đầy đủ cách tạo và kích thước ảnh. Chữ và liên kết trên banner dùng HTML để dễ đọc trên điện thoại; ảnh được tải khi cuộn tới và chỉ dùng để trang trí. Tiêu đề, mô tả, danh sách sản phẩm cùng trạng thái ẩn/hiện của từng mục vẫn chỉnh trong **Sản phẩm trang chủ** ở admin.
 

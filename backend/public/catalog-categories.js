@@ -1,6 +1,21 @@
 (() => {
   const grids = [...document.querySelectorAll("[data-featured-categories]")];
   const menus = [...document.querySelectorAll("[data-products-menu] .catalog-nav-menu")];
+  const shortcuts = menus.map(menu => {
+    const inner = menu.closest(".catalog-nav-inner");
+    if (!inner) return null;
+    const list = document.createElement("ul");
+    list.className = "catalog-category-shortcuts";
+    list.setAttribute("aria-label", "Các danh mục sản phẩm");
+    list.hidden = true;
+    inner.classList.add("has-category-shortcuts");
+    menu.closest("[data-products-menu]").after(list);
+    list.addEventListener("focusin", event => {
+      const link = event.target.closest("a");
+      if (link) revealShortcut(list, link);
+    });
+    return list;
+  }).filter(Boolean);
   const tabs = document.querySelector("[data-category-tabs]");
   const status = document.getElementById("categories-status");
   const retry = document.getElementById("categories-retry");
@@ -13,6 +28,13 @@
   let request = null;
   let categories = null;
   let active = true;
+
+  function revealShortcut(list, link) {
+    const rail = list.getBoundingClientRect();
+    const target = link.getBoundingClientRect();
+    if (target.left < rail.left + 4) list.scrollLeft -= rail.left + 4 - target.left;
+    else if (target.right > rail.right - 4) list.scrollLeft += target.right - rail.right + 4;
+  }
 
   function href(category) {
     const params = new URLSearchParams();
@@ -112,6 +134,24 @@
       const link = menu.closest("[data-products-menu]")?.querySelector("[data-products-link]");
       if (isCategoryPage) link?.toggleAttribute("data-active-category", Boolean(selected));
     }
+    for (const list of shortcuts) {
+      const options = items.map(category => {
+        const item = document.createElement("li");
+        const link = document.createElement("a");
+        link.className = "catalog-nav-link";
+        link.href = href(category);
+        link.textContent = category.name;
+        link.dataset.categoryId = String(category.id);
+        if (selected?.id === category.id) link.setAttribute("aria-current", "page");
+        link.addEventListener("click", event => navigate(event, link));
+        item.append(link);
+        return item;
+      });
+      list.replaceChildren(...options);
+      list.hidden = items.length === 0;
+      const currentLink = list.querySelector('[aria-current="page"]');
+      if (currentLink) revealShortcut(list, currentLink);
+    }
   }
 
   function renderPage(items) {
@@ -182,7 +222,7 @@
       if (count) count.textContent = String(all ? total : counts.get(category?.id) ?? 0);
       link.href = href(category);
     }
-    for (const menu of menus) {
+    for (const menu of [...menus, ...shortcuts]) {
       for (const link of menu.querySelectorAll("[data-category-id]")) {
         const category = categories.find(item => item.id === Number(link.dataset.categoryId));
         if (category) link.href = href(category);
@@ -194,6 +234,7 @@
     if (status) status.textContent = "Chưa tải được danh mục. Hãy thử tải lại.";
     if (retry) retry.hidden = false;
     grids.forEach(grid => grid.setAttribute("aria-busy", "false"));
+    shortcuts.forEach(list => { list.hidden = true; });
     for (const menu of menus) {
       const item = document.createElement("li");
       const button = document.createElement("button");
