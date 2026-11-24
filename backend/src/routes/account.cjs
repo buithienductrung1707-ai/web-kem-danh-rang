@@ -5,7 +5,7 @@ const { randomBytes, scrypt, timingSafeEqual, createHash } = require("node:crypt
 const { promisify } = require("node:util");
 const db = require("../db/database.cjs");
 const { runTransaction } = require("../db/transaction.cjs");
-const { getOrderItems, getOrderHistory } = require("../services/orders.cjs");
+const { getOrderItems, getOrderHistory, deleteCustomerOrder } = require("../services/orders.cjs");
 const mailer = require("../services/mailer.cjs");
 const { getSessionOptions } = require("../services/session-options.cjs");
 const { createProductImageUpload } = require("../services/product-images.cjs");
@@ -92,6 +92,13 @@ const claimLimiter = rateLimit({
   standardHeaders: "draft-8",
   legacyHeaders: false,
   message: { error: "Bạn đã thử thêm đơn nhiều lần. Hãy chờ một phút rồi thử lại." }
+});
+const deleteOrderLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Bạn đã thử xóa đơn nhiều lần. Hãy chờ một phút rồi thử lại." }
 });
 const forgotPasswordLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -421,6 +428,20 @@ router.get("/orders", requireCustomer, requireCustomerContext, (req, res) => {
   const orders = query.all(...parameters, (page - 1) * 10)
     .map(customerOrderResponse);
   res.json({ orders, page, totalPages, totalOrders });
+});
+
+router.delete("/orders/:id", requireCustomer, requireCustomerContext, deleteOrderLimiter, (req, res) => {
+  const id = req.params.id;
+  const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(id);
+  const orderNumber = /^[1-9]\d*$/.test(id) && Number.isSafeInteger(Number(id));
+  if (!uuid && !orderNumber) {
+    return res.status(400).json({ error: "Mã đơn hàng chưa hợp lệ.", field: "orderId" });
+  }
+  if (req.body?.expectedStatus !== "NEW") {
+    return res.status(400).json({ error: "Chỉ có thể xóa đơn hàng ở trạng thái Mới.", field: "expectedStatus" });
+  }
+  const result = deleteCustomerOrder(uuid ? id.toLowerCase() : id, res.locals.customer.id);
+  res.status(result.status).json(result.body);
 });
 
 router.post("/orders/claim", requireCustomer, requireCustomerContext, claimLimiter, (req, res) => {

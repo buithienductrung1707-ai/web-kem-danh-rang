@@ -33,13 +33,18 @@ const publicProductFields = `p.id, p.name, p.price, p.description, p.image_url A
     p.category_id AS categoryId, c.slug AS categorySlug, c.name AS categoryName`;
 const productsQuery = db.prepare(`
   SELECT ${publicProductFields}, p.specifications AS specificationsJson,
-    COALESCE(sales.soldCount, 0) AS soldCount
+    COALESCE(sales.soldCount, 0) AS soldCount,
+    COALESCE(reviews.reviewCount, 0) AS reviewCount, reviews.ratingAverage
   FROM products p LEFT JOIN product_categories c ON c.id = p.category_id
   LEFT JOIN (
     SELECT i.product_id, SUM(i.quantity) AS soldCount
     FROM orders o JOIN order_items i ON i.order_id = o.id
     WHERE o.status = 'COMPLETED' GROUP BY i.product_id
   ) sales ON sales.product_id = p.id
+  LEFT JOIN (
+    SELECT product_id, COUNT(*) AS reviewCount, AVG(rating) AS ratingAverage
+    FROM product_reviews GROUP BY product_id
+  ) reviews ON reviews.product_id = p.id
   WHERE p.active = 1
   ORDER BY p.id
 `);
@@ -61,6 +66,7 @@ app.get("/api/products", (req, res) => {
   res.json(productsQuery.all().map(({ specificationsJson, ...product }) => ({
     ...product,
     brand: productBrand(specificationsJson),
+    ratingAverage: product.reviewCount > 0 ? Math.round(product.ratingAverage * 10) / 10 : null,
     stockTracked: product.stockTracked === 1
   })));
 });

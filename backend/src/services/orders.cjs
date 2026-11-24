@@ -42,7 +42,7 @@ const findOrderStatus = db.prepare(`
   SELECT * FROM orders WHERE id = ? OR CAST(order_number AS TEXT) = ?
 `);
 const findOrderForDeletion = db.prepare(`
-  SELECT id, status, request_id FROM orders WHERE id = ? OR CAST(order_number AS TEXT) = ?
+  SELECT id, status, request_id, customer_id FROM orders WHERE id = ? OR CAST(order_number AS TEXT) = ?
 `);
 const recordDeletedRequest = db.prepare(`
   INSERT INTO deleted_order_requests (request_id) VALUES (?) ON CONFLICT DO NOTHING
@@ -103,7 +103,7 @@ function saveOrder(payload, items, paymentMethod, { customerId, expectedCustomer
   if (findDeletedRequest.get(key)) {
     return {
       status: 409,
-      body: { error: "Đơn hàng của lần gửi này đã được quản trị viên xóa. Hãy tải lại cửa hàng trước khi đặt đơn mới." }
+      body: { error: "Đơn hàng của lần gửi này đã bị xóa. Hãy tải lại cửa hàng trước khi đặt đơn mới." }
     };
   }
 
@@ -306,12 +306,12 @@ function restoreReservedStock(orderId) {
   return true;
 }
 
-function deleteOrder(id, expectedStatus) {
+function deleteOrder(id, expectedStatus, { customerId } = {}) {
   return runTransaction(db, () => {
     const current = findOrderForDeletion.get(id, id);
     let result;
 
-    if (!current) {
+    if (!current || (customerId !== undefined && current.customer_id !== customerId)) {
       result = { status: 404, body: { error: "Không tìm thấy đơn hàng." } };
     } else if (current.status !== expectedStatus) {
       result = {
@@ -334,4 +334,11 @@ function deleteOrder(id, expectedStatus) {
   }, { rollbackIf: result => result.status >= 400 });
 }
 
-module.exports = { createOrder, getOrderItems, getOrderHistory, changeOrderStatus, deleteOrder };
+function deleteCustomerOrder(id, customerId) {
+  if (!Number.isSafeInteger(customerId) || customerId < 1) {
+    return { status: 401, body: { error: "Hãy đăng nhập tài khoản của bạn." } };
+  }
+  return deleteOrder(id, "NEW", { customerId });
+}
+
+module.exports = { createOrder, getOrderItems, getOrderHistory, changeOrderStatus, deleteOrder, deleteCustomerOrder };

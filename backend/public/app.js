@@ -1431,6 +1431,7 @@ function matchesPrice(product) {
 function renderProductCards(target, displayedProducts, singleFeatured = false) {
   const fragment = document.createDocumentFragment();
   const idPrefix = target === productList || target === featuredProductList ? "" : target.id + "-";
+  const showHomeRatings = document.body.classList.contains("home-page");
   for (const product of displayedProducts) {
     const card = document.createElement("article");
     card.className = singleFeatured && product.imageUrl
@@ -1487,6 +1488,31 @@ function renderProductCards(target, displayedProducts, singleFeatured = false) {
     favoriteButton.title = favoriteLabel;
     favoriteButton.addEventListener("click", () => toggleFavorite(product, favoriteButton));
     card.append(favoriteButton);
+    if (showHomeRatings) {
+      const ratingLink = document.createElement("a");
+      ratingLink.className = "product-rating-badge";
+      ratingLink.href = "/chi-tiet-san-pham.html?id=" + product.id + "#reviews";
+      const ratingLabel = product.reviewCount > 0 && product.ratingAverage !== null
+        ? product.ratingAverage.toFixed(1) + " trên 5 sao từ " + product.reviewCount.toLocaleString("vi-VN") + " đánh giá"
+        : "Chưa có đánh giá";
+      ratingLink.setAttribute("aria-label", ratingLabel + " · " + product.name);
+      ratingLink.title = ratingLabel;
+      ratingLink.addEventListener("click", event => prepareNavigation(event, ratingLink));
+      const star = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      star.setAttribute("viewBox", "0 0 100 100");
+      star.setAttribute("aria-hidden", "true");
+      star.setAttribute("focusable", "false");
+      const starPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      starPath.setAttribute("d", "m50 4 14 29 32 5-23 23 5 32-28-15-28 15 5-32L4 38l32-5L50 4Z");
+      star.append(starPath);
+      const ratingValue = document.createElement("span");
+      ratingValue.className = "product-rating-value";
+      ratingValue.setAttribute("aria-hidden", "true");
+      ratingValue.textContent = product.reviewCount > 0 && product.ratingAverage !== null
+        ? product.ratingAverage.toFixed(1) : "—";
+      ratingLink.append(star, ratingValue);
+      card.append(ratingLink);
+    }
     if (product.description) {
       const details = document.createElement("details");
       const summary = document.createElement("summary");
@@ -1832,13 +1858,19 @@ async function loadCatalog() {
         (item.categoryName === undefined || typeof item.categoryName === "string") &&
         (item.brand === undefined || typeof item.brand === "string" && item.brand.length <= 200) &&
         (item.soldCount === undefined || Number.isSafeInteger(item.soldCount) && item.soldCount >= 0) &&
+        ((item.reviewCount === undefined && item.ratingAverage === undefined) ||
+          Number.isSafeInteger(item.reviewCount) && item.reviewCount >= 0 &&
+          (item.reviewCount === 0 ? item.ratingAverage === null :
+            typeof item.ratingAverage === "number" && Number.isFinite(item.ratingAverage) &&
+              item.ratingAverage >= 0 && item.ratingAverage <= 5)) &&
         ((item.stockTracked === undefined && item.stockQuantity === undefined) ||
           (typeof item.stockTracked === "boolean" && Number.isSafeInteger(item.stockQuantity) && item.stockQuantity >= 0))) ||
       new Set(result.map(item => item.id)).size !== result.length) {
       throw new Error("Dữ liệu sản phẩm chưa hợp lệ");
     }
     products = new Map(result.map(item => [item.id, {
-      stockTracked: false, stockQuantity: 0, categoryId: 1, categoryName: "Kem đánh răng", brand: "", soldCount: 0, ...item
+      stockTracked: false, stockQuantity: 0, categoryId: 1, categoryName: "Kem đánh răng", brand: "", soldCount: 0,
+      reviewCount: 0, ratingAverage: null, ...item
     }]));
     catalogCategories = categories;
     homeProductSettings = sectionSettings;

@@ -13,6 +13,7 @@
     </div>
   </section>
   <p id="orders-message" role="status" aria-atomic="true"></p>
+  <p id="orders-action-message" class="orders-action-message" role="status" aria-atomic="true" tabindex="-1"></p>
   <button id="orders-account-retry" class="button-secondary" type="button" hidden>Kiểm tra lại tài khoản</button>
   <section id="orders-panel" class="workspace-orders-panel dashboard-card" aria-label="Quản lý đơn hàng" hidden>
     <form id="orders-filter-form" class="workspace-orders-filters" role="search" aria-label="Lọc đơn hàng">
@@ -78,4 +79,13 @@
       </nav>
     </div>
   </section>
+  <dialog id="orders-delete-dialog" class="cart-remove-dialog orders-delete-dialog" aria-labelledby="orders-delete-title" aria-describedby="orders-delete-description">
+    <h2 id="orders-delete-title">Xóa đơn hàng?</h2>
+    <p id="orders-delete-description">Đơn ở trạng thái Mới nhận sẽ được xóa vĩnh viễn. Số lượng hàng đã giữ cho đơn sẽ được hoàn lại vào kho.</p>
+    <p id="orders-delete-message" class="orders-delete-message" role="status" aria-atomic="true"></p>
+    <div class="cart-remove-actions">
+      <button id="orders-delete-cancel" class="button-secondary" type="button" autofocus>Giữ lại đơn</button>
+      <button id="orders-delete-confirm" class="button-danger" type="button">Xóa đơn hàng</button>
+    </div>
+  </dialog>
 </section>

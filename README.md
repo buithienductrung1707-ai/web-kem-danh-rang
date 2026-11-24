@@ -139,7 +139,7 @@ Bộ lọc trên trang danh mục được giữ trong URL khi tải lại hoặ
 
 Hai lựa chọn **Còn hàng** và **Yêu thích** xếp theo chiều dọc, bên phải **Thương hiệu** và nằm chung khung bộ lọc. Dùng **Xóa bộ lọc** để trở về toàn bộ sản phẩm.
 
-Menu ngang đã bỏ nút **Trang chủ**. Bấm logo cửa hàng hoặc liên kết trong breadcrumb để về trang chủ. Các đường dẫn cũ `/san-pham.html` và `/kem-danh-rang.html` tự chuyển sang giao diện danh mục mới, giữ từ khóa và các tham số lọc.
+Menu ngang có **Danh mục** và lối tắt **CSKH** kèm biểu tượng trò chuyện để mở trung tâm hỗ trợ. Bấm logo cửa hàng hoặc liên kết trong breadcrumb để về trang chủ. Các đường dẫn cũ `/san-pham.html` và `/kem-danh-rang.html` tự chuyển sang giao diện danh mục mới, giữ từ khóa và các tham số lọc.
 
 Khách mua bằng thông tin nhận hàng nhập tại giỏ có thể điền thêm email để nhận thông báo. Tồn kho trên máy chủ được trừ khi đơn hàng được tạo thành công.
 
@@ -150,6 +150,7 @@ Khách mua bằng thông tin nhận hàng nhập tại giỏ có thể điền t
 - Hàng lọc chính gồm **Từ ngày**, **Đến ngày**, ô tìm mã đơn/tên sản phẩm dạng bo tròn và lựa chọn sắp xếp. Hàng dưới hiển thị số đơn thực tế đang khớp bộ lọc và lựa chọn trạng thái. Kết quả tự cập nhật khi đổi ngày, trạng thái hoặc sắp xếp; ô tìm kiếm cập nhật sau khi dừng gõ một chút và hỗ trợ **Enter** để tìm ngay. Xoá nội dung từng ô hoặc chọn **Tất cả** để bỏ điều kiện tương ứng. Các ô tự xuống hàng theo chiều rộng khu vực đơn hàng để phù hợp với điện thoại, thanh bên tài khoản và banner.
 - Khi chưa có đơn hoặc không có kết quả phù hợp, giao diện hiển thị biểu tượng kiện hàng, thông báo **Không có đơn ở mục này** và hướng dẫn phù hợp. Trạng thái trống không có nút danh mục hoặc phân trang. Khi kết nối gặp lỗi, dùng **Kiểm tra lại tài khoản** để thử lại.
 - Thẻ đơn hiển thị ảnh sản phẩm, tổng tiền và tiến trình xử lý. Các mốc đã ghi nhận dùng màu riêng: **Mới nhận** hồng, **Đã xác nhận** vàng, **Đang giao** xanh dương và **Hoàn thành** xanh lá. Mốc có lịch sử hiển thị dấu tích và thời gian thực tế; mốc hiện tại có vòng sáng, mốc chưa ghi nhận để màu dịu. Đơn hủy có nhãn riêng. Bấm **Xem chi tiết** để xem thông tin nhận hàng và các sản phẩm, hoặc **Mua lại** để thêm sản phẩm vào giỏ.
+- Đơn thuộc tài khoản của bạn và đang ở trạng thái **Mới nhận** có nút **Xóa đơn** màu đỏ ở góc dưới trái. Hộp thoại xác nhận cho phép **Giữ lại đơn** hoặc xóa vĩnh viễn. Khi xóa thành công, số lượng hàng đã giữ cho đơn được hoàn lại vào kho và danh sách cập nhật theo bộ lọc đang dùng. Máy chủ kiểm tra chủ sở hữu và trạng thái hiện tại; đơn đã chuyển sang trạng thái khác sẽ không bị xóa bằng thao tác này. Mã lần gửi của đơn đã xóa được giữ để các lần thử gửi lại không tạo lại đơn hoặc hoàn kho thêm lần nữa.
 
 Các trạng thái đơn hàng được hiển thị theo luồng xử lý.
 
@@ -370,6 +371,8 @@ Trang chủ mở đầu bằng dòng chữ lớn **Kem đánh răng số 1 tại
 Quảng cáo đầu trang có ba kiểu trang trí luân phiên với biểu tượng răng, chiếc lá và trái tim, cùng nhãn mở đầu, hai dòng gợi ý nhỏ và nhãn chú thích cạnh ảnh. Hình ảnh, tiêu đề, mô tả và nút chính vẫn lấy từ phần **Quảng cáo** của admin. Các nút chấm nằm ở hàng riêng để không che ảnh hoặc chữ; nút mũi tên và lịch chuyển tự động 4 giây giữ nguyên. Phần trang trí tự co giãn theo màn hình và hỗ trợ chế độ sáng/tối.
 
 **Danh mục nổi bật** nằm ngay sau quảng cáo đầu trang, phía trên **Sản phẩm bán chạy**, **Sản phẩm mới nhất** và **Sản phẩm nổi bật**. Mặc định, mỗi mục sản phẩm hiển thị tối đa 4 sản phẩm theo chế độ tự động. Bán chạy xếp theo tổng số lượng trong các đơn đã **Hoàn thành** và chỉ hiển thị sản phẩm đã có lượt mua thực tế; đơn mới, đang xử lý hoặc đã huỷ không được cộng. Nếu chưa có lượt mua hoàn thành, khu vực có hướng dẫn thay cho số bán minh hoạ. Mới nhất lấy thứ tự sản phẩm vừa được thêm vào cửa hàng (ID giảm dần). Sản phẩm ngừng bán hoặc thuộc danh mục bị ẩn không xuất hiện. Cả ba khu vực bán chạy, mới nhất và nổi bật dùng chung thao tác yêu thích, thêm giỏ và bảo vệ tồn kho. Thẻ sản phẩm dùng thanh **Đã bán** nền xanh nhạt, dải đỏ–cam và biểu tượng ngọn lửa, hiển thị số lượng thực từ đơn hoàn thành, kể cả 0. Dải màu là trang trí, không biểu thị phần trăm tồn kho; số lượng tồn không còn hiện riêng trên thẻ. Bấm tên hoặc ảnh để xem thông tin chi tiết.
+
+Trên các thẻ sản phẩm ở trang chủ, ngọn lửa chuyển động nhẹ và thanh **Đã bán** có dải sáng chạy qua. Hiệu ứng không thay đổi số liệu và được tắt khi thiết bị bật chế độ giảm chuyển động. Ngôi sao vàng ở góc phải chứa điểm đánh giá trung bình thực tế, làm tròn một chữ số thập phân; sản phẩm chưa có đánh giá hiện **—**. Bấm ngôi sao để mở phần đánh giá của sản phẩm. Nút trái tim nằm ở góc trái để không chồng lên điểm đánh giá. API `GET /api/products` cung cấp thêm `reviewCount` và `ratingAverage`, giá trị trung bình là `null` khi chưa có đánh giá.
 
 Trong trang quản trị, mở **Sản phẩm trang chủ** để quản lý riêng ba mục trên:
 

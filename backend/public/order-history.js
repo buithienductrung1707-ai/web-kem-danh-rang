@@ -17,6 +17,12 @@
   const nextButton = document.getElementById("orders-next");
   const pageLabel = document.getElementById("orders-page");
   const pagination = pageLabel.closest("nav");
+  const actionNotice = document.getElementById("orders-action-message");
+  const deleteDialog = document.getElementById("orders-delete-dialog");
+  const deleteTitle = document.getElementById("orders-delete-title");
+  const deleteMessage = document.getElementById("orders-delete-message");
+  const deleteCancel = document.getElementById("orders-delete-cancel");
+  const deleteConfirm = document.getElementById("orders-delete-confirm");
   const statuses = {
     NEW: "Mới nhận", CONFIRMED: "Đã xác nhận", SHIPPING: "Đang giao",
     COMPLETED: "Hoàn thành", CANCELLED: "Đã hủy"
@@ -36,6 +42,9 @@
   let currentPage = 1;
   let totalPages = 1;
   let listController = null;
+  let deleteController = null;
+  let deleteTarget = null;
+  let deleteTrigger = null;
   let filterTimer = null;
   let searchComposing = false;
   if (root) {
@@ -67,23 +76,43 @@
   }
 
   function setControls() {
-    const busy = !active || listController !== null || filterTimer !== null || customerId === null;
+    const busy = !active || listController !== null || deleteController !== null || filterTimer !== null || customerId === null;
     for (const control of [statusFilter, dateFrom, dateTo, searchField, sortField]) {
-      if (control) control.disabled = !active || !pageActive || panel.hidden;
+      if (control) control.disabled = !active || !pageActive || panel.hidden || deleteController !== null;
     }
     previousButton.disabled = busy || currentPage <= 1;
     nextButton.disabled = busy || currentPage >= totalPages;
-    retryButton.disabled = !active || listController !== null || filterTimer !== null;
+    retryButton.disabled = !active || listController !== null || deleteController !== null || filterTimer !== null;
     list.setAttribute("aria-busy", String(listController !== null || filterTimer !== null || searchComposing));
+    deleteCancel.disabled = deleteController !== null;
+    deleteConfirm.disabled = deleteController !== null;
+    deleteConfirm.textContent = deleteController ? "Đang xóa..." : "Xóa đơn hàng";
+    deleteDialog.setAttribute("aria-busy", String(deleteController !== null));
   }
 
-  function clearPrivateContent(keepFilters = false) {
+  function closeDeleteDialog(restoreFocus = true) {
+    const trigger = deleteTrigger;
+    deleteTarget = null;
+    deleteTrigger = null;
+    deleteTitle.textContent = "Xóa đơn hàng?";
+    deleteMessage.textContent = "";
+    if (deleteDialog.open) deleteDialog.close();
+    if (restoreFocus && active && pageActive) requestAnimationFrame(() => {
+      if (!active || !pageActive || deleteDialog.open) return;
+      if (trigger?.isConnected) trigger.focus();
+      else actionNotice.focus();
+    });
+  }
+
+  function clearPrivateContent(keepFilters = false, keepNotice = false) {
+    if (!deleteController) closeDeleteDialog(false);
     customerId = null;
     panel.hidden = !keepFilters;
     prompt.hidden = true;
     list.replaceChildren();
     summary.textContent = "";
     pagination.hidden = true;
+    if (!keepNotice) actionNotice.textContent = "";
   }
 
   function orderDate(value) {
@@ -254,7 +283,7 @@
       actionMessage.className = "customer-order-action-message";
       actionMessage.setAttribute("role", "status");
       reorder.addEventListener("click", () => {
-        if (!active || customerId === null || reorder.disabled) return;
+        if (!active || customerId === null || deleteController || reorder.disabled) return;
         reorder.disabled = true;
         const prepared = window.ShopMemory?.queueReorder(code, order.items);
         if (!prepared || prepared.error) {
@@ -265,7 +294,28 @@
         if (window.ShopAccountWorkspace) window.ShopAccountWorkspace.open("cart");
         else window.location.assign("/dang-nhap.html?view=cart");
       });
-      actions.append(detail, reorder);
+      if (order.status === "NEW") {
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "button-danger customer-order-delete";
+        remove.textContent = "Xóa đơn";
+        remove.setAttribute("aria-label", "Xóa đơn " + code);
+        remove.addEventListener("click", () => {
+          if (!active || !pageActive || customerId === null || deleteController || listController) return;
+          deleteTarget = { id: order.orderId, code, customerId };
+          deleteTrigger = remove;
+          deleteTitle.textContent = "Xóa đơn #" + code + "?";
+          deleteMessage.textContent = "";
+          setControls();
+          deleteDialog.showModal();
+          deleteCancel.focus();
+        });
+        actions.append(remove);
+      }
+      const rightActions = document.createElement("div");
+      rightActions.className = "customer-order-actions-right";
+      rightActions.append(detail, reorder);
+      actions.append(rightActions);
       card.append(header, items, paymentRow, renderProgress(order), actions, actionMessage);
       fragment.append(card);
     }
@@ -295,8 +345,8 @@
     list.replaceChildren(fragment);
   }
 
-  async function loadOrders(page = 1) {
-    if (!active || !pageActive) return;
+  async function loadOrders(page = 1, keepNotice = false) {
+    if (!active || !pageActive || deleteController) return;
     cancelFilterTimer();
     listController?.abort();
     const controller = new AbortController();
@@ -307,7 +357,7 @@
     if (dateTo?.value) params.set("dateTo", dateTo.value);
     if (searchField?.value.trim()) params.set("q", searchField.value.trim());
     if (sortField) params.set("sort", sortField.value);
-    clearPrivateContent(!panel.hidden);
+    clearPrivateContent(!panel.hidden, keepNotice);
     prompt.hidden = true;
     retryButton.hidden = true;
     message.textContent = "Đang tải đơn hàng...";
@@ -373,6 +423,70 @@
       }
     }
   }
+
+  deleteCancel.addEventListener("click", () => {
+    if (!deleteController) closeDeleteDialog();
+  });
+  deleteDialog.addEventListener("cancel", event => {
+    if (deleteController) event.preventDefault();
+  });
+  deleteDialog.addEventListener("close", () => {
+    if (deleteTarget && !deleteController) closeDeleteDialog();
+  });
+  deleteConfirm.addEventListener("click", async () => {
+    if (!active || !pageActive || !deleteTarget || deleteController || listController ||
+      customerId !== deleteTarget.customerId) return;
+    const target = deleteTarget;
+    const controller = new AbortController();
+    deleteController = controller;
+    deleteMessage.textContent = "Đang xóa đơn hàng...";
+    setControls();
+    let notice = "";
+    try {
+      const response = await fetch("/api/account/orders/" + encodeURIComponent(target.id), {
+        method: "DELETE", credentials: "same-origin", cache: "no-store",
+        headers: { "Content-Type": "application/json", "X-Customer-Id": String(target.customerId) },
+        body: JSON.stringify({ expectedStatus: "NEW" }),
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)])
+      });
+      const result = await response.json();
+      if (!active || !pageActive || deleteController !== controller || customerId !== target.customerId) return;
+      if (response.status === 401) {
+        deleteController = null;
+        closeDeleteDialog(false);
+        clearPrivateContent();
+        prompt.hidden = false;
+        retryButton.hidden = false;
+        message.textContent = "Phiên tài khoản đã thay đổi. Hãy đăng nhập lại để kiểm tra đơn hàng.";
+        return;
+      }
+      if (response.status === 409) notice = (typeof result?.error === "string" ? result.error
+        : "Đơn #" + target.code + " đã thay đổi trạng thái.") + " Hãy kiểm tra danh sách hiện tại.";
+      else if (response.status === 404) notice = "Không còn tìm thấy đơn #" + target.code + " trong tài khoản. Hãy kiểm tra danh sách hiện tại.";
+      else if (!response.ok) {
+        deleteMessage.textContent = typeof result?.error === "string" ? result.error : "Chưa xóa được đơn. Hãy thử lại.";
+        return;
+      } else {
+        if (response.status !== 200 || result?.id !== target.id || result.deleted !== true) {
+          throw new Error("Kết quả xóa đơn chưa hợp lệ");
+        }
+        notice = "Đã xóa đơn #" + target.code + ".";
+      }
+    } catch {
+      if (!active || !pageActive || deleteController !== controller || customerId !== target.customerId) return;
+      notice = "Chưa xác nhận được kết quả xóa đơn #" + target.code + ". Danh sách được tải lại để bạn kiểm tra trước khi thử lại.";
+    } finally {
+      if (deleteController === controller) {
+        deleteController = null;
+        setControls();
+      }
+    }
+    if (!notice || !active || !pageActive || customerId !== target.customerId) return;
+    closeDeleteDialog(false);
+    actionNotice.textContent = notice;
+    await loadOrders(currentPage, true);
+    if (active && pageActive && customerId === target.customerId) actionNotice.focus();
+  });
 
   function cancelFilterTimer() {
     clearTimeout(filterTimer);
@@ -443,6 +557,9 @@
     cancelFilterTimer();
     listController?.abort();
     listController = null;
+    deleteController?.abort();
+    deleteController = null;
+    closeDeleteDialog(false);
   }
   function setActive(value) {
     const next = value === true && pageActive;

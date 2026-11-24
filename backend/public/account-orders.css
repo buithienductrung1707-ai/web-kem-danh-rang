@@ -3,6 +3,9 @@
   --order-confirmed: #806000;
   --order-shipping: #08758b;
   --order-completed: #08754f;
+  --order-delete-fill: var(--account-danger-fill, #c5203b);
+  --order-delete-hover: #a71930;
+  --order-delete-text: #ffffff;
   min-width: 0;
   container: account-orders / inline-size;
 }
@@ -465,6 +468,65 @@
   padding: 10px 16px;
   border-radius: 22px;
   font-size: 13px;
+}
+
+.account-orders .customer-order-actions-right {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+  margin-left: auto;
+}
+
+.account-orders .customer-order-actions > .customer-order-delete {
+  flex: 0 0 auto;
+  margin-right: auto;
+}
+
+.account-orders .customer-order-delete,
+.orders-delete-dialog #orders-delete-confirm {
+  border-color: var(--order-delete-fill);
+  background: var(--order-delete-fill);
+  color: var(--order-delete-text);
+}
+
+.account-orders .customer-order-delete:hover:not(:disabled),
+.orders-delete-dialog #orders-delete-confirm:hover:not(:disabled) {
+  background: var(--order-delete-hover);
+  color: var(--order-delete-text);
+}
+
+.orders-action-message {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--soft);
+  color: var(--text);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.orders-action-message:empty,
+.orders-delete-message:empty {
+  display: none;
+}
+
+.orders-delete-dialog h2 {
+  overflow-wrap: anywhere;
+}
+
+#orders-delete-description {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.orders-delete-message {
+  color: var(--danger);
+  font-size: 14px;
+  overflow-wrap: anywhere;
 }
 
 .account-orders .orders-pagination {
