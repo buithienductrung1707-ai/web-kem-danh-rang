@@ -33,23 +33,38 @@
         </div>
       </section>
       <aside class="account-cart-summary" aria-labelledby="cart-summary-title">
-        <h2 id="cart-summary-title">Tổng giỏ hàng</h2>
+        <h2 id="cart-summary-title">Thông tin đơn hàng</h2>
         <div class="account-cart-summary-body">
           <dl class="account-cart-totals">
             <div>
-              <dt>Sản phẩm đã chọn</dt>
-              <dd><span id="cart-selected-lines">0</span>/<span id="cart-lines">0</span></dd>
-            </div>
-            <div>
-              <dt>Số lượng</dt>
+              <dt>Tổng sản phẩm đã chọn</dt>
               <dd id="cart-quantity">0</dd>
             </div>
+            <div>
+              <dt>Tạm tính</dt>
+              <dd id="cart-subtotal">0 ₫</dd>
+            </div>
+            <div>
+              <dt>Mã giảm giá</dt>
+              <dd id="cart-discount">0 ₫</dd>
+            </div>
             <div class="account-cart-grand-total">
-              <dt>Tiền sản phẩm</dt>
+              <dt>Tổng thanh toán</dt>
               <dd id="cart-total">0 ₫</dd>
             </div>
           </dl>
-          <p class="account-cart-summary-note">Kiểm tra thông tin nhận hàng và phương thức thanh toán ở bước tiếp theo.</p>
+          <p class="visually-hidden">Đã chọn <span id="cart-selected-lines">0</span>/<span id="cart-lines">0</span> mặt hàng.</p>
+          <p class="account-cart-price-note">Tổng tiền trên chưa bao gồm phí vận chuyển.</p>
+          <section class="account-cart-coupon" aria-labelledby="cart-coupon-title">
+            <h3 id="cart-coupon-title">Mã giảm giá</h3>
+            <label for="cart-coupon-code">Nhập mã giảm giá của bạn</label>
+            <div class="account-cart-coupon-controls">
+              <input id="cart-coupon-code" type="text" autocomplete="off" placeholder="Nhập mã giảm giá" aria-describedby="cart-coupon-help" disabled>
+              <button type="button" class="account-cart-coupon-apply" disabled>Áp dụng</button>
+            </div>
+            <p id="cart-coupon-help" class="account-cart-coupon-help">Hiện chưa có mã giảm giá khả dụng.</p>
+          </section>
+          <p class="account-cart-summary-note">Vui lòng kiểm tra sản phẩm đã chọn trước khi đặt hàng.</p>
           <button id="cart-continue" class="account-cart-primary" type="button" disabled>Tạo đơn hàng <span aria-hidden="true">→</span></button>
         </div>
       </aside>
@@ -58,18 +73,9 @@
 
   <div data-cart-step="checkout" hidden>
     <div class="account-cart-grid account-checkout-grid">
-      <section class="account-checkout-products" aria-labelledby="checkout-items-title">
-        <div class="account-cart-panel-heading">
-          <h2 id="checkout-items-title">Đơn hàng của bạn</h2>
-          <span id="checkout-item-count"></span>
-        </div>
-        <div id="checkout-review-items"></div>
-        <p class="account-checkout-products-note">Kiểm tra tên sản phẩm, số lượng và thông tin nhận hàng trước khi tạo đơn.</p>
-      </section>
-      <div class="account-checkout-side">
-        <section class="account-checkout-details" aria-labelledby="checkout-title">
+      <section class="account-checkout-details" aria-labelledby="checkout-title">
           <div class="account-cart-panel-heading">
-            <h2 id="checkout-title">Xác nhận đặt hàng</h2>
+            <h2 id="checkout-title">Thông tin giao hàng</h2>
           </div>
           <form id="checkout-form">
             <fieldset id="checkout-recipient-fields" class="checkout-recipient-fields" hidden disabled>
@@ -102,24 +108,56 @@
               <p id="payment-method-help" class="field-help"></p>
             </div>
           </form>
+      </section>
+      <div class="account-checkout-side">
+        <section class="account-checkout-products" aria-labelledby="checkout-items-title">
+          <div class="account-cart-panel-heading">
+            <h2 id="checkout-items-title">Thông tin sản phẩm</h2>
+            <span id="checkout-item-count"></span>
+          </div>
+          <div id="checkout-review-items"></div>
+          <p class="account-checkout-products-note">Kiểm tra tên sản phẩm và số lượng trước khi xác nhận đơn hàng.</p>
+        </section>
+        <section id="checkout-promotion-panel" class="account-cart-coupon-panel" aria-labelledby="checkout-coupon-title">
+          <div class="account-cart-panel-heading">
+            <h2 id="checkout-coupon-title">Áp dụng giảm giá</h2>
+          </div>
+          <div class="account-cart-coupon">
+            <label for="checkout-coupon-code">Nhập mã giảm giá của bạn</label>
+            <div class="account-cart-coupon-controls">
+              <input id="checkout-coupon-code" type="text" autocomplete="off" placeholder="Nhập mã giảm giá" aria-describedby="checkout-coupon-help" disabled>
+              <button type="button" class="account-cart-coupon-apply" disabled>Áp dụng</button>
+            </div>
+            <p id="checkout-coupon-help" class="account-cart-coupon-help">Hiện chưa có mã giảm giá khả dụng.</p>
+          </div>
         </section>
         <section class="account-cart-summary" aria-labelledby="checkout-total-title">
-          <h2 id="checkout-total-title">Tổng thanh toán</h2>
+          <h2 id="checkout-total-title">Đơn hàng của bạn</h2>
           <div class="account-cart-summary-body">
             <dl class="account-cart-totals">
               <div>
-                <dt>Tiền sản phẩm</dt>
+                <dt>Tổng sản phẩm đã chọn</dt>
+                <dd id="checkout-selected-quantity">0</dd>
+              </div>
+              <div>
+                <dt>Tạm tính</dt>
                 <dd id="checkout-subtotal">0 ₫</dd>
               </div>
               <div>
-                <dt>Thanh toán</dt>
-                <dd id="checkout-payment-label">Khi nhận hàng</dd>
+                <dt>Phí vận chuyển</dt>
+                <dd class="account-cart-shipping-status">Chưa tính</dd>
+              </div>
+              <div>
+                <dt>Mã giảm giá</dt>
+                <dd id="checkout-discount">0 ₫</dd>
               </div>
               <div class="account-cart-grand-total">
-                <dt>Tổng cộng</dt>
+                <dt>Tổng thanh toán</dt>
                 <dd id="checkout-total">0 ₫</dd>
               </div>
             </dl>
+            <p class="account-cart-price-note">Tổng tiền trên chưa bao gồm phí vận chuyển.</p>
+            <p class="visually-hidden">Phương thức thanh toán: <span id="checkout-payment-label">Khi nhận hàng</span>.</p>
             <p id="order-preview" class="visually-hidden" role="status"></p>
             <a id="checkout-back-cart" class="checkout-back-link" href="/dang-nhap.html?view=cart"><span aria-hidden="true">←</span> Quay lại giỏ hàng</a>
             <button id="review-order" class="account-cart-primary" form="checkout-form" type="submit" disabled>Xác nhận đơn hàng</button>

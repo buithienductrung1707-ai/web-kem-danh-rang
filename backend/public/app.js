@@ -50,6 +50,8 @@ const headerCartTotal = document.getElementById("header-cart-total");
 const headerSearchForm = document.querySelector("[data-header-search]");
 const headerSearchSubmit = headerSearchForm?.querySelector('button[type="submit"]');
 const totalLabel = document.getElementById("cart-total");
+const cartSubtotalLabel = document.getElementById("cart-subtotal");
+const checkoutSelectedQuantity = document.getElementById("checkout-selected-quantity");
 const storageMessage = document.getElementById("storage-message");
 const checkoutForm = document.getElementById("checkout-form");
 const reviewButton = document.getElementById("review-order");
@@ -1042,6 +1044,7 @@ function updateControls() {
     quantityLabel.textContent = cartWorkspace ? String(selectedTotals.quantity) : quantityText;
     totalLabel.textContent = orderPending && Number.isSafeInteger(pendingTotal)
       ? money.format(pendingTotal) : selectedTotals.valid ? money.format(selectedTotals.total) : "—";
+    if (cartSubtotalLabel) cartSubtotalLabel.textContent = totalLabel.textContent;
     clearButton.disabled = locked || cart.size === 0;
     const recipientReady = checkoutAccountState === "guest" ||
       (checkoutAccountState === "member" && completeCheckoutProfile(checkoutAccount));
@@ -1331,7 +1334,7 @@ function renderCheckoutVisuals() {
   if (!checkoutReviewItems) return;
   document.getElementById("checkout-total-title").textContent = currentReceipt && !reviewedOrder
     ? currentReceipt.status === "CANCELLED" ? "Đơn hàng đã hủy" : "Đặt hàng thành công"
-    : "Tổng thanh toán";
+    : "Đơn hàng của bạn";
   const items = reviewedOrder?.items ?? currentReceiptItems ?? [...selectedCart()].map(([productId, quantity]) => ({
     productId, quantity, expectedUnitPrice: products.get(productId)?.price,
     expectedProductName: products.get(productId)?.name ?? "Sản phẩm #" + productId
@@ -1385,6 +1388,7 @@ function renderCheckoutVisuals() {
   }
   checkoutReviewItems.replaceChildren(fragment);
   document.getElementById("checkout-item-count").textContent = items.length + " sản phẩm · " + quantity + " món";
+  if (checkoutSelectedQuantity) checkoutSelectedQuantity.textContent = String(quantity);
   const shownTotal = currentReceipt && !reviewedOrder ? money.format(currentReceipt.total)
     : validTotal && (catalogReady || orderPending || items.length === 0) ? money.format(total) : "—";
   document.getElementById("checkout-subtotal").textContent = shownTotal;

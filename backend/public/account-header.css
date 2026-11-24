@@ -1,3 +1,33 @@
+:root {
+  --guest-login-fill: #1d4ed8;
+  --guest-login-hover: #1e40af;
+  --guest-login-text: #ffffff;
+}
+
+.commerce-header .site-nav [data-account-link]:not(.has-account-avatar),
+.account-menu-nav:has(> a[href^="/dang-ky.html"]) > a:first-child {
+  border: 1px solid var(--guest-login-fill);
+  border-radius: 12px;
+  background: var(--guest-login-fill);
+  color: var(--guest-login-text);
+}
+
+.commerce-header .site-nav [data-account-link]:not(.has-account-avatar):hover,
+.account-menu-nav:has(> a[href^="/dang-ky.html"]) > a:first-child:hover {
+  border-color: var(--guest-login-hover);
+  background: var(--guest-login-hover);
+  color: var(--guest-login-text);
+}
+
+.commerce-header [data-account-link]:not(.has-account-avatar) :is(.header-link-label, strong) {
+  color: var(--guest-login-text);
+}
+
+.commerce-header [data-account-link]:not(.has-account-avatar):focus-visible {
+  outline: 3px solid var(--guest-login-text);
+  outline-offset: 2px;
+}
+
 .commerce-header [data-account-link].has-account-avatar > .header-icon {
   display: none;
 }

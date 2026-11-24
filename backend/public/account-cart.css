@@ -4,6 +4,9 @@
   --cart-action-hover-start: #af4110;
   --cart-action-hover-end: #98300d;
   --cart-action-text: #ffffff;
+  --cart-total-text: var(--account-emphasis, var(--danger));
+  --cart-coupon-action: #232323;
+  --cart-coupon-text: #ffffff;
   min-width: 0;
 }
 
@@ -22,6 +25,7 @@
 .account-checkout-products,
 .account-checkout-details,
 .account-cart-summary,
+.account-cart-coupon-panel,
 .account-cart-empty {
   min-width: 0;
   overflow: hidden;
@@ -252,14 +256,18 @@
   padding: 18px 20px;
   border-bottom: 1px solid var(--line);
   background: var(--soft);
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .account-cart-summary > h2 {
-  color: var(--primary-dark);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .02em;
+  color: var(--text);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.account-cart-summary,
+.account-cart-coupon-panel {
+  border-radius: 16px;
 }
 
 .account-cart-summary-body {
@@ -268,7 +276,7 @@
 
 .account-cart-totals {
   display: grid;
-  gap: 14px;
+  gap: 18px;
   margin: 0;
 }
 
@@ -277,11 +285,12 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .account-cart-totals dt {
-  color: var(--muted);
+  color: var(--text);
+  line-height: 1.5;
 }
 
 .account-cart-totals dd {
@@ -292,20 +301,119 @@
 }
 
 .account-cart-totals .account-cart-grand-total {
-  display: grid;
-  gap: 10px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
   padding-top: 18px;
-  border-top: 1px dashed var(--line);
+  border-top: 1px solid var(--line);
 }
 
 .account-cart-grand-total dt {
+  min-width: 0;
   color: var(--text);
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
-.account-cart-grand-total dd {
-  color: var(--primary-dark);
-  font-size: 24px;
+.account-cart-grand-total dd,
+.account-cart-workspace #cart-total {
+  flex-shrink: 0;
+  max-width: 70%;
+  color: var(--cart-total-text);
+  font-size: 20px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.account-cart-totals .account-cart-shipping-status {
+  font-style: italic;
+}
+
+.account-cart-price-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.account-cart-coupon {
+  margin-top: 26px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.account-cart-coupon h3 {
+  margin: 0 0 16px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.account-cart-coupon label {
+  display: block;
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.account-cart-coupon-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.account-cart-coupon input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+}
+
+.account-cart-coupon input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.account-cart-workspace .account-cart-coupon-apply,
+.account-cart-workspace .account-cart-coupon-apply:disabled:hover {
+  min-width: 88px;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--cart-coupon-action);
+  color: var(--cart-coupon-text);
+  font-size: 12px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.account-cart-coupon-help {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.account-cart-coupon-panel > .account-cart-coupon {
+  margin: 0;
+  padding: 20px;
+  border: 0;
+}
+
+.account-cart-workspace:has(#receipt-actions:not([hidden])) #checkout-promotion-panel {
+  display: none;
 }
 
 .account-cart-summary-note,
@@ -440,7 +548,7 @@
 
 .account-cart-messages p:empty,
 .account-cart-order-message:empty,
-.account-checkout-side #checkout-account-status:empty {
+.account-checkout-details #checkout-account-status:empty {
   display: none;
 }
 
@@ -465,7 +573,9 @@
 
 .account-cart-panel-heading h2 {
   margin: 0;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
 }
 
 .account-cart-panel-heading > span {
@@ -526,33 +636,35 @@
   padding: 0 20px;
 }
 
-.account-checkout-side #checkout-form {
+.account-checkout-details #checkout-form {
   display: grid;
   gap: 16px;
   padding: 20px;
 }
 
-.account-checkout-side :is(input:not([type="checkbox"]), textarea, select) {
+.account-checkout-details :is(input:not([type="checkbox"]), textarea, select) {
   width: 100%;
   min-width: 0;
   margin: 6px 0 14px;
   padding: 11px 12px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
-.account-checkout-side .checkout-recipient-fields {
+.account-checkout-details .checkout-recipient-fields {
+  min-width: 0;
+  margin: 0;
   padding: 0;
   border: 0;
 }
 
-.account-checkout-side .checkout-recipient-fields legend,
+.account-checkout-details .checkout-recipient-fields legend,
 .account-checkout-recipient h3 {
   margin: 0 0 12px;
   font-size: 14px;
   font-weight: 750;
 }
 
-.account-checkout-side label {
+.account-checkout-details label {
   display: block;
   margin: 0;
   font-size: 13px;
@@ -575,14 +687,14 @@
   font-size: 12px;
 }
 
-.account-checkout-side .checkout-payment {
+.account-checkout-details .checkout-payment {
   margin: 0;
   padding-top: 16px;
   border-top: 1px solid var(--line);
 }
 
-.account-checkout-side .field-help,
-.account-checkout-side #checkout-account-status {
+.account-checkout-details .field-help,
+.account-checkout-details #checkout-account-status {
   margin: 0;
   font-size: 12px;
 }
@@ -706,7 +818,8 @@
   .account-cart-summary > h2,
   .account-cart-panel-heading,
   .account-cart-summary-body,
-  .account-checkout-side #checkout-form {
+  .account-checkout-details #checkout-form,
+  .account-cart-coupon-panel > .account-cart-coupon {
     padding: 16px;
   }
 
@@ -714,7 +827,7 @@
     padding: 16px;
   }
 
-  .account-checkout-side :is(input:not([type="checkbox"]), textarea, select) {
+  .account-checkout-details :is(input:not([type="checkbox"]), textarea, select) {
     font-size: 16px;
   }
 }

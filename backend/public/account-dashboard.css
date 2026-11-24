@@ -1,6 +1,7 @@
 .account-shell.has-account-dashboard {
-  --main-max-width: 1240px;
+  --main-max-width: 1440px;
   padding-top: 36px;
+  padding-inline: 16px;
 }
 
 .has-account-dashboard > .account-heading {
@@ -15,9 +16,9 @@
   --account-emphasis: #c5203b;
   --account-danger-fill: #c5203b;
   display: grid;
-  grid-template-columns: 264px minmax(0, 1fr);
+  grid-template-columns: 208px minmax(0, 1fr);
   align-items: start;
-  gap: 28px;
+  gap: 20px;
 }
 
 html[data-theme="dark"] .account-dashboard {
@@ -37,7 +38,7 @@ html[data-theme="dark"] .account-dashboard {
 }
 
 .account-dashboard-summary {
-  padding: 24px 20px 20px;
+  padding: 18px 14px 16px;
   background: linear-gradient(135deg, var(--soft), color-mix(in srgb, var(--primary) 17%, var(--surface)));
   border-bottom: 1px solid var(--line);
 }
@@ -45,7 +46,7 @@ html[data-theme="dark"] .account-dashboard {
 .account-dashboard-summary-top {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .account-dashboard-identity {
@@ -56,7 +57,7 @@ html[data-theme="dark"] .account-dashboard {
 }
 
 .account-dashboard-identity strong {
-  font-size: 17px;
+  font-size: 15px;
   line-height: 1.4;
 }
 
@@ -76,8 +77,8 @@ html[data-theme="dark"] .account-dashboard {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 20px 0 0;
-  font-size: 13px;
+  margin: 14px 0 0;
+  font-size: 12px;
 }
 
 .account-dashboard-customer-code dt {
@@ -106,9 +107,9 @@ html[data-theme="dark"] .account-dashboard {
 }
 
 .dashboard-avatar-small {
-  width: 52px;
-  height: 52px;
-  font-size: 19px;
+  width: 42px;
+  height: 42px;
+  font-size: 16px;
 }
 
 .dashboard-avatar-large {
@@ -126,17 +127,17 @@ html[data-theme="dark"] .account-dashboard {
 .account-dashboard-nav {
   display: grid;
   gap: 6px;
-  padding: 12px 10px;
+  padding: 10px 8px;
 }
 
 .account-dashboard-nav :is(a, #account-logout) {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   min-height: 48px;
-  padding: 10px 14px;
+  padding: 10px;
   border: 0;
   border-radius: 14px;
   background: transparent;
@@ -179,6 +180,29 @@ html[data-theme="dark"] .account-dashboard {
 .account-dashboard .account-dashboard-nav #account-logout:hover:not(:disabled) {
   background: #a71930;
   color: #ffffff;
+}
+
+.account-page #account-submit,
+.account-dashboard #orders-account-prompt .button-link,
+.account-dashboard .account-dashboard-nav #workspace-login {
+  border: 1px solid var(--guest-login-fill);
+  background: var(--guest-login-fill);
+  color: var(--guest-login-text);
+}
+
+.account-page #account-submit:hover:not(:disabled),
+.account-dashboard #orders-account-prompt .button-link:hover,
+.account-dashboard .account-dashboard-nav #workspace-login:hover {
+  border-color: var(--guest-login-hover);
+  background: var(--guest-login-hover);
+  color: var(--guest-login-text);
+}
+
+.account-page #account-submit:focus-visible,
+.account-dashboard #orders-account-prompt .button-link:focus-visible,
+.account-dashboard .account-dashboard-nav #workspace-login:focus-visible {
+  outline: 3px solid var(--guest-login-fill);
+  outline-offset: 3px;
 }
 
 .dashboard-breadcrumb {
@@ -603,9 +627,17 @@ html[data-theme="dark"] .account-dashboard {
   accent-color: var(--primary);
 }
 
+@media screen and (min-width: 1280px) {
+  body.account-page.has-side-banners > .account-shell.has-account-dashboard {
+    width: min(var(--main-max-width), calc((100vw - var(--side-banner-left-width) - var(--side-banner-right-width) - 32px) / var(--storefront-content-scale, 1)));
+    margin-left: calc((var(--side-banner-left-width) + 16px) / var(--storefront-content-scale, 1));
+    margin-right: auto;
+  }
+}
+
 @media screen and (max-width: 960px) {
   .account-dashboard {
-    grid-template-columns: 224px minmax(0, 1fr);
+    grid-template-columns: 200px minmax(0, 1fr);
     gap: 20px;
   }
 

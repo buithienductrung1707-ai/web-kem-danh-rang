@@ -90,6 +90,12 @@ Giao diện cửa hàng dùng tỷ lệ nội dung **125%** trên trang chủ, d
 
 Bước xác nhận có liên kết nhỏ **Quay lại giỏ hàng** ngay trên nút **Xác nhận đơn hàng**. Liên kết giữ nguyên lựa chọn sản phẩm và tạm khóa trong lúc đang gửi đơn; sau khi nhận mã, phần thành công chỉ hiện nút **Xem đơn hàng của tôi**. Khách chưa đăng nhập được hướng dẫn đăng nhập ở trang đơn hàng. Khi kết quả gửi đơn chưa rõ, trang giữ nút **Thử gửi lại**, chưa hiển thị trạng thái thành công. Giỏ hàng không còn nút **Cập nhật sản phẩm**; nếu tải sản phẩm gặp lỗi, thông báo hướng dẫn kiểm tra kết nối và tải lại trang.
 
+Khung **Thông tin đơn hàng** trong giỏ hiển thị tổng số lượng sản phẩm đã chọn, tạm tính, giảm giá và tổng thanh toán. Bước xác nhận đặt thông tin nhận hàng và phương thức thanh toán bên trái; danh sách sản phẩm, khung giảm giá và **Đơn hàng của bạn** ở bên phải. Trên màn hình nhỏ, các khu vực xếp dọc theo thứ tự nhập thông tin rồi kiểm tra đơn. Số lượng và tiền trong phần xác nhận lấy từ bản đơn đang xác nhận hoặc đã nhận mã, kể cả khi các sản phẩm chưa chọn còn lại trong giỏ.
+
+Phí vận chuyển hiện hiển thị **Chưa tính**, giảm giá là **0 ₫** và tổng tiền chỉ gồm tiền sản phẩm. Website chưa có chính sách hay bộ xử lý mã giảm giá, nên ô nhập mã và nút **Áp dụng** đang tạm khóa, kèm thông báo chưa có mã khả dụng. Giao diện không tự cộng phí vận chuyển, trừ tiền hay xác nhận giá đã bao gồm VAT.
+
+Khu vực tài khoản có thanh bên nhỏ gọn hơn và lề trái hẹp để tăng chỗ cho giỏ hàng, đặt hàng và lịch sử đơn. Các nút **Đăng nhập** của khách dùng nền xanh dương và chữ trắng; khi đã đăng nhập, header tiếp tục hiển thị lời chào và avatar như trước.
+
 **Tài khoản**, **Giỏ hàng** và **Đơn hàng** dùng chung bố cục có thanh điều hướng bên trái. Có thể mở trực tiếp [hồ sơ](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html), [giỏ hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=cart), [xác nhận mua hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=checkout) và [đơn hàng](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=orders). Giỏ rỗng hiển thị nút **Tiếp tục mua sắm** để mở trang danh mục và nút xem đơn hàng. Các đường dẫn giỏ hàng, đơn hàng cũ tự chuyển về khu vực tương ứng.
 
 Giỏ hàng và bước xác nhận hỗ trợ mua khi chưa đăng nhập. Lựa chọn sản phẩm được giữ khi chuyển giữa giỏ và xác nhận trong cùng tab. Khi chưa nhận được kết quả gửi đơn, giữ trang hoặc mở lại bước xác nhận rồi bấm **Thử gửi lại** để tiếp tục cùng lần đặt hàng.
