@@ -113,6 +113,7 @@ let ordersDownloadTimer = null;
 let pageActive = true;
 const categoryEditor = window.ShopAdminCategories;
 const homeSectionsEditor = window.ShopAdminHomeSections;
+const shoppingGuidesEditor = window.ShopAdminShoppingGuides;
 
 function setBusy(value) {
   busy = value;
@@ -172,6 +173,7 @@ function setBusy(value) {
   loginForm.setAttribute("aria-busy", String(value));
   categoryEditor.setBusy(value);
   homeSectionsEditor.setBusy(value);
+  shoppingGuidesEditor.setBusy(value);
 }
 
 function finishRequest(focusTarget = logoutButton) {
@@ -196,6 +198,7 @@ function finishRequest(focusTarget = logoutButton) {
 function showAuth(admin) {
   categoryEditor.clear();
   homeSectionsEditor.clear();
+  shoppingGuidesEditor.clear();
   clearOrdersExport();
   clearOrdersSummary();
   clearOrderSearch();
@@ -225,6 +228,7 @@ function showAuth(admin) {
 function showUnknown(message) {
   categoryEditor.clear();
   homeSectionsEditor.clear();
+  shoppingGuidesEditor.clear();
   clearOrdersExport();
   clearOrdersSummary();
   clearOrderSearch();
@@ -288,6 +292,9 @@ async function checkSession() {
     if (!adminPanel.hidden && !sessionCheckQueued && pageActive) {
       await homeSectionsEditor.load();
     }
+    if (!adminPanel.hidden && !sessionCheckQueued && pageActive) {
+      await shoppingGuidesEditor.load();
+    }
   } catch {
     if (sessionCheckQueued || !pageActive) return;
     showUnknown(
@@ -349,6 +356,9 @@ loginForm.addEventListener("submit", async (event) => {
     if (!adminPanel.hidden && !sessionCheckQueued && pageActive) {
       await homeSectionsEditor.load();
     }
+    if (!adminPanel.hidden && !sessionCheckQueued && pageActive) {
+      await shoppingGuidesEditor.load();
+    }
   } catch {
     if (sessionCheckQueued || !pageActive) return;
     showUnknown(
@@ -369,6 +379,7 @@ logoutButton.addEventListener("click", async () => {
   clearProductEditor();
   categoryEditor.clear();
   homeSectionsEditor.clear();
+  shoppingGuidesEditor.clear();
   clearOrders();
   messageLabel.textContent = "Đang đăng xuất...";
 
@@ -2088,6 +2099,7 @@ window.addEventListener("pagehide", clearBannerEditor);
 window.addEventListener("pagehide", clearOrdersSummary);
 window.addEventListener("pagehide", () => categoryEditor.clear());
 window.addEventListener("pagehide", () => homeSectionsEditor.clear());
+window.addEventListener("pagehide", () => shoppingGuidesEditor.clear());
 
 categoryEditor.configure({
   request: callAdmin,
@@ -2112,6 +2124,17 @@ homeSectionsEditor.configure({
   setBusy,
   finish: finishRequest,
   categories: () => categoryEditor.items,
+  onUnauthorized() {
+    showAuth(null);
+    messageLabel.textContent = "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.";
+  }
+});
+
+shoppingGuidesEditor.configure({
+  request: callAdmin,
+  isActive: () => !adminPanel.hidden && pageActive && !sessionCheckQueued,
+  setBusy,
+  finish: finishRequest,
   onUnauthorized() {
     showAuth(null);
     messageLabel.textContent = "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.";

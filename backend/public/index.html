@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="product-cards.css">
     <link rel="stylesheet" href="section-decorations.css">
     <link rel="stylesheet" href="hero-decorations.css">
+    <link rel="stylesheet" href="shopping-guides.css">
     <link rel="stylesheet" href="storefront-scale.css">
     <script src="catalog-categories.js" defer></script>
     <script src="shop-memory.js" defer></script>
@@ -26,6 +27,7 @@
     <script src="header.js" defer></script>
     <script src="support-chat.js" defer></script>
     <script src="carousel.js" defer></script>
+    <script src="shopping-guides.js" defer></script>
   </head>
 
   <body class="storefront-page home-page">
@@ -334,7 +336,58 @@
         <a id="pending-cart-link" class="navigation-link cart-navigation" href="/dang-nhap.html?view=cart" hidden>Đi đến giỏ hàng</a>
       </div>
       <hr class="home-section-divider" aria-hidden="true">
-      <div class="home-band" data-home-band="tinted">
+      <div class="home-band home-band--guides" data-home-band="tinted">
+        <section id="shopping-guides" class="shopping-guides home-band-inner" aria-label="Hướng dẫn mua và nhận hàng">
+          <article class="shopping-guide" data-shopping-guide="buying" aria-labelledby="buying-guide-title">
+            <header class="shopping-guide-heading">
+              <p class="shopping-guide-kicker"><span aria-hidden="true">01</span> Mua sắm dễ dàng</p>
+              <h2 id="buying-guide-title">Hướng dẫn <span>mua hàng</span></h2>
+              <p>Từ chọn sản phẩm đến xác nhận đơn, cùng bạn đặt hàng chỉ trong vài bước.</p>
+            </header>
+            <div class="shopping-guide-media" data-guide-media>
+              <div class="shopping-guide-placeholder">
+                <span class="shopping-guide-play" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="26" height="20" rx="5"/><path d="m13 11 8 5-8 5V11Z"/></svg></span>
+                <strong>Chưa có video hướng dẫn</strong>
+                <span>Tham khảo các bước mua hàng bên dưới.</span>
+              </div>
+            </div>
+            <p class="shopping-guide-video-status" data-guide-status role="status" aria-atomic="true"></p>
+            <ol class="shopping-guide-steps">
+              <li><strong>Chọn sản phẩm</strong><span>Xem thông tin, chọn số lượng rồi thêm vào giỏ.</span></li>
+              <li><strong>Kiểm tra giỏ hàng</strong><span>Chọn sản phẩm cần mua và kiểm tra thông tin nhận hàng.</span></li>
+              <li><strong>Xác nhận đơn hàng</strong><span>Chọn cách thanh toán, xác nhận và theo dõi đơn trong tài khoản.</span></li>
+            </ol>
+            <a class="shopping-guide-link" href="/danh-muc.html">Bắt đầu mua sắm <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="shopping-guide shopping-guide--unboxing" data-shopping-guide="unboxing" aria-labelledby="unboxing-guide-title">
+            <header class="shopping-guide-heading">
+              <p class="shopping-guide-kicker"><span aria-hidden="true">02</span> Nhận hàng an tâm</p>
+              <h2 id="unboxing-guide-title">Hướng dẫn quay video <span>mở hàng</span></h2>
+              <p>Ghi lại quá trình mở gói hàng để dễ kiểm tra sản phẩm và trao đổi khi cần hỗ trợ.</p>
+            </header>
+            <div class="shopping-guide-media" data-guide-media>
+              <div class="shopping-guide-placeholder">
+                <span class="shopping-guide-play" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="19" height="17" rx="4"/><path d="m22 14 7-4v13l-7-4M9 8V5h7v3"/></svg></span>
+                <strong>Chưa có video hướng dẫn</strong>
+                <span>Tham khảo các bước quay video bên dưới.</span>
+              </div>
+            </div>
+            <p class="shopping-guide-video-status" data-guide-status role="status" aria-atomic="true"></p>
+            <ol class="shopping-guide-steps">
+              <li><strong>Quay rõ gói hàng</strong><span>Ghi lại mã vận đơn và tình trạng bao bì trước khi mở.</span></li>
+              <li><strong>Quay liên tục khi mở</strong><span>Giữ sản phẩm trong khung hình, kiểm tra số lượng và tình trạng.</span></li>
+              <li><strong>Giữ lại video gốc</strong><span>Lưu video và mã đơn để cửa hàng dễ hỗ trợ khi cần.</span></li>
+            </ol>
+            <a class="shopping-guide-link" href="/cskh.html">Liên hệ hỗ trợ <span aria-hidden="true">→</span></a>
+          </article>
+          <div class="shopping-guides-feedback">
+            <p id="shopping-guides-message" role="status" aria-atomic="true"></p>
+            <button id="shopping-guides-retry" class="button-secondary" type="button" hidden>Thử tải lại video</button>
+          </div>
+        </section>
+      </div>
+      <hr class="home-section-divider" aria-hidden="true">
+      <div class="home-band" data-home-band="plain">
       <section class="shopping-faq home-band-inner home-panel home-panel--help" aria-labelledby="shopping-faq-title">
         <div class="faq-heading">
           <h2 id="shopping-faq-title">Câu hỏi <span>thường gặp</span></h2>

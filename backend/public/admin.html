@@ -10,9 +10,11 @@
     <link rel="stylesheet" href="admin-categories.css">
     <link rel="stylesheet" href="admin-products.css">
     <link rel="stylesheet" href="admin-home-sections.css">
+    <link rel="stylesheet" href="admin-shopping-guides.css">
     <script src="admin-categories.js" defer></script>
     <script src="admin-products.js" defer></script>
     <script src="admin-home-sections.js" defer></script>
+    <script src="admin-shopping-guides.js" defer></script>
     <script src="admin.js" defer></script>
     <script src="admin-support.js" defer></script>
   </head>
@@ -88,6 +90,7 @@
             <a href="#banner-editor-title">Quảng cáo</a>
             <a href="#category-editor-title">Danh mục</a>
             <a href="#home-sections-title">Sản phẩm trang chủ</a>
+            <a href="#shopping-guides-editor-title">Video hướng dẫn</a>
             <a href="#product-editor-title">Sản phẩm</a>
             <a href="#orders-title">Đơn hàng</a>
           </nav>
@@ -363,6 +366,48 @@
                 <p id="home-section-draft-status" class="field-help" aria-live="polite"></p>
               </div>
             </form>
+          </section>
+
+          <section id="admin-shopping-guides" class="panel admin-shopping-guides" aria-labelledby="shopping-guides-editor-title">
+            <div class="panel-heading">
+              <div>
+                <h2 id="shopping-guides-editor-title">Video hướng dẫn</h2>
+                <p class="field-help">Hai video hiển thị trên trang chủ, giữa Sản phẩm nổi bật và Câu hỏi thường gặp.</p>
+              </div>
+              <button id="shopping-guides-reload" type="button" class="button-secondary" disabled>Tải lại video</button>
+            </div>
+            <p id="shopping-guides-message" role="status" aria-atomic="true"></p>
+            <p id="shopping-guides-url-help" class="field-help">Dán link YouTube hoặc đường dẫn HTTPS tới video MP4. Để trống và bấm Lưu video để gỡ video; trang chủ vẫn giữ khung hướng dẫn. Video chỉ tải khi khách bấm xem.</p>
+            <div id="shopping-guides-forms" class="shopping-guides-editor-grid" hidden>
+              <form class="shopping-guide-editor" data-shopping-guide-form="buying" aria-labelledby="guide-buying-editor-title">
+                <span class="shopping-guide-editor-number" aria-hidden="true">01</span>
+                <h3 id="guide-buying-editor-title">Hướng dẫn mua hàng</h3>
+                <p class="field-help">Hướng dẫn chọn sản phẩm, thêm vào giỏ và xác nhận đơn hàng.</p>
+                <div class="field">
+                  <label for="guide-buying-video-url">Đường dẫn video mua hàng</label>
+                  <input id="guide-buying-video-url" name="videoUrl" type="url" inputmode="url" maxlength="2048" autocomplete="off" spellcheck="false" aria-describedby="shopping-guides-url-help guide-buying-message" disabled>
+                </div>
+                <div class="shopping-guide-save-row">
+                  <button type="submit" data-guide-save disabled>Lưu video</button>
+                  <p class="field-help" data-guide-draft></p>
+                </div>
+                <p id="guide-buying-message" class="shopping-guide-editor-message" data-guide-message role="status" aria-atomic="true"></p>
+              </form>
+              <form class="shopping-guide-editor" data-shopping-guide-form="unboxing" aria-labelledby="guide-unboxing-editor-title">
+                <span class="shopping-guide-editor-number" aria-hidden="true">02</span>
+                <h3 id="guide-unboxing-editor-title">Hướng dẫn quay video mở hàng</h3>
+                <p class="field-help">Minh họa cách quay rõ kiện hàng, nhãn vận chuyển và sản phẩm bên trong.</p>
+                <div class="field">
+                  <label for="guide-unboxing-video-url">Đường dẫn video mở hàng</label>
+                  <input id="guide-unboxing-video-url" name="videoUrl" type="url" inputmode="url" maxlength="2048" autocomplete="off" spellcheck="false" aria-describedby="shopping-guides-url-help guide-unboxing-message" disabled>
+                </div>
+                <div class="shopping-guide-save-row">
+                  <button type="submit" data-guide-save disabled>Lưu video</button>
+                  <p class="field-help" data-guide-draft></p>
+                </div>
+                <p id="guide-unboxing-message" class="shopping-guide-editor-message" data-guide-message role="status" aria-atomic="true"></p>
+              </form>
+            </div>
           </section>
 
           <section class="panel admin-product" aria-labelledby="product-editor-title">

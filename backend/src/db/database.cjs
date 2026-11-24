@@ -191,6 +191,12 @@ function initializeSchema() {
       revision INTEGER NOT NULL DEFAULT 0 CHECK (revision BETWEEN 0 AND 9007199254740991)
     ) STRICT;
 
+    CREATE TABLE IF NOT EXISTS shopping_guides (
+      key TEXT PRIMARY KEY CHECK (key IN ('buying', 'unboxing')),
+      video_url TEXT NOT NULL DEFAULT '' CHECK (length(video_url) <= 2048),
+      revision INTEGER NOT NULL DEFAULT 0 CHECK (revision BETWEEN 0 AND 9007199254740991)
+    ) STRICT;
+
     CREATE TABLE IF NOT EXISTS support_conversations (
       id TEXT PRIMARY KEY,
       token_hash TEXT NOT NULL UNIQUE,
@@ -211,6 +217,8 @@ function initializeSchema() {
     CREATE INDEX IF NOT EXISTS support_messages_conversation
       ON support_messages(conversation_id, id);
   `);
+
+  db.exec("INSERT INTO shopping_guides (key) VALUES ('buying'), ('unboxing') ON CONFLICT DO NOTHING");
 
   if (!homeSectionsExist) {
     const seedHomeSection = db.prepare("INSERT INTO home_sections (key, title, subtitle) VALUES (?, ?, ?)");

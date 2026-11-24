@@ -11,6 +11,7 @@ const { parseOrderFilters, orderFilterSql, orderFilterParameters } = require("..
 const { ordersToCsv } = require("../utils/order-export.cjs");
 const { getAdminBanners, createBanner, updateBanner, deleteBanner } = require("../services/banners.cjs");
 const { getAdminHomeSections, updateHomeSection } = require("../services/home-sections.cjs");
+const { getShoppingGuides, updateShoppingGuide } = require("../services/shopping-guides.cjs");
 const {
   DEFAULT_CATEGORY_ID, getAdminCategories, createCategory, updateCategory, deleteCategory, categoryExists
 } = require("../services/categories.cjs");
@@ -193,6 +194,15 @@ router.get("/home-sections", requireAdmin, (req, res) => {
 
 router.put("/home-sections/:key", requireAdmin, (req, res) => {
   const result = updateHomeSection(req.params.key, req.body);
+  res.status(result.status).json(result.body);
+});
+
+router.get("/shopping-guides", requireAdmin, (req, res) => {
+  res.json(getShoppingGuides());
+});
+
+router.put("/shopping-guides/:key", requireAdmin, (req, res) => {
+  const result = updateShoppingGuide(req.params.key, req.body);
   res.status(result.status).json(result.body);
 });
 

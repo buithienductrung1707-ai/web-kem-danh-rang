@@ -1,0 +1,292 @@
+.home-page .shopping-guides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 28px;
+  container: shopping-guides / inline-size;
+}
+
+.shopping-guide {
+  --guide-accent: var(--primary-dark);
+  min-width: 0;
+  padding: clamp(20px, 2.6vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.shopping-guide--unboxing {
+  --guide-accent: var(--info);
+}
+
+.shopping-guide-heading {
+  margin-bottom: 24px;
+}
+
+.shopping-guide-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  color: var(--guide-accent);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: .025em;
+}
+
+.shopping-guide-kicker > span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid color-mix(in srgb, var(--guide-accent) 25%, var(--line));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--guide-accent) 7%, var(--surface));
+  font-variant-numeric: tabular-nums;
+}
+
+.home-page .shopping-guide h2 {
+  margin: 0 0 12px;
+  color: var(--guide-accent);
+  font-family: var(--home-heading-font);
+  font-size: clamp(27px, 2.6vw, 36px);
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: -.025em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.shopping-guide h2 > span {
+  display: block;
+}
+
+.shopping-guide-heading > p:last-child {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.shopping-guide-media {
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 210px;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--guide-accent) 25%, var(--line));
+  border-radius: 16px;
+  background: radial-gradient(ellipse at top right,
+    color-mix(in srgb, var(--guide-accent) 16%, var(--surface)), transparent 70%),
+    var(--soft);
+}
+
+.shopping-guide-placeholder,
+.shopping-guide .shopping-guide-open {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 20px 16px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: var(--guide-accent);
+  text-align: center;
+  text-decoration: none;
+}
+
+.shopping-guide-placeholder > strong,
+.shopping-guide-open > strong {
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.shopping-guide-placeholder > span:last-child,
+.shopping-guide-open > span:last-child {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.shopping-guide-play {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 2px;
+  border: 1px solid color-mix(in srgb, var(--guide-accent) 25%, var(--line));
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition: transform 180ms ease-out;
+}
+
+.shopping-guide-play svg {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.shopping-guide .shopping-guide-open:hover {
+  background: color-mix(in srgb, var(--guide-accent) 6%, transparent);
+  color: var(--guide-accent);
+}
+
+.shopping-guide-open:hover .shopping-guide-play {
+  transform: scale(1.06);
+}
+
+.shopping-guide-open:focus-visible,
+.shopping-guide-media :is(iframe, video):focus-visible {
+  outline: 3px solid var(--guide-accent);
+  outline-offset: -5px;
+}
+
+.shopping-guide-media :is(iframe, video) {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
+  background: var(--text);
+  object-fit: contain;
+}
+
+.shopping-guide-video-status {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.shopping-guide-video-status:empty,
+.shopping-guides-feedback:has(> p:empty):has(> button[hidden]) {
+  display: none;
+}
+
+.shopping-guide-video-status a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-left: 6px;
+  color: var(--guide-accent);
+  font-weight: 650;
+}
+
+.shopping-guide-steps {
+  display: grid;
+  gap: 18px;
+  margin: 24px 0 20px;
+  padding: 0;
+  list-style: none;
+  counter-reset: guide-step;
+}
+
+.shopping-guide-steps li {
+  position: relative;
+  min-width: 0;
+  padding-left: 38px;
+  counter-increment: guide-step;
+}
+
+.shopping-guide-steps li::before {
+  content: counter(guide-step, decimal-leading-zero);
+  position: absolute;
+  top: 1px;
+  left: 0;
+  color: var(--guide-accent);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.shopping-guide-steps strong,
+.shopping-guide-steps span {
+  display: block;
+}
+
+.shopping-guide-steps strong {
+  margin-bottom: 3px;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.shopping-guide-steps span {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.shopping-guide-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: var(--guide-accent);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.shopping-guide-link:hover {
+  color: var(--guide-accent);
+  text-decoration-thickness: 2px;
+}
+
+.shopping-guides-feedback {
+  grid-column: 1 / -1;
+  color: var(--muted);
+}
+
+.shopping-guides-feedback p {
+  margin: 0 0 12px;
+}
+
+@media (max-width: 850px) {
+  .home-page .shopping-guides {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .shopping-guide {
+    padding: 20px 16px;
+  }
+
+  .shopping-guide-media {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shopping-guide-play {
+    transition: none;
+  }
+
+  .shopping-guide-open:hover .shopping-guide-play {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .shopping-guide,
+  .shopping-guide-media,
+  .shopping-guide-play {
+    border-color: CanvasText;
+  }
+}

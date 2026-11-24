@@ -316,6 +316,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | [backend/src/routes/support.cjs](backend/src/routes/support.cjs), [backend/src/services/support.cjs](backend/src/services/support.cjs) | API và lưu trữ tin nhắn chăm sóc khách hàng |
 | [backend/src/services/categories.cjs](backend/src/services/categories.cjs) | Danh mục dùng chung cho trang chủ, menu và sản phẩm |
 | [backend/src/services/home-sections.cjs](backend/src/services/home-sections.cjs) | Cấu hình và danh sách sản phẩm cho ba mục trang chủ |
+| [backend/src/services/shopping-guides.cjs](backend/src/services/shopping-guides.cjs) | Cấu hình hai video hướng dẫn mua và mở hàng |
 | [backend/src/db/database.cjs](backend/src/db/database.cjs) | Schema, nâng cấp cấu trúc và dữ liệu mẫu |
 | [backend/src/services/](backend/src/services/) | Xử lý đơn, ảnh, quảng cáo và email |
 | [backend/src/utils/](backend/src/utils/) | Lọc đơn và xuất CSV |
@@ -350,6 +351,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Danh mục nổi bật, menu và dữ liệu danh mục dùng chung | [catalog-categories.js](backend/public/catalog-categories.js), [catalog-categories.css](backend/public/catalog-categories.css) |
 | Quản lý danh mục trong trang admin | [admin-categories.js](backend/public/admin-categories.js), [admin-categories.css](backend/public/admin-categories.css) |
 | Quản lý ba mục sản phẩm trang chủ | [admin-home-sections.js](backend/public/admin-home-sections.js), [admin-home-sections.css](backend/public/admin-home-sections.css) |
+| Video hướng dẫn trên trang chủ và quản trị | [shopping-guides.js](backend/public/shopping-guides.js), [shopping-guides.css](backend/public/shopping-guides.css), [admin-shopping-guides.js](backend/public/admin-shopping-guides.js), [admin-shopping-guides.css](backend/public/admin-shopping-guides.css) |
 | Ảnh logo dùng chung | [shop-logo.png](backend/public/assets/shop-logo.png) |
 | Danh mục sản phẩm, giỏ hàng và đặt hàng | [app.js](backend/public/app.js) |
 | Trình chiếu và trang trí quảng cáo trang chủ | [carousel.js](backend/public/carousel.js), [hero-decorations.css](backend/public/hero-decorations.css) |
@@ -381,6 +383,12 @@ Trong trang quản trị, mở **Sản phẩm trang chủ** để quản lý ri�
 3. Bấm **Lưu mục**, sau đó tải lại trang chủ để xem kết quả. Danh sách tự chọn được giữ khi chuyển qua chế độ tự động. Xoá hết danh sách tự chọn sẽ để mục trống, không tự bổ sung sản phẩm.
 
 Gỡ sản phẩm khỏi mục trang chủ không xoá sản phẩm trong kho hay các mục khác. Số đã bán luôn lấy từ đơn hoàn thành, kể cả khi admin tự chọn sản phẩm. Nếu có người khác chỉnh cùng mục, giao diện giữ bản đang sửa và yêu cầu tải lại trước khi lưu tiếp. Cấu hình được lưu trong bảng `home_sections`, tự khởi tạo khi cập nhật phiên bản; khởi động lại không ghi đè các thay đổi đã lưu. Nếu chưa tải được cấu hình, trang chủ có thông báo và nút thử lại thay vì hiển thị danh sách cũ.
+
+Giữa **Sản phẩm nổi bật** và **Câu hỏi thường gặp** là hai mục **Hướng dẫn mua hàng** và **Hướng dẫn quay video mở hàng**, mỗi mục có khung video và ba bước tham khảo. Máy tính hiển thị hai cột, điện thoại xếp dọc. Các khung vẫn hiện khi chưa thêm video; không có video minh họa được tự động chèn vào.
+
+Để chèn video, đăng nhập quản trị và mở **Video hướng dẫn**. Dán link YouTube hoặc đường dẫn trực tiếp tới tệp **MP4 qua HTTPS** vào mục tương ứng, rồi bấm **Lưu video**. Tải lại trang chủ để xem kết quả. Không dán mã iframe; link trang chia sẻ Google Drive hoặc đường dẫn tệp trên máy chưa phải link MP4 trực tiếp. Để gỡ, xóa nội dung ô link rồi lưu lại. Video YouTube được nhúng qua `youtube-nocookie.com`; video MP4 dùng trình phát có điều khiển. Video chỉ tải sau khi khách bấm xem và không tự động phát. Khi trình phát không hoạt động, khách có thể dùng **Mở video gốc**.
+
+Hai link được lưu riêng trong bảng `shopping_guides`, tự khởi tạo khi cập nhật và giữ nguyên khi triển khai lại. API công khai là `GET /api/shopping-guides`; quản trị dùng `GET /api/admin/shopping-guides` và `PUT /api/admin/shopping-guides/:key` với `key` là `buying` hoặc `unboxing`, nội dung `{videoUrl, revision}`. Nếu có người sửa cùng video, giao diện giữ bản đang nhập và yêu cầu tải lại trước khi lưu tiếp. Chưa có chức năng tải trực tiếp tệp video lên máy chủ.
 
 Trên điện thoại, header sắp xếp logo, tài khoản, giỏ hàng và nút đổi giao diện ở hàng đầu. Ô tìm kiếm nằm ở hàng riêng, tiếp theo là nút **Danh mục** với biểu tượng menu và mũi tên. Bấm chữ để mở trang danh mục, bấm mũi tên để chọn nhanh một danh mục. Mặt trăng/mặt trời đổi giao diện sáng/tối.
 
