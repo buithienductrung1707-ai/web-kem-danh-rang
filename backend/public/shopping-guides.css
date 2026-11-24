@@ -81,7 +81,7 @@
   border: 1px solid color-mix(in srgb, var(--guide-accent) 25%, var(--line));
   border-radius: 16px;
   background: radial-gradient(ellipse at top right,
-    color-mix(in srgb, var(--guide-accent) 16%, var(--surface)), transparent 70%),
+    color-mix(in srgb, var(--guide-accent) 12%, var(--surface)), transparent 70%),
     var(--soft);
 }
 
