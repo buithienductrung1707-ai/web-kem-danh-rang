@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Điều khoản sử dụng — Cửa hàng kem đánh răng</title>
+    <meta name="description" content="Thông tin sử dụng website demo, sản phẩm, đặt hàng, thanh toán và liên hệ hỗ trợ.">
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="support-chat.css">
+    <link rel="stylesheet" href="catalog-categories.css">
+    <link rel="stylesheet" href="account-header.css">
+    <link rel="stylesheet" href="help-pages.css">
+    <link rel="stylesheet" href="storefront-scale.css">
+    <script src="catalog-categories.js" defer></script>
+    <script src="shop-memory.js" defer></script>
+    <script src="account-menu.js" defer></script>
+    <script src="account.js" defer></script>
+    <script src="header.js" defer></script>
+    <script src="support-chat.js" defer></script>
+  </head>
+  <body class="storefront-page help-page terms-page">
+    <a class="skip-link" href="#main-content">Đến nội dung chính</a>
+    <header class="site-header commerce-header">
+      <div class="site-header-inner">
+        <a class="header-brand" href="/" aria-label="Trang chủ cửa hàng kem đánh răng">
+          <img src="/assets/shop-logo.png" width="48" height="48" alt="">
+          <span class="header-brand-name">Kem đánh răng</span>
+        </a>
+        <form class="header-search" data-header-search role="search" aria-label="Tìm sản phẩm" action="/danh-muc.html#catalog" method="get">
+          <label class="visually-hidden" for="header-search-input">Tìm sản phẩm</label>
+          <input id="header-search-input" data-header-search-input name="q" type="search" autocomplete="off" placeholder="Tìm tên hoặc mô tả sản phẩm...">
+          <button class="header-search-button" type="submit">
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg>
+            <span>Tìm</span>
+          </button>
+        </form>
+        <div class="header-actions">
+          <nav class="site-nav" aria-label="Điều hướng chính">
+            <a class="header-action-link" href="/tra-cuu.html" data-temporary-hidden="order-tracking" hidden>
+              <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 17h4V6H3v11h2m9-8h4l3 4v4h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+              <span class="header-link-copy"><span class="header-link-label">Tra cứu</span><strong>Đơn hàng</strong></span>
+            </a>
+            <a class="header-action-link" href="/dang-nhap.html" data-account-link>
+              <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+              <span class="header-link-copy"><span class="header-link-label">Tài khoản</span><strong data-account-label>Đăng nhập</strong></span>
+            </a>
+            <a class="header-action-link header-cart cart-navigation" href="/dang-nhap.html?view=cart">
+              <span class="header-link-icon" aria-hidden="true"><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m3 3 2 2 2.4 11.5h11.2L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span id="header-cart-count" class="cart-count" hidden>0</span></span>
+              <span class="header-link-copy"><span class="header-link-label">Giỏ hàng</span><strong id="header-cart-total" data-header-cart-total>0 ₫</strong></span>
+            </a>
+          </nav>
+          <button class="theme-toggle button-secondary" type="button" data-theme-toggle aria-label="Chế độ tối" aria-pressed="false" title="Bật chế độ tối">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>
+          </button>
+        </div>
+        <p id="theme-message" role="status" aria-atomic="true"></p>
+        <p id="header-message" role="status" aria-atomic="true"></p>
+      </div>
+      <nav class="catalog-nav" aria-label="Điều hướng cửa hàng">
+        <div class="catalog-nav-inner">
+          <div class="catalog-nav-products" data-products-menu>
+            <a class="catalog-nav-link" data-products-link href="/danh-muc.html"><svg class="catalog-nav-category-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Danh mục</span></a>
+            <button class="catalog-nav-toggle" type="button" data-products-toggle aria-expanded="false" aria-controls="products-menu" aria-label="Mở danh sách danh mục">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <ul class="catalog-nav-menu" id="products-menu" hidden>
+              <li><a href="/danh-muc.html?danh-muc=kem-danh-rang">Kem đánh răng</a></li>
+              <li><a href="/danh-muc.html?danh-muc=ban-chai-danh-rang">Bàn chải đánh răng</a></li>
+            </ul>
+          </div>
+          <a class="catalog-nav-link" href="/dang-nhap.html?view=orders" data-temporary-hidden="my-orders" hidden><span class="catalog-label-desktop">Đơn hàng của tôi</span><span class="catalog-label-mobile" aria-hidden="true">Đơn của tôi</span></a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main-content" class="help-shell">
+      <nav class="help-breadcrumb" aria-label="Đường dẫn trang">
+        <ol>
+          <li><a href="/">Trang chủ</a></li>
+          <li aria-current="page">Điều khoản sử dụng</li>
+        </ol>
+      </nav>
+
+      <header class="help-terms-heading">
+        <p class="help-eyebrow">Thông tin sử dụng website</p>
+        <h1 id="terms-title" class="help-gradient-text">Điều khoản sử dụng</h1>
+        <p>Những thông tin cần biết khi xem sản phẩm, sử dụng tài khoản và đặt hàng trên website.</p>
+        <p class="help-demo-note">Nội dung dành cho bản demo. Thông tin đơn vị bán hàng và chính sách chi tiết sẽ được cập nhật trước khi vận hành chính thức.</p>
+      </header>
+
+      <div class="help-terms-layout">
+        <nav class="help-card help-terms-toc" aria-labelledby="terms-toc-title">
+          <h2 id="terms-toc-title">Nội dung</h2>
+          <ol>
+            <li><a href="#pham-vi">Phạm vi sử dụng</a></li>
+            <li><a href="#san-pham-gia">Sản phẩm và giá</a></li>
+            <li><a href="#dat-hang-thanh-toan">Đặt hàng và thanh toán</a></li>
+            <li><a href="#giao-nhan-thay-doi">Giao nhận và hỗ trợ</a></li>
+            <li><a href="#du-lieu-ca-nhan">Thông tin cá nhân</a></li>
+            <li><a href="#su-dung-website">Sử dụng có trách nhiệm</a></li>
+            <li><a href="#lien-he">Liên hệ</a></li>
+          </ol>
+        </nav>
+
+        <article class="help-card help-terms-content" aria-labelledby="terms-title">
+          <section id="pham-vi" class="help-policy-section" aria-labelledby="terms-scope-title">
+            <p class="help-section-number" aria-hidden="true">01</p>
+            <h2 id="terms-scope-title">Phạm vi sử dụng</h2>
+            <p>Website hiện là bản demo giới thiệu sản phẩm chăm sóc răng miệng và trải nghiệm mua sắm. Các chức năng gồm tài khoản, giỏ hàng, đặt hàng, tra cứu trạng thái và trao đổi với cửa hàng.</p>
+            <p>Hãy đọc thông tin sản phẩm và kiểm tra nội dung đơn trước khi xác nhận. Thông tin vận hành chính thức sẽ được cập nhật trên website khi có.</p>
+          </section>
+          <section id="san-pham-gia" class="help-policy-section" aria-labelledby="terms-products-title">
+            <p class="help-section-number" aria-hidden="true">02</p>
+            <h2 id="terms-products-title">Sản phẩm và giá</h2>
+            <p>Tên, hình ảnh, mô tả, thông số, giá và tình trạng còn hàng được hiển thị tại trang sản phẩm. Giá trên website được thể hiện bằng đồng Việt Nam.</p>
+            <p>Giá hoặc tồn kho có thể thay đổi trong khi bạn đang mua sắm. Nếu website yêu cầu tải lại giỏ, hãy kiểm tra thông tin mới trước khi tiếp tục. Bạn có thể hỏi cửa hàng khi cần làm rõ nội dung sản phẩm.</p>
+            <p>Thông tin giới thiệu sản phẩm không thay thế hướng dẫn trên bao bì hoặc tư vấn của người có chuyên môn về sức khỏe răng miệng.</p>
+          </section>
+          <section id="dat-hang-thanh-toan" class="help-policy-section" aria-labelledby="terms-checkout-title">
+            <p class="help-section-number" aria-hidden="true">03</p>
+            <h2 id="terms-checkout-title">Đặt hàng và thanh toán</h2>
+            <p>Bạn có thể chọn sản phẩm trong giỏ, kiểm tra số lượng, thông tin nhận hàng và phương thức thanh toán rồi xác nhận đơn. Với tài khoản đã đăng nhập, hãy kiểm tra địa chỉ nhận hàng đang được sử dụng.</p>
+            <p>Website hỗ trợ thanh toán khi nhận hàng (COD) và chuyển khoản ngân hàng khi có thông tin ngân hàng được cấu hình. Chỉ chuyển khoản theo hướng dẫn và nội dung chuyển khoản hiển thị cho đơn hàng.</p>
+            <p>Thông báo đặt hàng thành công cùng mã đơn cho biết hệ thống đã ghi nhận đơn. Thông báo này không xác nhận tiền chuyển khoản đã được nhận. Giữ mã đơn để theo dõi hoặc liên hệ hỗ trợ.</p>
+          </section>
+          <section id="giao-nhan-thay-doi" class="help-policy-section" aria-labelledby="terms-delivery-title">
+            <p class="help-section-number" aria-hidden="true">04</p>
+            <h2 id="terms-delivery-title">Giao nhận, thay đổi và hỗ trợ</h2>
+            <p>Cung cấp đúng tên người nhận, số điện thoại và địa chỉ để cửa hàng xử lý đơn. Theo dõi lịch sử trạng thái qua Đơn hàng của tôi hoặc trang tra cứu bằng mã đơn và số điện thoại nhận hàng.</p>
+            <p>Nếu cần thay đổi thông tin, hủy đơn hoặc phản ánh vấn đề khi nhận hàng, hãy liên hệ kèm mã đơn và mô tả cụ thể. Việc xử lý phụ thuộc vào tình trạng thực tế của đơn và nội dung được trao đổi với cửa hàng.</p>
+            <p>Thời gian giao hàng, chi phí và chính sách đổi trả chi tiết sẽ được cập nhật trước khi vận hành chính thức. Bạn nên làm rõ các thông tin còn thiếu với cửa hàng trước khi mua.</p>
+          </section>
+          <section id="du-lieu-ca-nhan" class="help-policy-section" aria-labelledby="terms-privacy-title">
+            <p class="help-section-number" aria-hidden="true">05</p>
+            <h2 id="terms-privacy-title">Thông tin cá nhân và dữ liệu trình duyệt</h2>
+            <p>Website sử dụng thông tin bạn cung cấp như họ tên, email, số điện thoại, địa chỉ nhận hàng và ảnh đại diện nếu có để phục vụ tài khoản và đơn hàng. Nội dung trao đổi qua cửa sổ hỗ trợ được lưu để tiếp tục hội thoại.</p>
+            <p>Trình duyệt có thể lưu giỏ hàng, lựa chọn giao diện, mã đơn và thông tin phiên hỗ trợ. Một số thông tin của lần đặt hàng đang chờ kết quả được giữ trong phiên trình duyệt để thử gửi lại. Phiên đăng nhập sử dụng cookie.</p>
+            <p>Hãy đăng xuất khi sử dụng thiết bị dùng chung. Không gửi mật khẩu hoặc thông tin thẻ thanh toán qua chat và email. Liên hệ cửa hàng nếu cần trao đổi về thông tin đã cung cấp.</p>
+          </section>
+          <section id="su-dung-website" class="help-policy-section" aria-labelledby="terms-conduct-title">
+            <p class="help-section-number" aria-hidden="true">06</p>
+            <h2 id="terms-conduct-title">Sử dụng website có trách nhiệm</h2>
+            <p>Cung cấp thông tin đúng khi tạo tài khoản, đặt hàng và yêu cầu hỗ trợ. Giữ thông tin đăng nhập của bạn và chỉ sử dụng tài khoản mà bạn có quyền truy cập.</p>
+            <p>Không gửi nội dung giả mạo hoặc spam, không truy cập trái phép tài khoản của người khác và không thực hiện hành vi gây gián đoạn website.</p>
+          </section>
+          <section id="lien-he" class="help-policy-section" aria-labelledby="terms-contact-title">
+            <p class="help-section-number" aria-hidden="true">07</p>
+            <h2 id="terms-contact-title">Liên hệ khi cần hỗ trợ</h2>
+            <p>Mở trang chăm sóc khách hàng để tìm câu trả lời hoặc nhắn tin cho cửa hàng. Khi hỏi về một đơn cụ thể, hãy chuẩn bị mã đơn và mô tả vấn đề.</p>
+            <a class="help-text-link" href="/cskh.html">Đến trang chăm sóc khách hàng <svg class="help-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></a>
+            <p class="help-small">Email demo <a href="mailto:example@gmail.com">example@gmail.com</a>. Địa chỉ này sẽ được cập nhật trước khi vận hành chính thức.</p>
+          </section>
+        </article>
+      </div>
+    </main>
+    <footer class="site-footer store-footer">
+      <div class="site-footer-inner">
+        <div class="footer-brand">
+          <a class="brand-name" href="/">Kem đánh răng</a>
+          <p>Lựa chọn kem đánh răng cho nhu cầu chăm sóc răng miệng hằng ngày.</p>
+        </div>
+        <section class="footer-column" aria-labelledby="footer-shop-title">
+          <h2 id="footer-shop-title">Mua sắm</h2>
+          <nav aria-label="Mua sắm cuối trang">
+            <a href="/">Trang chủ</a>
+            <a href="/danh-muc.html?danh-muc=kem-danh-rang">Kem đánh răng</a>
+            <a class="cart-navigation" href="/dang-nhap.html?view=cart">Giỏ hàng</a>
+          </nav>
+        </section>
+        <section class="footer-column" aria-labelledby="footer-account-title">
+          <h2 id="footer-account-title">Tài khoản &amp; hỗ trợ</h2>
+          <nav aria-label="Tài khoản và hỗ trợ cuối trang">
+            <a href="/dang-nhap.html?view=orders">Đơn hàng của tôi</a>
+            <a href="/tra-cuu.html">Tra cứu đơn hàng</a>
+            <a href="/dang-nhap.html">Tài khoản của bạn</a>
+            <a href="/dang-ky.html">Đăng ký tài khoản</a>
+            <a href="/cskh.html">Chăm sóc khách hàng</a>
+            <a href="/dieu-khoan.html" aria-current="page">Điều khoản sử dụng</a>
+          </nav>
+        </section>
+        <section class="footer-column" aria-labelledby="footer-payment-title">
+          <h2 id="footer-payment-title">Thanh toán</h2>
+          <ul class="footer-payment-list">
+            <li><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9h.01M18 15h.01"/></svg><span>Thanh toán khi nhận hàng</span></li>
+            <li><svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m3 9 9-6 9 6H3Zm2 3v6m7-6v6m7-6v6M3 21h18"/></svg><span>Chuyển khoản ngân hàng</span></li>
+          </ul>
+        </section>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Cửa hàng kem đánh răng</p>
+        <a href="/admin.html">Quản trị cửa hàng</a>
+      </div>
+    </footer>
+  </body>
+</html>

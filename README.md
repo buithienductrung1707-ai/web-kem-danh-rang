@@ -18,6 +18,8 @@ Website bán hàng bằng tiếng Việt, gồm cửa hàng cho khách và trang
 | Đăng nhập, thông tin tài khoản | [Mở tài khoản](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html) |
 | Đơn hàng của tôi | [Xem đơn đã đặt](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dang-nhap.html?view=orders) |
 | Tra cứu đơn hàng | [Tra cứu trạng thái đơn](https://web-kem-danh-rang.buithienductrung1707.workers.dev/tra-cuu.html) |
+| Chăm sóc khách hàng | [Mở trung tâm hỗ trợ](https://web-kem-danh-rang.buithienductrung1707.workers.dev/cskh.html) |
+| Điều khoản sử dụng | [Đọc điều khoản](https://web-kem-danh-rang.buithienductrung1707.workers.dev/dieu-khoan.html) |
 | Quản trị cửa hàng | [Đăng nhập quản trị](https://web-kem-danh-rang.buithienductrung1707.workers.dev/admin.html) |
 
 Bản demo chạy trên Cloudflare Workers và SQLite-backed Durable Object thuộc gói miễn phí, sử dụng tên miền phụ `workers.dev`. Website tiếp tục hoạt động khi tắt máy tính cá nhân. Đăng nhập admin bằng tài khoản có trong database tại lần triển khai đầu tiên.
@@ -160,6 +162,10 @@ Các trạng thái đơn hàng được hiển thị theo luồng xử lý.
 | `CANCELLED` | Đã hủy |
 
 ## Trò chuyện với cửa hàng
+
+Trang **Chăm sóc khách hàng** tại `/cskh.html` có hướng dẫn hỗ trợ đơn hàng, tài khoản, sản phẩm, các câu hỏi thường gặp mở/thu gọn và nút mở cuộc trò chuyện hiện có. Nhấn nút trên trang hoặc bong bóng góc phải để mở cùng cửa sổ chat; nhập nội dung và bấm **Gửi tin nhắn** để gửi đến mục CSKH trong trang quản trị. Đóng cửa sổ hoặc nhấn **Escape** sẽ đưa focus về nút vừa mở chat. Email `example@gmail.com` trên trang được ghi rõ là địa chỉ demo.
+
+Trang **Điều khoản sử dụng** tại `/dieu-khoan.html` có mục lục và bảy phần về phạm vi, thông tin sản phẩm, đặt hàng/thanh toán, giao nhận/thay đổi đơn, dữ liệu cá nhân, cách sử dụng website và liên hệ. Nội dung hiện dành cho bản demo; thông tin đơn vị bán hàng và chính sách chi tiết cần được cập nhật trước khi vận hành chính thức. Hai trang cùng dùng header, chế độ sáng/tối, tỷ lệ nội dung 125% và được liên kết trong cột **Tài khoản & hỗ trợ** ở footer các trang cửa hàng.
 
 Bấm bong bóng chat ở góc phải dưới các trang cửa hàng để mở cửa sổ **Chăm sóc khách hàng**. Nhập nội dung rồi bấm **Gửi tin nhắn**. Có thể thêm tên trước tin nhắn đầu tiên. Khách có thể gửi tin khi chưa đăng nhập và dùng các liên kết trong cửa sổ để tra cứu đơn hoặc xem sản phẩm.
 
@@ -347,6 +353,7 @@ Khi khôi phục, dừng máy chủ và chép database, thư mục ảnh cùng c
 | Danh mục sản phẩm, giỏ hàng và đặt hàng | [app.js](backend/public/app.js) |
 | Trình chiếu và trang trí quảng cáo trang chủ | [carousel.js](backend/public/carousel.js), [hero-decorations.css](backend/public/hero-decorations.css) |
 | Bong bóng và cửa sổ chăm sóc khách hàng | [support-chat.js](backend/public/support-chat.js), [support-chat.css](backend/public/support-chat.css) |
+| Trang CSKH và điều khoản sử dụng | [cskh.html](backend/public/cskh.html), [dieu-khoan.html](backend/public/dieu-khoan.html), [help-pages.css](backend/public/help-pages.css) |
 | Đọc và trả lời tin nhắn trong quản trị | [admin-support.js](backend/public/admin-support.js), [admin-support.css](backend/public/admin-support.css) |
 | Giao diện quản trị | [admin.html](backend/public/admin.html), [admin.js](backend/public/admin.js) |
 

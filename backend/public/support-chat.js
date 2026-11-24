@@ -133,6 +133,14 @@
   widget.append(panel, bubble);
   document.body.append(widget);
   document.body.classList.add("has-support-chat");
+  const pageTriggers = [...document.querySelectorAll("[data-open-support-chat]")];
+  let chatOpener = bubble;
+  for (const trigger of pageTriggers) {
+    trigger.setAttribute("aria-controls", panel.id);
+    trigger.setAttribute("aria-haspopup", "dialog");
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.addEventListener("click", () => setOpen(true, true, trigger));
+  }
 
   function showStorageWarning() {
     storageAvailable = false;
@@ -417,11 +425,13 @@
     }
   });
 
-  function setOpen(value, restoreFocus = true) {
+  function setOpen(value, restoreFocus = true, opener = bubble) {
+    if (value) chatOpener = opener;
     open = value;
     panel.hidden = !value;
     bubble.setAttribute("aria-expanded", String(value));
     bubble.setAttribute("aria-label", value ? "Đóng cửa sổ chăm sóc khách hàng" : "Mở cửa sổ chăm sóc khách hàng");
+    for (const trigger of pageTriggers) trigger.setAttribute("aria-expanded", String(value));
     document.body.classList.toggle("has-support-chat-open", value);
     if (value) {
       close.focus({ preventScroll: true });
@@ -429,7 +439,10 @@
     } else {
       clearTimeout(pollTimer);
       controller?.abort();
-      if (restoreFocus) bubble.focus({ preventScroll: true });
+      if (restoreFocus) {
+        const target = chatOpener?.isConnected && !chatOpener.disabled && !chatOpener.hidden ? chatOpener : bubble;
+        target.focus({ preventScroll: true });
+      }
     }
   }
 
