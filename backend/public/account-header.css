@@ -1,7 +1,7 @@
 :root {
-  --guest-login-fill: #1d4ed8;
-  --guest-login-hover: #1e40af;
-  --guest-login-text: #ffffff;
+  --guest-login-fill: var(--primary);
+  --guest-login-hover: var(--primary-dark);
+  --guest-login-text: var(--button-text);
 }
 
 .commerce-header .site-nav [data-account-link]:not(.has-account-avatar),
@@ -24,7 +24,7 @@
 }
 
 .commerce-header [data-account-link]:not(.has-account-avatar):focus-visible {
-  outline: 3px solid var(--guest-login-text);
+  outline: 3px solid var(--text);
   outline-offset: 2px;
 }
 

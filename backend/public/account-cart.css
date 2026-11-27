@@ -5,7 +5,7 @@
   --cart-action-hover-end: #98300d;
   --cart-action-text: #ffffff;
   --cart-total-text: var(--account-emphasis, var(--danger));
-  --cart-coupon-action: #232323;
+  --cart-coupon-action: #000000;
   --cart-coupon-text: #ffffff;
   min-width: 0;
 }
@@ -416,8 +416,8 @@
 }
 
 .account-cart-workspace .account-cart-coupon-apply:hover:not(:disabled) {
-  background: var(--text);
-  color: var(--surface);
+  background: var(--cart-coupon-action);
+  color: var(--cart-coupon-text);
 }
 
 .account-cart-coupon-panel > .account-cart-coupon {

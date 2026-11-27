@@ -64,62 +64,65 @@
     gap: 8px;
   }
 
-  .home-page .product-rating-badge {
-    --rating-star-fill: #ffcc45;
-    --rating-star-outline: #a86a00;
-    --rating-star-text: #493000;
-    position: absolute;
-    z-index: 2;
-    top: 16px;
-    right: 16px;
-    display: grid;
-    place-items: center;
-    width: 62px;
-    height: 62px;
-    min-width: 44px;
+  .storefront-page .product-rating-row {
+    --rating-star-fill: #ffd329;
+    --rating-star-outline: #967000;
+    --rating-star-text: #765700;
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    gap: 6px;
     min-height: 44px;
     color: var(--rating-star-text);
+    font-size: 14px;
+    line-height: 1;
     text-decoration: none;
+    border-radius: 6px;
   }
 
-  .home-page .product-rating-badge svg {
+  :root[data-theme="dark"] .product-rating-row {
+    --rating-star-outline: #e1b741;
+    --rating-star-text: #ffdf70;
+  }
+
+  .storefront-page .product-rating-stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .storefront-page .product-rating-star {
     display: block;
-    width: 100%;
-    height: 100%;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+  }
+
+  .storefront-page .product-rating-star-fill {
     fill: var(--rating-star-fill);
+    clip-path: inset(0 calc(100% - var(--star-fill)) 0 0);
+  }
+
+  .storefront-page .product-rating-star-outline {
+    fill: none;
     stroke: var(--rating-star-outline);
-    stroke-width: 1.7;
+    stroke-width: 1.1;
     stroke-linejoin: round;
   }
 
-  .home-page .product-rating-value {
-    position: absolute;
-    top: 52%;
-    left: 50%;
-    color: var(--rating-star-text);
-    font-size: 13px;
-    font-weight: 850;
-    line-height: 1;
+  .storefront-page .product-rating-value {
+    font-weight: 750;
     font-variant-numeric: tabular-nums;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
   }
 
-  .home-page .product-rating-badge:hover svg {
-    stroke-width: 3;
+  .storefront-page .product-rating-row:hover .product-rating-value {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
-  .home-page .product-rating-badge:focus-visible {
-    border-radius: 12px;
-  }
-
-  .home-page .home-panel .product:has(> .product-image-link:not([hidden])) > .favorite-button {
-    right: auto;
-    left: 22px;
-  }
-
-  .home-page .product:not(:has(> .product-image-link:not([hidden]))) {
-    padding-top: 86px;
+  .storefront-page .product-rating-row:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
   }
 
   .home-page .product-sales-meter-flame {

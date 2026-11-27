@@ -1449,8 +1449,6 @@ function matchesPrice(product) {
 
 function renderProductCards(target, displayedProducts, singleFeatured = false) {
   const fragment = document.createDocumentFragment();
-  const idPrefix = target === productList || target === featuredProductList ? "" : target.id + "-";
-  const showHomeRatings = document.body.classList.contains("home-page");
   for (const product of displayedProducts) {
     const card = document.createElement("article");
     card.className = singleFeatured && product.imageUrl
@@ -1487,51 +1485,43 @@ function renderProductCards(target, displayedProducts, singleFeatured = false) {
     const price = document.createElement("p");
     price.className = "price";
     price.textContent = money.format(product.price);
-    card.append(heading, price);
-    const favoriteButton = document.createElement("button");
-    favoriteButton.type = "button";
-    favoriteButton.id = "favorite-" + idPrefix + product.id;
-    favoriteButton.className = "favorite-button button-secondary";
-    favoriteButton.dataset.productId = String(product.id);
-    favoriteButton.dataset.action = "favorite";
-    const favoriteIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    favoriteIcon.setAttribute("viewBox", "0 0 24 24");
-    favoriteIcon.setAttribute("aria-hidden", "true");
-    const favoritePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    favoritePath.setAttribute("d", "M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z");
-    favoriteIcon.append(favoritePath);
-    favoriteButton.append(favoriteIcon);
-    favoriteButton.setAttribute("aria-pressed", String(favoriteProducts.has(product.id)));
-    const favoriteLabel = (favoriteProducts.has(product.id) ? "Bỏ yêu thích · " : "Thêm vào yêu thích · ") + product.name;
-    favoriteButton.setAttribute("aria-label", favoriteLabel);
-    favoriteButton.title = favoriteLabel;
-    favoriteButton.addEventListener("click", () => toggleFavorite(product, favoriteButton));
-    card.append(favoriteButton);
-    if (showHomeRatings) {
-      const ratingLink = document.createElement("a");
-      ratingLink.className = "product-rating-badge";
-      ratingLink.href = "/chi-tiet-san-pham.html?id=" + product.id + "#reviews";
-      const ratingLabel = product.reviewCount > 0 && product.ratingAverage !== null
-        ? product.ratingAverage.toFixed(1) + " trên 5 sao từ " + product.reviewCount.toLocaleString("vi-VN") + " đánh giá"
-        : "Chưa có đánh giá";
-      ratingLink.setAttribute("aria-label", ratingLabel + " · " + product.name);
-      ratingLink.title = ratingLabel;
-      ratingLink.addEventListener("click", event => prepareNavigation(event, ratingLink));
+    const hasReviews = product.reviewCount > 0 && product.ratingAverage !== null;
+    const ratingAverage = hasReviews ? product.ratingAverage : 0;
+    const ratingText = hasReviews
+      ? ratingAverage.toLocaleString("vi-VN", { maximumFractionDigits: 1 }) : "—";
+    const ratingLabel = hasReviews
+      ? ratingText + " trên 5 sao từ " + product.reviewCount.toLocaleString("vi-VN") + " đánh giá"
+      : "Chưa có đánh giá";
+    const ratingLink = document.createElement("a");
+    ratingLink.className = "product-rating-row";
+    ratingLink.href = "/chi-tiet-san-pham.html?id=" + product.id + "#reviews";
+    ratingLink.setAttribute("aria-label", ratingLabel + " · " + product.name);
+    ratingLink.title = ratingLabel;
+    ratingLink.addEventListener("click", event => prepareNavigation(event, ratingLink));
+    const stars = document.createElement("span");
+    stars.className = "product-rating-stars";
+    stars.setAttribute("aria-hidden", "true");
+    for (let index = 0; index < 5; index += 1) {
       const star = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      star.setAttribute("viewBox", "0 0 100 100");
-      star.setAttribute("aria-hidden", "true");
+      star.classList.add("product-rating-star");
+      star.setAttribute("viewBox", "0 0 24 24");
       star.setAttribute("focusable", "false");
-      const starPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      starPath.setAttribute("d", "m50 4 14 29 32 5-23 23 5 32-28-15-28 15 5-32L4 38l32-5L50 4Z");
-      star.append(starPath);
-      const ratingValue = document.createElement("span");
-      ratingValue.className = "product-rating-value";
-      ratingValue.setAttribute("aria-hidden", "true");
-      ratingValue.textContent = product.reviewCount > 0 && product.ratingAverage !== null
-        ? product.ratingAverage.toFixed(1) : "—";
-      ratingLink.append(star, ratingValue);
-      card.append(ratingLink);
+      const fillPercent = Math.round(Math.max(0, Math.min(1, ratingAverage - index)) * 100);
+      star.style.setProperty("--star-fill", fillPercent + "%");
+      for (const layer of ["fill", "outline"]) {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.classList.add("product-rating-star-" + layer);
+        path.setAttribute("d", "m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z");
+        star.append(path);
+      }
+      stars.append(star);
     }
+    const ratingValue = document.createElement("span");
+    ratingValue.className = "product-rating-value";
+    ratingValue.setAttribute("aria-hidden", "true");
+    ratingValue.textContent = ratingText;
+    ratingLink.append(stars, ratingValue);
+    card.append(heading, ratingLink, price);
     if (product.description) {
       const details = document.createElement("details");
       const summary = document.createElement("summary");

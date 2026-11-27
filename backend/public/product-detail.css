@@ -276,12 +276,6 @@
   font-weight: 650;
 }
 
-.detail-gallery-help {
-  margin: 12px 0 20px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
 .detail-purchase {
   padding: 28px;
   border-left: 1px solid var(--line);
@@ -358,9 +352,6 @@
   margin-left: auto;
 }
 
-#detail-favorite-message:empty { display: none; }
-#detail-favorite-message { color: var(--muted); font-size: 13px; }
-
 .detail-low-stock {
   display: flex;
   align-items: flex-start;
@@ -401,7 +392,6 @@
   .detail-rating-row { gap: 6px 10px; }
   .detail-review-link { font-size: 12px; }
   .detail-purchase .detail-price-card { padding: 18px; }
-  .detail-gallery-help { font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -446,14 +436,14 @@
 }
 
 .detail-purchase {
-  --purchase-price-start: #ff565d;
-  --purchase-price-end: #ffa25f;
-  --purchase-price-fallback: #ff7868;
-  --purchase-card-start: #131d35;
-  --purchase-card-end: #1a1b29;
-  --purchase-card-glow: #b37b5c;
-  --purchase-card-line: #3a3d50;
-  --purchase-card-copy: #cbd4e6;
+  --purchase-price-start: #a5e6ce;
+  --purchase-price-end: #b3d8ff;
+  --purchase-price-fallback: #a5e6ce;
+  --purchase-card-start: #113b37;
+  --purchase-card-end: #132f3a;
+  --purchase-card-glow: #4bada4;
+  --purchase-card-line: #456e6a;
+  --purchase-card-copy: #d5e9e5;
   --purchase-card-alert: #ff9b91;
   --purchase-action-start: #ed3947;
   --purchase-action-end: #f79b57;

@@ -196,9 +196,6 @@
     thumbnails.replaceChildren(fragment);
     thumbnails.hidden = images.length === 0;
     get("detail-gallery-controls").hidden = images.length <= 1;
-    get("detail-gallery-help").textContent = images.length > 1
-      ? "Chọn ảnh thu nhỏ hoặc dùng mũi tên để chuyển ảnh. Rê chuột hoặc bấm phóng to để xem chi tiết."
-      : "Rê chuột hoặc bấm biểu tượng phóng to để xem chi tiết ảnh.";
     get("detail-main-media").tabIndex = images.length > 1 ? 0 : -1;
     get("detail-main-media").setAttribute("aria-label", images.length > 1
       ? "Thư viện ảnh sản phẩm. Dùng phím mũi tên để chuyển ảnh." : "Ảnh sản phẩm");
